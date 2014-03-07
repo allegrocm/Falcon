@@ -1,5 +1,5 @@
 #include "JugglerInterface.h"
-#include "PaddleApp.h"
+#include "FalconApp.h"
 
 
 JugglerInterface::JugglerInterface(vrj::Kernel* kern, int& argc, char** argv) : vrj::OsgApp(kern)
@@ -30,8 +30,8 @@ void JugglerInterface::init()
 void JugglerInterface::initScene()
 {
 	printf("______initing scene_____\n");
-	 PaddleApp::instance().init();
-	 _rootNode = PaddleApp::instance().getRoot();
+	 FalconApp::instance().init();
+	 _rootNode = FalconApp::instance().getRoot();
 }
 
 void JugglerInterface::preFrame()
@@ -57,17 +57,17 @@ void JugglerInterface::latePreFrame()
 	for(int i = 0; i < 6; i++)
 	{
 		if(mButton[i]->getData() == gadget::Digital::TOGGLE_ON)
-			PaddleApp::instance().buttonInput(i, true);
+			FalconApp::instance().buttonInput(i, true);
 		else if(mButton[i]->getData() == gadget::Digital::TOGGLE_OFF)
-			PaddleApp::instance().buttonInput(i, false);
+			FalconApp::instance().buttonInput(i, false);
 	}
 
-	PaddleApp::instance().update(dt);
+	FalconApp::instance().update(dt);
 	//attach the wand's matrix to the paint sprayer
 	osg::Matrixf wandMatrix(mWand->getData().mData);
-	PaddleApp::instance().setWandMatrix(wandMatrix);
+	FalconApp::instance().setWandMatrix(wandMatrix);
 	osg::Matrixf headMatrix	(mHead->getData().mData);
-	PaddleApp::instance().setHeadMatrix(headMatrix);
+	FalconApp::instance().setHeadMatrix(headMatrix);
 
 }
 

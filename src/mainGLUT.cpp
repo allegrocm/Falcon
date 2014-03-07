@@ -11,7 +11,7 @@
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 #include <stdarg.h>
-#include "PaddleApp.h"
+#include "FalconApp.h"
 
 int screenWidth = 1024;
 int screenHeight = 768;
@@ -223,8 +223,8 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 200.0);
-	currentCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 500.0);
+//	currentCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 	gluPerspective(60, aspect, 0.2, 200.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -247,13 +247,13 @@ void display(void)
 	//Right now, we can grab GL's modelview matrix and use that, but matrix inversions are hard
 	//Fortunately, since we're not doing any scaling, our modelview matrix is an orthogonal matrix
 	//this means that its inverse is the same as its transpose!  so....
-	PaddleApp::instance().setHeadMatrix(osg::Matrixf(gCamera.getViewMatrix(CameraController::FPS_VIEW).getInverse().m));
+	FalconApp::instance().setHeadMatrix(osg::Matrixf(gCamera.getViewMatrix(CameraController::FPS_VIEW).getInverse().m));
 	
 
 	//next we'll send the app a wand matrix based on the mouse position
 
 	KMatrix wandMat = gCamera.getWandMatrix(KVec3(-1.0 + 2.0 * gMouseX / screenWidth, -1.0 + 2.0 * gMouseY / screenHeight, -2));
-	PaddleApp::instance().setWandMatrix(osg::Matrixf(wandMat.m));
+	FalconApp::instance().setWandMatrix(osg::Matrixf(wandMat.m));
 
 	currentCam->setViewMatrix(osg::Matrixf(view.m));
     if (viewer.valid()) viewer->frame();
@@ -264,6 +264,9 @@ void display(void)
 	glDisable(GL_BLEND);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+//	double fov, aspect, near, far;
+//	currentCam->getProjectionMatrixAsPerspective(fov, aspect, near, far);
+//	printf("Cam nearfar:  %.2f, %.2f\n", near, far);
 	osg::Matrixf proj = 	currentCam->getProjectionMatrix();
 	glMultMatrixf(proj.ptr());
 	glMatrixMode(GL_MODELVIEW);
@@ -273,7 +276,8 @@ void display(void)
 	if(gCamera.getViewMode() != CameraController::FPS_VIEW)
 		drawTheFPSGuy();
 	glDisable(GL_LIGHTING);
-	drawC6(false);
+	if(gShowC6)
+		drawC6(false);
 	drawStatus();
     // Swap Buffers
     glutSwapBuffers();
@@ -357,7 +361,7 @@ void keyboard(unsigned char key, int x, int y)
 		case 'x': gCamera.setRaise(true);		break;
 	
 		case 'c': gShowC6 = !gShowC6; break;
-		case ' ':	PaddleApp::instance().buttonInput(0, true);	break;		//space bar controls the main wand button
+		case ' ':	FalconApp::instance().buttonInput(0, true);	break;		//space bar controls the main wand button
 	
 		case 'p':	gPaused = !gPaused;	break;		//pause/unpause
 		//switch input modes with tab
@@ -367,13 +371,20 @@ void keyboard(unsigned char key, int x, int y)
 			else glutReshapeWindow(1024, 768);
 			gFullScreen = !gFullScreen;
 			break;
-		case 27:	exit(1);	break;
+		case 27:	viewer = NULL;  exit(1);	break;
+		case 'F':
+		{
+			printf("fstats!\n");
+			window->getEventQueue()->keyPress( (osgGA::GUIEventAdapter::KeySymbol) 's' );
+			window->getEventQueue()->keyRelease( (osgGA::GUIEventAdapter::KeySymbol) 's' );
+			break;
+		}
 		default:
-            if (window.valid())
-            {
-                window->getEventQueue()->keyPress( (osgGA::GUIEventAdapter::KeySymbol) key );
-                window->getEventQueue()->keyRelease( (osgGA::GUIEventAdapter::KeySymbol) key );
-            }
+//            if (window.valid())
+//            {
+//                window->getEventQueue()->keyPress( (osgGA::GUIEventAdapter::KeySymbol) key );
+//                window->getEventQueue()->keyRelease( (osgGA::GUIEventAdapter::KeySymbol) key );
+//            }
             break;
     }
 	glutPostRedisplay();
@@ -409,7 +420,7 @@ void timer(int bl)
 	gCamera.update(dt);
 	
 	if(!gPaused)
-		PaddleApp::instance().update(dt);		//send the timestep to the app class
+		FalconApp::instance().update(dt);		//send the timestep to the app class
 	glutTimerFunc(0, timer, 0);
 	glutPostRedisplay();
 
@@ -430,7 +441,7 @@ void keyUpBoard(unsigned char key, int x, int y)
 		case 'z': gCamera.setLower(false);		break;
 		case 'x': gCamera.setRaise(false);		break;
 		
-		case ' ':	PaddleApp::instance().buttonInput(0, false);	break;		//space bar controls the main wand button
+		case ' ':	FalconApp::instance().buttonInput(0, false);	break;		//space bar controls the main wand button
 	}
 
 	glutPostRedisplay();
@@ -438,7 +449,7 @@ void keyUpBoard(unsigned char key, int x, int y)
 
 void quitski()
 {
-	PaddleApp::instance().shutdown();
+	FalconApp::instance().shutdown();
 	if(viewer) viewer = NULL;
 }
 
@@ -459,17 +470,18 @@ int main( int argc, char **argv )
 	glutKeyboardUpFunc(keyboardUp);
 	glutSpecialFunc(keySpecial);
 	glutKeyboardUpFunc(keyUpBoard);
+
     // create the view of the scene.
     viewer = new osgViewer::Viewer;
     window = viewer->setUpViewerAsEmbeddedInWindow(100,100,800,600);
-	PaddleApp::instance().init();
-    viewer->setSceneData(PaddleApp::instance().getRoot());
-//    viewer->setCameraManipulator(new osgGA::TrackballManipulator);
+	FalconApp::instance().init();
+    viewer->setSceneData(FalconApp::instance().getRoot());
+
     viewer->addEventHandler(new osgViewer::StatsHandler);
     viewer->realize();
 	glutTimerFunc(100, timer, 0);
 	atexit(quitski);
-	
+
     glutMainLoop();
     
     return 0;

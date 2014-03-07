@@ -22,7 +22,7 @@ public:
 	virtual ~GameObject();					//destroy and remove all traces from the scenegraph
 
 	//timestep update.  return false if this needs to be deleted and removed
-	virtual bool update(float dt){return true;}
+	virtual bool update(float dt){ mAge += dt;  return true;}
 	
 	//the root is a group, but it also contains a positionAttitudeTransform
 	//just in case certain objects want to position things globally
@@ -50,9 +50,11 @@ public:
 	virtual void setForward(osg::Vec3 f);
 	virtual osg::Vec3 getForward();
 	
+	virtual float getAge()							{return mAge;}
 protected:
 	osg::ref_ptr<osg::Group>						mRoot;
 	osg::ref_ptr<osg::PositionAttitudeTransform>	mPat;		//used for positioning/orienting
+	float											mAge;		//how old is this?  Can be used for timing and control
 };
 
 

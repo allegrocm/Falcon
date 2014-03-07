@@ -15,6 +15,7 @@ using namespace osg;
 
 GameObject::GameObject()
 {
+	mAge = 0;
 	mRoot = new Group();
 	mRoot->setName("GameObject Root");
 	mPat = new PositionAttitudeTransform();
