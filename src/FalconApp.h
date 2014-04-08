@@ -15,11 +15,15 @@
 #include <osg/MatrixTransform>
 
 class Spacecraft;
+class Bullet;
 class Falcon;
+class GameObject;
+class ParticleFX;
 
 class FalconApp
 {
 public:
+	static const float TimeStep = 0.01;
 	enum ButtonState {OFF, ON, TOGGLE_OFF, TOGGLE_ON};		//the four possible states of your standard button
 	static FalconApp& instance()	{static FalconApp a;  return a;}				//singleton instance
 	void init();
@@ -39,13 +43,18 @@ public:
 	void shutdown();									//clean up before exiting
 	
 	std::vector<Spacecraft*> getShips()				{return mShips;}
+//	std::vector<Bullet*>	getBullets()			{return mBullets;}
+
+	bool addThis(GameObject* g);					//adds this to the proper group.  returns false if couldn't be added
+
 	Falcon* getFalcon()								{return mFalcon;}
+	ParticleFX*			getFX()						{return mParticleFX;}
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call
 	FalconApp()
 	{
-		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = 0.01;
+		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = TimeStep;
 	}
 	
 	//update our calculated frame rate
@@ -54,8 +63,10 @@ protected:
 
 	//game entities
 	std::vector<Spacecraft*>				mShips;				//all our spaceships that are doin stuff
+	std::vector<Bullet*>					mBullets;			//pewpewpew
+	std::vector<GameObject*>				mJunk;			//other stuff that will take care of itself
 	Falcon*									mFalcon;			//the Millennium Falcon!
-
+	
 
 
 	osg::ref_ptr<osg::Group> mRoot;								//root of our scenegraph
@@ -80,6 +91,9 @@ protected:
 
 	//needed for clusteredness
 	bool mIsMaster;										//is this the master node of the cluster?
+	
+	
+	ParticleFX*						mParticleFX;
 };
 
 

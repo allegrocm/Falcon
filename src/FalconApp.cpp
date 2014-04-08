@@ -19,12 +19,15 @@
 
 
 #include "FalconApp.h"
-
+#include "ParticleFX.h"
 #include "StupidPlaceholderShip.h"
+#include "Bullet.h"
 #include "Falcon.h"
 
 #include "XML/KenXML.h"
 #include "Util.h"
+
+using namespace osg;
 
 
 void FalconApp::init()
@@ -57,15 +60,22 @@ void FalconApp::init()
 	mWandXForm = new osg::MatrixTransform;
 	mModelGroup->addChild(mWandXForm);
 
-	//just add a single generic spaceship for now
-	mShips.push_back(new StupidPlaceholderShip());
-	
+	//just add a few generic spaceships for now
+	for(int i = 0; i < 5; i++)
+	{
+		StupidPlaceholderShip* sps = new StupidPlaceholderShip();
+		sps->setCircleOrigin(Vec3(-85 + 20 * i, 15, -100));
+		mShips.push_back(sps);
+	}
+//	mShips.push_back(new StupidPlaceholderShip());
 	for(size_t i = 0; i < mShips.size(); i++)
 		mModelGroup->addChild(mShips[i]->getRoot());
 
 	mFalcon = new Falcon();
 		mModelGroup->addChild(mFalcon->getRoot());
 
+	mParticleFX = new ParticleFX();
+	mModelGroup->addChild(mParticleFX->getRoot());
 }
 
 
@@ -87,18 +97,55 @@ void FalconApp::update(float dt)
 	{
 		mTotalTime += mTimeStep;
 		//process navigation, etc
-		if(mButtons[0] == ON)
+		if(mButtons[0] == TOGGLE_ON)
 		{
-			osg::Vec3 direction(mWandMatrix.ptr()[8], mWandMatrix.ptr()[9],mWandMatrix.ptr()[10]);
-			mNavigation->setMatrix(mNavigation->getMatrix() * osg::Matrix::translate(direction * dt * 4.0));
+			//fire!
+			mFalcon->fire();
+		//	printf("BAM!\n");
 		}
 
-		
+		mParticleFX->update(dt);
+
 		for(size_t i = 0; i < mShips.size(); i++)
 		{
-			mShips[i]->update(mTimeStep);
+			if(!mShips[i]->update(mTimeStep))
+			{
+				mModelGroup->removeChild(mShips[i]->getRoot());
+				delete mShips[i];
+				mShips[i] = mShips.back();
+				mShips.pop_back();
+
+			}
 		}
+		
+		
+		//update bullets. when one is "finished", delete it
+		for(size_t i = 0; i < mBullets.size(); i++)
+		{
+			if(!mBullets[i]->update(mTimeStep))
+			{
+				mModelGroup->removeChild(mBullets[i]->getRoot());
+				delete mBullets[i];
+				mBullets[i] = mBullets.back();
+				mBullets.pop_back();
+			}
+		}
+		
+		
+		//update all the other stuff
+		for(size_t i = 0; i < mJunk.size(); i++)
+		{
+			if(!mJunk[i]->update(mTimeStep))
+			{
+				mModelGroup->removeChild(mJunk[i]->getRoot());
+				delete mJunk[i];
+				mJunk[i] = mJunk.back();
+				mJunk.pop_back();
+			}
+		}
+		
 	
+		
 		deToggleButtons();			//it's important that this be called every frame
 	}
 	
@@ -248,4 +295,27 @@ void FalconApp::shutdown()
 	printf("Final Profiler Summary:  \n%s\n", prof.c_str());
 	Util::printErrors();
 }
+
+bool FalconApp::addThis(GameObject* g)
+{
+	//we can find out what kind of object this is through dynamic casts
+	Spacecraft* ship = dynamic_cast<Spacecraft*>(g);
+	Bullet* bullet = dynamic_cast<Bullet*>(g);
+	if(bullet)
+	{
+		mBullets.push_back(bullet);
+		mModelGroup->addChild(bullet->getRoot());
+		return true;
+	}
+	
+	if(g)
+	{
+		printf("add some other object\n");
+		mJunk.push_back(g);
+		mModelGroup->addChild(g->getRoot());
+
+	}
+	return false;
+}
+
 

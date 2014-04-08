@@ -56,6 +56,10 @@ namespace Util
 
 	std::string findDataFile(std::string name);						//error reporting version of OSG"s finddatafile function
 	
+	
+	//number generation
+	float random(float minVal, float maxVal);
+	osg::Vec3 randomVector();			//a random unit vector
 	//this loads a model with the given name, and scales, rotates, and translates it (in the order of the arguments) to a useable state
 	//handy for importing downloaded models which are usually way way way too big
 	//(rotations are in degrees!)
@@ -64,6 +68,7 @@ namespace Util
 	//print out logged errors.  This is usually called right before the program exits
 	void printErrors();
 
+	void clearLoadedModels();		//calling this before exit may help us exit more smoothly
 };
 #endif /* defined(__OSGSample__Util__) */
 

@@ -21,6 +21,7 @@ GameObject::GameObject()
 	mPat = new PositionAttitudeTransform();
 	mPat->setName("GameObject Pat");
 	mRoot->addChild(mPat);
+	setName("GameObject");
 }
 
 GameObject::~GameObject()
@@ -56,7 +57,7 @@ void GameObject::setForward(osg::Vec3 f)
 {
 	if(f.length() < 0.001)
 	{
-		printf("attempting to use tiny vector for forward!\n");
+		printf("attempting to use tiny vector for forward!  %.2f, %.2f, %.2f\n", f.x(), f.y(), f.z());
 		return;
 	}
 	
@@ -71,3 +72,10 @@ osg::Vec3 GameObject::getForward()
 	Matrixf x = getTransform();
 	return (Vec3(x.ptr()[8], x.ptr()[9], x.ptr()[10])*-1.0);
 }
+
+void GameObject::setName(std::string s)
+{
+	mName = s;
+	mRoot->setName(s);
+}
+

@@ -7,6 +7,10 @@
 #else
 #  include <GL/glut.h>
 #endif
+#ifdef KENS_MIDI_CONTROLLER
+	#include "magicjoystick.h"
+#endif
+
 
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
@@ -25,7 +29,7 @@ bool gPaused = false;
 bool gFullScreen;
 int gMouseX, gMouseY;
 
-bool gShowC6 = true;
+bool gShowC6 = false;
 
 
 #include "CameraController.h"
@@ -224,6 +228,8 @@ void display(void)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 500.0);
+	
+
 //	currentCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 	gluPerspective(60, aspect, 0.2, 200.0);
 	glMatrixMode(GL_MODELVIEW);
@@ -253,6 +259,32 @@ void display(void)
 	//next we'll send the app a wand matrix based on the mouse position
 
 	KMatrix wandMat = gCamera.getWandMatrix(KVec3(-1.0 + 2.0 * gMouseX / screenWidth, -1.0 + 2.0 * gMouseY / screenHeight, -2));
+
+	//get a directional wand by projecting our mouse position
+	double px, py, pz;
+	int vp[4];
+	glGetIntegerv(GL_VIEWPORT, vp);
+	osg::Matrixd vd(gCamera.getViewMatrix(CameraController::FPS_VIEW).m);
+	gluUnProject(gMouseX, gMouseY, 0.99, vd.ptr(), currentCam->getProjectionMatrix().ptr(), vp, &px, &py, &pz);
+	KVec3 headPos = gCamera.mFPPos;
+	KVec3 z(headPos.x - px, headPos.y - py, headPos.z - pz);
+	z.normalize();
+	KVec3 x = KVec3(0, 1, 0).cross(z);
+	x.normalize();
+	KVec3 y = z.cross(x);
+
+	x.normalize();
+	y.normalize();
+//	printf("y:  %.2f, %.2f, %.2f\n");
+	//stick new directions into our wand matrix
+	for(int i = 0; i < 3; i++)
+	{
+		wandMat.m[i] = x.ptr()[i];
+		wandMat.m[4+i] = y.ptr()[i];
+		wandMat.m[8+i] = z.ptr()[i];
+	}
+//	wandMat.print();
+//	printf("Unproject to %.2f, %.2f, %.2f\n", px, py, pz);
 	FalconApp::instance().setWandMatrix(osg::Matrixf(wandMat.m));
 
 	currentCam->setViewMatrix(osg::Matrixf(view.m));
@@ -418,7 +450,10 @@ void timer(int bl)
 	float dt = 0.001 * ((float) thisTime - lastTime);
 	lastTime = thisTime;
 	gCamera.update(dt);
-	
+#ifdef KENS_MIDI_CONTROLLER
+	MagicJoystick::update();
+#endif
+
 	if(!gPaused)
 		FalconApp::instance().update(dt);		//send the timestep to the app class
 	glutTimerFunc(0, timer, 0);

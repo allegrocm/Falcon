@@ -12,6 +12,7 @@
 Spacecraft::Spacecraft()
 {
 	mIsEnemy = true;
+	mDead = false;
 }
 
 
@@ -23,7 +24,7 @@ Spacecraft::~Spacecraft()
 bool Spacecraft::update(float dt)
 {
 	GameObject::update(dt);
-	return true;
+	return !mDead;
 }
 
 bool Spacecraft::shoot()

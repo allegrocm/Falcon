@@ -169,9 +169,38 @@ std::string findDataFile(std::string name)
 	return found;
 }
 
+
+//store all our loaded models so we don't have to re-load them
+std::map<std::string, osg::ref_ptr<osg::Node> > gLoadedModels;
+
 MatrixTransform* loadModel(std::string name, float scale, float rotX, float rotY, float rotZ, osg::Vec3 translate)
 {
-	Node* n = osgDB::readNodeFile(findDataFile(name));
+	__FUNCTION_HEADER__
+
+	Node* n = NULL;
+	
+	//did we already load (or try to load) this one?
+	std::map<std::string, osg::ref_ptr<osg::Node> >::iterator i;
+	bool haz = false;
+	for(i = gLoadedModels.begin(); i != gLoadedModels.end(); i++)
+	{
+		if(i->first == name)
+		{
+			haz = true;
+//			printf("We already have %s\n", name.c_str());
+			n = i->second;
+		}
+	}
+	
+
+	if(!haz)		//if we didn't try to laod it before, do so now
+	{
+		n = osgDB::readNodeFile(findDataFile(name));
+		gLoadedModels[name] = n;
+		if(!n)
+			logError("Unable to load model %s\n", name.c_str());
+		else	printf("Loaded %s\n", name.c_str());
+	}
 	if(!n) return NULL;
 
 	MatrixTransform* m = new MatrixTransform();
@@ -186,7 +215,15 @@ MatrixTransform* loadModel(std::string name, float scale, float rotX, float rotY
 	return m;
 }
 
+float random(float minVal, float maxVal) 	{return minVal + (maxVal-minVal) * rand() / RAND_MAX;}
+osg::Vec3 randomVector()
+{
+	Vec3 v(random(-1, 1), random(-1, 1), random(-1,1));
+	v.normalize();
+	return v;
 }
+}
+
 
 ScopedBlock::ScopedBlock(std::string name)
 {
