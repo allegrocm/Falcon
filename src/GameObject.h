@@ -8,7 +8,8 @@
 
 #ifndef __PaddleboatQuest__GameObject__
 #define __PaddleboatQuest__GameObject__
-
+#include <windows.h>
+#include <gl/glut.h>
 #include <osg/PositionAttitudeTransform>
 #include <iostream>
 

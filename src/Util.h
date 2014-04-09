@@ -9,7 +9,8 @@
 
 #ifndef __UTIL__
 #define __UTIL__
-
+#include <windows.h>
+#include <gl/glut.h>
 #include <iostream>
 #include <osg/MatrixTransform>
 #include "quickprof.h"

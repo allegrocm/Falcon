@@ -1,4 +1,4 @@
-#ifndef DP3DJUGGLERH
+ifndef DP3DJUGGLERH
 #define DP3DJUGGLERH
 
 #include <vrj/Draw/OGL/GlApp.h>
