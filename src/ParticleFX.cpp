@@ -65,7 +65,7 @@ void ParticleFX::update(float dt)
 void ParticleFX::makeExplosion(Vec3 pos, float size, float countMult, float lifeMult)
 {
 
-	printf("boom at %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
+//	printf("boom at %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
 	osgParticle::Particle basicParticle;
 	basicParticle.setLifeTime(.75);
 	basicParticle.setAlphaRange(osgParticle::rangef(0.0, 1.0));

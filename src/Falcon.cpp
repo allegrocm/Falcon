@@ -21,12 +21,29 @@ Falcon::Falcon()
 	MatrixTransform* n = Util::loadModel("data/models/falcon3DS/milfalcon.3ds", scaleFactor, -90, 180, 0, Vec3(0, -8, 0));
 	
 	mPat->addChild(n);
+	mFireTimer = 0;
+	mFireRate = 6;
 	
 }
+
+bool Falcon::update(float dt)
+{
+	mFireTimer -= dt;
+	return true;
+
+}
+
 
 
 void Falcon::fire()
 {
+//	printf("Fire!  (timer:  %.3f\n", mFireTimer);
+	if(mFireTimer > 0)
+	{
+		return;		//can't shoot yet
+	}
+	
+	mFireTimer = 1.0 / mFireRate;
 	Bullet* b = new Bullet();
 	b->mShooter = this;
 	//align the new bullet more or less with the wand, since that's our turret

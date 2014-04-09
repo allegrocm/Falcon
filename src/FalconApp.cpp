@@ -27,7 +27,7 @@
 
 #include "XML/KenXML.h"
 #include "Util.h"
-
+#include "SpaceBox.h"
 using namespace osg;
 
 
@@ -51,7 +51,11 @@ void FalconApp::init()
 	mAvgFrameRate = 30;
 	mModelGroup = new osg::Group;
 	mNavigation->addChild(mModelGroup.get());
-
+	
+	//quickly add a lil spacebox
+ 	mModelGroup->addChild((new SpaceBox())->getRoot());
+	
+	
 	osg::Light* light = mLightSource->getLight();
 	light->setDiffuse(osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
 	light->setSpecular(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -89,11 +93,11 @@ void FalconApp::buttonInput(unsigned int button, bool pressed)
 
 }
 
-void FalconApp::update(float dt)
+void FalconApp::update(float fulldt)
 {
 	__FUNCTION_HEADER__
 
-	mTargetTime += dt;
+	mTargetTime += fulldt;
 	while(mTotalTime < mTargetTime)
 	{
 		mTotalTime += mTimeStep;
@@ -105,8 +109,8 @@ void FalconApp::update(float dt)
 		//	printf("BAM!\n");
 		}
 
-		mParticleFX->update(dt);
-
+		mParticleFX->update(mTimeStep);
+		mFalcon->update(mTimeStep);
 		for(size_t i = 0; i < mShips.size(); i++)
 		{
 			if(!mShips[i]->update(mTimeStep))
