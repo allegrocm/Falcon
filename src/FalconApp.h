@@ -9,6 +9,9 @@
 
 #ifndef FalconAppCUZKENLOVESYOU
 #define FalconAppCUZKENLOVESYOU
+
+#define TimeStep 0.01
+
 #include <osg/Group>
 #include <osg/Geode>
 #include <osg/LightSource>
@@ -23,7 +26,6 @@ class ParticleFX;
 class FalconApp
 {
 public:
-	static const float TimeStep = 0.01;
 	enum ButtonState {OFF, ON, TOGGLE_OFF, TOGGLE_ON};		//the four possible states of your standard button
 	static FalconApp& instance()	{static FalconApp a;  return a;}				//singleton instance
 	void init();
