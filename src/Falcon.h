@@ -18,6 +18,9 @@ class Falcon : public Spacecraft
 {
 public:
 	Falcon();
-
+	void fire();			//pewpewpew!
+	void aimAt(osg::Vec3 location);			//point the gun at a specific spot
+protected:
+	osg::Vec3 mAimTarget;		//where is the gun aiming?
 };
 #endif /* defined(__Millennium_Falcon__Falcon__) */

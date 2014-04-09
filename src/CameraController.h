@@ -137,7 +137,7 @@ public:
 		mFPPos = KVec3(0, 5.5, 4);
 		mFPYaw = 0;
 		mFPPitch = 0;
-		mFPMaxSpeed = 7.0;
+		mFPMaxSpeed = 27.0;
 		mUp = mDown = mLeft = mRight = mStrafeLeft = mStrafeRight = false;
 		
 		mFPPeekX = 0;
@@ -291,7 +291,7 @@ public:
 			glTranslatef(offset.x, offset.y, offset.z);
 #ifndef OCULUS
 	//dont do this if we're using the leap
-			glRotatef(90, 1, 0, 0);
+		//	glRotatef(90, 1, 0, 0);
 #endif
 			//let the joystick rotate the lightsaber
 			glRotatef(60 * JSY, 1, 0, 0);

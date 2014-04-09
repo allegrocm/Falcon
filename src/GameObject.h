@@ -50,12 +50,14 @@ public:
 	//aim the front of this guy forward, attempting to preserve the other axes
 	virtual void setForward(osg::Vec3 f);
 	virtual osg::Vec3 getForward();
-	
+	std::string getName()							{return mName;}
+	void setName(std::string s);
 	virtual float getAge()							{return mAge;}
 protected:
 	osg::ref_ptr<osg::Group>						mRoot;
 	osg::ref_ptr<osg::PositionAttitudeTransform>	mPat;		//used for positioning/orienting
 	float											mAge;		//how old is this?  Can be used for timing and control
+	std::string										mName;
 };
 
 

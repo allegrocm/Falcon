@@ -20,6 +20,8 @@ public:
 	StupidPlaceholderShip();
 	void setCircleOrigin(osg::Vec3 p)	{mCenter = p;}
 	bool update(float dt);			//flies around in a circle....
+	void explode();
+	void wasHit(Bullet* b);
 protected:
 
 	osg::Vec3 mCenter;			//center of our
