@@ -40,7 +40,7 @@ bool Bullet::update(float dt)
 
 void Bullet::addGeometry()
 {
-	Cylinder* cyl = new Cylinder(Vec3(), 0.25, 4.0);
+	Cylinder* cyl = new Cylinder(Vec3(), 0.25, 8.0);
 //	cyl->setRotation(Quat(3.14159/2.0, Vec3(1, 0, 0)));
 	ShapeDrawable* sd = new ShapeDrawable(cyl);
 	sd->setColor(Vec4(.4, .9, .4, 1));
@@ -107,6 +107,7 @@ bool Bullet::checkHit()
 		return true;
 	}
 */
+
 	return false;
 
 }
