@@ -22,6 +22,8 @@ public:
 	bool update(float dt);			//flies around in a circle....
 	void explode();
 	void wasHit(Bullet* b);
+	float mRadius;
+	float mOffset;
 protected:
 
 	osg::Vec3 mCenter;			//center of our

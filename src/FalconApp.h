@@ -19,11 +19,14 @@ class Bullet;
 class Falcon;
 class GameObject;
 class ParticleFX;
+class ComputerScreen;
+class EnemyController;
+
 
 class FalconApp
 {
 public:
-	static const float TimeStep = 0.01;
+	static float TimeStep;
 	enum ButtonState {OFF, ON, TOGGLE_OFF, TOGGLE_ON};		//the four possible states of your standard button
 	static FalconApp& instance()	{static FalconApp a;  return a;}				//singleton instance
 	void init();
@@ -41,8 +44,9 @@ public:
 	void drawStatus();									//draw run-time info, like frame rate, on the head node
 	void handleArguments(int* argc, char** argv);		//process command line arguments
 	void shutdown();									//clean up before exiting
-	
-	std::vector<Spacecraft*> getShips()				{return mShips;}
+	void drawDebug();
+//	std::vector<Spacecraft*> getShips()				{return mShips;}
+	EnemyController*		getEnemyController()	{return mEnemyController;}
 //	std::vector<Bullet*>	getBullets()			{return mBullets;}
 
 	bool addThis(GameObject* g);					//adds this to the proper group.  returns false if couldn't be added
@@ -62,16 +66,18 @@ protected:
 
 
 	//game entities
-	std::vector<Spacecraft*>				mShips;				//all our spaceships that are doin stuff
+//	std::vector<Spacecraft*>				mShips;				//all our spaceships that are doin stuff
+	EnemyController*						mEnemyController;
 	std::vector<Bullet*>					mBullets;			//pewpewpew
 	std::vector<GameObject*>				mJunk;			//other stuff that will take care of itself
 	Falcon*									mFalcon;			//the Millennium Falcon!
-	
+	ComputerScreen*							mScreen;			//in-game data display
 
 
 	osg::ref_ptr<osg::Group> mRoot;								//root of our scenegraph
 	osg::ref_ptr<osg::MatrixTransform> mNavigation;				//navigation matrix
 	osg::ref_ptr<osg::Group> mModelGroup;						//this is where we put things into the app!
+	
 	osg::Matrixf mWandMatrix;
 	osg::Matrixf mHeadMatrix;
 	osg::ref_ptr<osg::LightSource> mLightSource;

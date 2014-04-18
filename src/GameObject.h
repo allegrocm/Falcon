@@ -12,7 +12,7 @@
 #include <osg/PositionAttitudeTransform>
 #include <iostream>
 
-
+class Debris;
 //the base class for things that are in the game
 
 class GameObject
@@ -52,6 +52,12 @@ public:
 	std::string getName()							{return mName;}
 	void setName(std::string s);
 	virtual float getAge()							{return mAge;}
+	
+	//break a 3D model apart according to its hierarchy to the stated depth
+	//each piece might split into its sub pieces, or might vanish instead of becoming debris
+	//called recursively
+	virtual std::vector<Debris*> explodeSection(osg::Group* n, int depth, int maxDepth, float splitChance, float vanishChance, osg::Matrixf currentTransform, osg::Node* root);
+	virtual void drawDebug();		//for...you guessed it...debugging!
 protected:
 	osg::ref_ptr<osg::Group>						mRoot;
 	osg::ref_ptr<osg::PositionAttitudeTransform>	mPat;		//used for positioning/orienting

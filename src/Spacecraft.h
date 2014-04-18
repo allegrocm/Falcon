@@ -11,8 +11,9 @@
 
 #include <iostream>
 #include "GameObject.h"
-
+#include "KSoundManager.h"
 class Bullet;
+
 class Spacecraft: public GameObject
 {
 public:
@@ -29,6 +30,7 @@ protected:
 	bool			mIsEnemy;
 	bool mDead;		//should we be deleted now?
 	osg::Vec3 mVel;		//velocity
+	SkySound* mEngineSound;
 };
 
 
