@@ -26,6 +26,9 @@ public:
 	void addShip(Spacecraft* s);
 protected:
 	std::vector<Spacecraft*> mEnemies;
+	int mMaxEnemies;			//max in play
+	int mLeftToSpawn;			//how many more enemies will we be spawning
+	
 	
 
 };

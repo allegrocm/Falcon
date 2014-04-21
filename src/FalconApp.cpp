@@ -30,7 +30,7 @@
 #include "ROM.h"
 #include "ComputerScreen.h"
 #include "EnemyController.h"
-
+#include "GameController.h"
 
 using namespace osg;
 float FalconApp::TimeStep;
@@ -41,6 +41,8 @@ void FalconApp::init()
 	__FUNCTION_HEADER__
 	ROM::load();			//load our "ROM" right off the bat so we have access to its data
 	TimeStep = mTimeStep = 0.01;
+	mGameController = new GameController();
+	
 	//set up our OSGDB search paths
 	osgDB::getDataFilePathList().push_back("data");
 	osgDB::getDataFilePathList().push_back("data/models");
@@ -112,7 +114,7 @@ void FalconApp::update(float fulldt)
 		mParticleFX->update(mTimeStep);
 		mFalcon->update(mTimeStep);
 		mEnemyController->update(mTimeStep);
-		
+		mGameController->update(mTimeStep);
 		//update bullets. when one is "finished", delete it
 		for(size_t i = 0; i < mBullets.size(); i++)
 		{
@@ -287,7 +289,7 @@ void FalconApp::shutdown()
 {
 	//print out our profiler summary and important errors
 	std::string prof = PROFILER.getSummary();
-	printf("Final Profiler Summary:  \n%s\n", prof.c_str());
+	printf("__________________Final Profiler Summary:____________________  \n%s\n", prof.c_str());
 	Util::printErrors();
 }
 

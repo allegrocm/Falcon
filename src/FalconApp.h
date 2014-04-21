@@ -21,7 +21,7 @@ class GameObject;
 class ParticleFX;
 class ComputerScreen;
 class EnemyController;
-
+class GameController;
 
 class FalconApp
 {
@@ -47,6 +47,7 @@ public:
 	void drawDebug();
 //	std::vector<Spacecraft*> getShips()				{return mShips;}
 	EnemyController*		getEnemyController()	{return mEnemyController;}
+	GameController*			getGameController()		{return mGameController;}
 //	std::vector<Bullet*>	getBullets()			{return mBullets;}
 
 	bool addThis(GameObject* g);					//adds this to the proper group.  returns false if couldn't be added
@@ -72,7 +73,7 @@ protected:
 	std::vector<GameObject*>				mJunk;			//other stuff that will take care of itself
 	Falcon*									mFalcon;			//the Millennium Falcon!
 	ComputerScreen*							mScreen;			//in-game data display
-
+	GameController*							mGameController;
 
 	osg::ref_ptr<osg::Group> mRoot;								//root of our scenegraph
 	osg::ref_ptr<osg::MatrixTransform> mNavigation;				//navigation matrix

@@ -33,14 +33,14 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	l->addChild(lod, 100, 99999);
 	l->addChild(n, 20, 100);
 	l->addChild(nbest, 0, 20);
-	Util::printNodeHierarchy(n);
+//	Util::printNodeHierarchy(n);
 	mPat->addChild(l);
 //	n = Util::loadModel("data/models/TieWing.3ds", 10.0, -90,0,0, Vec3(8, 0, 0));
 //	mPat->addChild(n);
 	setName("Placeholder Ship");
 	Vec4 center = Util::getNodeCG(n, n);
 	center /= center.w();
-	printf("COG:  %.2f, %.2f, %.2f\n", center.x(), center.y(), center.z());
+//	printf("COG:  %.2f, %.2f, %.2f\n", center.x(), center.y(), center.z());
 	
 	std::string engineSound;
 	if(Defaults::instance().getValue("placeholderShipSound", engineSound))

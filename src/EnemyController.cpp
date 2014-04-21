@@ -11,6 +11,7 @@
 #include "Spacecraft.h"
 #include "StupidPlaceholderShip.h"
 #include "Defaults.h"
+#include "Util.h"
 
 using namespace osg;
 EnemyController& EnemyController::instance()
@@ -30,6 +31,8 @@ EnemyController::EnemyController()
 		addShip(sps);
 	}
 
+	mLeftToSpawn = 10;
+	mMaxEnemies = 15;
 }
 
 
@@ -47,6 +50,23 @@ void EnemyController::update(float dt)
 			mEnemies.pop_back();
 		}
 
+	}
+		
+	//should we spawn new enemies?
+	if(mLeftToSpawn)
+	{
+		int diff = mMaxEnemies - mEnemies.size();		//how many more enemies can we put in play?
+		float chance = 0.1 * diff;
+		if(1.0 * rand() /  RAND_MAX < chance * dt)
+		{
+			//spawn a ship!
+			mLeftToSpawn--;
+			StupidPlaceholderShip* sps = new StupidPlaceholderShip();
+			sps->setCircleOrigin(Vec3(Util::random(-40, 40), Util::random(-10, 40), Util::random(-50, -150)));
+			addShip(sps);
+			printf("Spawn ship!\n");
+		}
+		
 	}
 	
 }
