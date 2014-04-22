@@ -8,8 +8,6 @@
  */
 
 // OSG Headers
-#include <windows.h>
-#include <gl/glut.h>
 #include <osg/Geode>
 #include <osg/Geometry>
 #include <osgdb/FileUtils>
