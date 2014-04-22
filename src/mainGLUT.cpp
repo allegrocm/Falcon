@@ -16,6 +16,7 @@
 #include <osgViewer/ViewerEventHandlers>
 #include <stdarg.h>
 #include "FalconApp.h"
+#include "quickprof.h"
 
 int screenWidth = 1024;
 int screenHeight = 768;
@@ -224,6 +225,7 @@ void display(void)
 {
     // update and render the scene graph
 	osg::Camera* currentCam = viewer->getCamera();
+	currentCam->setCullingActive(false);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -288,8 +290,9 @@ void display(void)
 	FalconApp::instance().setWandMatrix(osg::Matrixf(wandMat.m));
 
 	currentCam->setViewMatrix(osg::Matrixf(view.m));
+	PROFILER.beginBlock("OSG Frame");
     if (viewer.valid()) viewer->frame(gTime);
-	
+	PROFILER.endBlock("OSG Frame");
 	//go back to our view so we can draw some extras
 	glViewport(0, 0, screenWidth, screenHeight);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

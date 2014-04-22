@@ -14,6 +14,7 @@
 #include <osg/BlendFunc>
 #include "ScreenImage.h"
 #include "RadarScreen.h"
+#include "GameController.h"
 
 using namespace osg;
 float gScreenAspect = 1.25;
@@ -45,12 +46,14 @@ ComputerScreen::ComputerScreen()
 	std::string where = osgDB::findDataFile("../Models/tarzeau_ocr_a.ttf");
 //	std::string where = "../Models/arial.ttf";
 	mStatusText->setFont(where.c_str());
-
+	mScoreText = (osgText::Text*)mStatusText->clone(CopyOp::SHALLOW_COPY);		//copy the parameters for the status text
+	mScoreText->setPosition(Vec3(-.4, .15, 0));
+	
 	Geode* textGeode = new Geode();
-//	PositionAttitudeTransform* textXform = new PositionAttitudeTransform;
-//	textXform->addChild(textGeode);
-//	textXform->setPosition(Vec3(0, 0, 0));
+
+	//add our text displays to this geode
 	textGeode->addDrawable(mStatusText);
+	textGeode->addDrawable(mScoreText);
 	mCamera->addChild(textGeode);
 	ScreenImage* image = new ScreenImage();
 	mCamera->addChild(image->transform);
@@ -114,6 +117,7 @@ bool ComputerScreen::update(float dt)
 {
 	GameObject::update(dt);
 	mStatusText->setText(Util::stringWithFormat("Time:  %2.2f", mAge).c_str());
+	mScoreText->setText(Util::stringWithFormat("Score:  %i", GameController::instance().getStats().score).c_str());
 	mRadar->update(dt);
 	return true;
 }

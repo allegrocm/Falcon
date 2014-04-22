@@ -12,6 +12,7 @@
 #include <osg/Geometry>
 #include <osgdb/FileUtils>
 #include <osgDB/ReadFile>
+#include <osg/PositionAttitudeTransform>
 
 // STL Headers
 #include <stdio.h>
@@ -34,6 +35,15 @@ void printNodeHierarchy(osg::Node* node)
 	}
 	std::string name = node->getName();
 	static int recursion = 0;
+	static int line = 0;
+	static int smalls = 0;
+	if(!recursion)
+	{
+		smalls = 0;
+		line = 0;
+
+	}
+		line++;
 	int maxRecursion = 10;
 	
 	if(recursion >= maxRecursion)
@@ -44,6 +54,7 @@ void printNodeHierarchy(osg::Node* node)
 	recursion++;
 
 	//append dashes to the name to show the hierarchical structure
+//	printf("%04i:", line);
 	for(int i = 0; i < recursion - 1; i++)
 		printf("-");
 	printf("%s: %s", name.c_str(), node->className());
@@ -56,6 +67,17 @@ void printNodeHierarchy(osg::Node* node)
 			int chillun = node->asGroup()->getNumChildren();		
 		
 			printf("--->%i children", chillun);
+		}
+	}
+	
+	if(std::string("Geode") == node->className())
+	{
+		float geodeSize = getNodeCG(node, node).w();
+		printf("--area:  %.3f", geodeSize);
+		if(geodeSize < 0.25)
+		{
+			smalls++;
+			printf("->SMALL!");
 		}
 	}
 	printf("\n");
@@ -74,7 +96,10 @@ void printNodeHierarchy(osg::Node* node)
 			osg::Geometry* geom = dynamic_cast<osg::Geometry*>(drawable);
 			const osg::Vec3Array* verts = (const osg::Vec3Array*)(geom->getVertexArray());
 			if(verts != NULL)
-			printf("-Geometry--%i vertices\n", (int)verts->size());
+			{
+
+				printf("-Geometry--%i vertices\n", (int)verts->size());
+			}
 		}
 	}
 	
@@ -95,8 +120,84 @@ void printNodeHierarchy(osg::Node* node)
 		}
 	}
 	recursion--;
+	if(!recursion)
+	{
+		printf("%i small geodes detected\n", smalls);
+	}
+	
 	return;
 }
+
+
+void cullSmallGeodes(osg::Node* node, float threshold)
+{
+	if(!node)
+	{
+		printf("%s:  null node supplied!\n", __FUNCTION__);
+		return;
+	}
+	static int recursion = 0;
+	static int smalls = 0;
+	static int geodes = 0;
+	if(!recursion)
+	{
+		smalls = 0;
+		geodes = 0;
+	}
+
+	int maxRecursion = 10;
+	
+	if(recursion >= maxRecursion)
+	{
+		
+		return;
+	}
+	recursion++;
+
+	
+	if(std::string("Geode") == node->className())
+	{
+		geodes++;
+		float geodeSize = getNodeCG(node, node).w();
+//		printf("Geodearea:  %.3f", geodeSize);
+		if(geodeSize < threshold)
+		{
+			smalls++;
+			node->getParent(0)->removeChild(node);
+//			printf("->SMALL!");
+			//this is small.  de-parent it
+			recursion--;
+			return;
+		}
+	}
+	
+	//if this isn't a group, grab its bounding box and return it
+	if(!node->asGroup() || recursion >= maxRecursion)
+	{ 
+		recursion--;
+		return;
+	}
+	//otherwise dive in, child by child
+	else
+	{
+		int kids = node->asGroup()->getNumChildren();
+		
+		for(int i = 0; i < kids; i++)
+		{
+			cullSmallGeodes(node->asGroup()->getChild(i), threshold);
+		}
+	}
+	recursion--;
+	if(!recursion)
+	{
+		if(smalls)
+			printf("%i of %i geodes removed from %s\n", smalls, geodes, node->getName().c_str());
+	}
+	
+	return;
+}
+
+
 
 osg::Node* findNodeWithName(osg::Group* group, std::string nameToFind)
 {
@@ -204,6 +305,7 @@ MatrixTransform* loadModel(std::string name, float scale, float rotX, float rotY
 	if(!n) return NULL;
 
 	MatrixTransform* m = new MatrixTransform();
+	m->setName(name);
 	m->addChild(n);
 	
 	Matrix mat = Matrix::scale(scale, scale, scale);
@@ -413,13 +515,17 @@ float areaOfTriangle(osg::Vec3 v0, osg::Vec3 v1, osg::Vec3 v2)
 	return cross.length() / 2;
 }
 
+std::map<osg::Node*, osg::Vec4> gCOGCache;			//cache this so we only need to calculate it once
 osg::Vec4 getNodeCG(osg::Node* node, osg::Node* topLevel)
 {
+	static Matrixf cumulative;
 	__FUNCTION_HEADER__
 	Vec4 soFar;		//use homogeneous coordinates so we know what to divide by
 	if(node->asGroup())
 	{
-
+		ScopedBlock sb("GroupCG");
+		Matrixf lastCumulative = cumulative;			//store the last cumulative so we can go back to it
+		cumulative = Util::getTransform(node) * cumulative;			//add in the cumulative transform
 		for(int i = 0; i < node->asGroup()->getNumChildren(); i++)
 		{
 			Node* child = node->asGroup()->getChild(i);
@@ -427,18 +533,29 @@ osg::Vec4 getNodeCG(osg::Node* node, osg::Node* topLevel)
 			Vec3 pos(more.x(), more.y(), more.z());
 //			printf("CG for %s:  %.2f, %.2f, %.2f\n", child->getName().c_str(), more.x(), more.y(), more.z());
 			//transform the data from this node into local space for the topLevel object
-			Matrixf xform = Util::getCumulativeTransform(child, topLevel);
-			pos = pos * xform;
+//			Matrixf xform = Util::getTransform(child);
+//			xform = xform * soFar;
+			pos = pos * cumulative;
 			more.x() = pos.x();
 			more.y() = pos.y();
 			more.z() = pos.z();
 //			printf("Transform to:  %.2f, %.2f, %.2f (%.2f weight)\n", more.x(), more.y(), more.z(), more.w());
 			soFar += more;
 		}
+		cumulative = lastCumulative;		//pop the cumulative matrix
 		
 	}
 	else
 	{
+		ScopedBlock sb("NodeCG");
+		
+		//do we already have this one?
+		std::map<osg::Node*, osg::Vec4>::iterator iter;
+		for(iter = gCOGCache.begin(); iter != gCOGCache.end(); ++iter)
+		{
+			if(iter->first == node) return iter->second;
+		}
+		
 		//if this isn't a group, turn it into triangles!
 		std::vector<OSGTri> tris = turnNodeToTriangles(node);
 		for(size_t i = 0; i < tris.size(); i++)
@@ -447,19 +564,42 @@ osg::Vec4 getNodeCG(osg::Node* node, osg::Node* topLevel)
 			Vec3 center = tris[i].getCenter() * area;
 			soFar += Vec4(center.x(), center.y(), center.z(), area);
 		}
-
+		
+		//put this in our cache if it's not there already
+		gCOGCache[node] = soFar;
 		
 	}
 	
 	return soFar;
 }
 
+osg::Matrixf getTransform(osg::Node* n)
+{
+	if(!n->asGroup()) return Matrixf();
+	MatrixTransform* mt = dynamic_cast<MatrixTransform*>(n);
+	PositionAttitudeTransform* pat = dynamic_cast<PositionAttitudeTransform*>(n);
+	if(mt) return mt->getMatrix();
+	if(pat)
+	{
+		Matrixf currentXForm;
+		Vec3 pos = pat->getPosition();
+		pat->getAttitude().get(currentXForm);
+		currentXForm.ptr()[12] = pos.x();
+		currentXForm.ptr()[13] = pos.y();
+		currentXForm.ptr()[14] = pos.z();
+		return  currentXForm;
+	}
+	
+	return Matrixf();
+}
+
+
 osg::Matrixf getCumulativeTransform(osg::Node* from, osg::Node* to)
 {
 	__FUNCTION_HEADER__
 	if(!from || !to) return Matrixf();
-	MatrixList mats = from->getWorldMatrices(to);
-	if(!mats.size()) return Matrixf();
+//	MatrixList mats = from->getWorldMatrices(to);
+//	if(!mats.size()) return Matrixf();
 
 	NodePathList nodePaths = from->getParentalNodePaths(to);
 	
@@ -473,26 +613,38 @@ osg::Matrixf getCumulativeTransform(osg::Node* from, osg::Node* to)
 	{
 		if(nodePaths[j][0] == to)
 		{
-			return mats[j];
+			//found it.  multiply out the matrices!
+			Matrixf final;
+			for(int k = 0; k < nodePaths[j].size(); k++)
+			{
+				final = getTransform(nodePaths[j][k]) * final;
+			}
+//			printf("path length:  %i\n", nodePaths[j].size());
+//			printf("______________using______________\n");
+//			printMatrix(mats[j]);
+//			printf("____________compare to___________\n");
+//			printMatrix(final);
+//			return mats[j];
+			return final;
+
 		}
 		
 //		p = nodePaths[j];
 //		printf("a path:\n");
 //		for(int i = 0; i < p.size(); i++)
 //			printf("%s\n", p[i]->getName().c_str());
-//		printMatrix(mats[j]);
 //		printf("---------------\n");
 		
 	}
-	return mats[0];
-	
-	for(size_t i = 0; i < mats.size(); i++)
-	{
-//		printf("-----------matrix for %s--------------\n", p[i]->getName().c_str());
-		printMatrix(mats[i]);		printf("-----------------------------\n");
-//		mat = mats[i] * mat;
-		mat *= mats[i];
-	}
+//	return mats[0];
+//	
+//	for(size_t i = 0; i < mats.size(); i++)
+//	{
+////		printf("-----------matrix for %s--------------\n", p[i]->getName().c_str());
+//		printMatrix(mats[i]);		printf("-----------------------------\n");
+////		mat = mats[i] * mat;
+//		mat *= mats[i];
+//	}
 	return mat;
 
 }
@@ -504,6 +656,17 @@ std::string stringWithFormat(const char* format, ...)
 	va_start(args, format);
 	vsprintf(stringData, format, args);
 	return stringData;
+}
+
+void deCull(osg::Node* n)
+{
+	n->setCullingActive(false);
+	if(n->asGroup())
+	{
+		for(int i = 0; i < n->asGroup()->getNumChildren(); i++)
+			deCull(n->asGroup()->getChild(i));
+	}
+	
 }
 
 

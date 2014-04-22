@@ -16,6 +16,8 @@ Spacecraft::Spacecraft()
 	mIsEnemy = true;
 	mDead = false;
 	mEngineSound = NULL;
+	mHP = 2;
+	mScore = 10;
 }
 
 

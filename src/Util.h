@@ -75,7 +75,7 @@ namespace Util
 	void logError(const char* format, ...);
 	void printMatrix(osg::Matrixf m);
 	void printNodeHierarchy(osg::Node* n);							//for looking at a node's structure within your app
-
+	void cullSmallGeodes(osg::Node* n, float threshold);
 	osg::Node* findNodeWithName(osg::Group* g, std::string name);	//find a node in this group with the given name
 
 	std::string findDataFile(std::string name);						//error reporting version of OSG"s finddatafile function
@@ -99,6 +99,9 @@ namespace Util
 	float areaOfTriangle(osg::Vec3 v0, osg::Vec3 v1, osg::Vec3 v2);
 	std::vector<OSGTri> turnNodeToTriangles(osg::Node* node);
 	osg::Vec4 getNodeCG(osg::Node* node, osg::Node* topLevel);	//get the center of gravity of this node relative to the topLevel node
+	
+	osg::Matrixf getTransform(osg::Node* n);				//gets matrix from a matrixtransform, or turns a PAT into a matrix
+	void deCull(osg::Node* n);					//recursively turn off culling.  experimenting with using no culling
 };
 #endif /* defined(__OSGSample__Util__) */
 

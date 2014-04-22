@@ -33,6 +33,7 @@ void GameController::update(float dt)
 void GameController::start()
 {
 	mMode = MAIN_GAME;
+	mStats.reset();
 }
 
 void GameController::end()
@@ -42,9 +43,15 @@ void GameController::end()
 
 void GameController::enemyWasKilled(Spacecraft* c)
 {
-	
+	mStats.score += c->getScore();
 
 }
+
+void GameController::enemyWasHit(Spacecraft* c)
+{
+	mStats.shotsHit++;
+}
+
 
 
 

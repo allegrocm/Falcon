@@ -77,7 +77,7 @@ void FalconApp::init()
 	mEnemyController = new EnemyController;
 
 	mFalcon = new Falcon();
-		mModelGroup->addChild(mFalcon->getRoot());
+	mModelGroup->addChild(mFalcon->getRoot());
 
 	mParticleFX = new ParticleFX();
 	mModelGroup->addChild(mParticleFX->getRoot());

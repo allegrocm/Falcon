@@ -27,6 +27,7 @@ public:
 protected:
 	PrerenderCamera* mCamera;			//renders the display contents to a texture
 	osg::ref_ptr<osgText::Text>			mStatusText;
+	osg::ref_ptr<osgText::Text>			mScoreText;
 	RadarScreen* mRadar;
 	void makeScreenGeometry();
 	

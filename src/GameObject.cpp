@@ -24,6 +24,7 @@ GameObject::GameObject()
 	mPat->setName("GameObject Pat");
 	mRoot->addChild(mPat);
 	setName("GameObject");
+
 }
 
 GameObject::~GameObject()
@@ -81,7 +82,7 @@ void GameObject::setName(std::string s)
 	mRoot->setName(s);
 }
 
-std::vector<Debris*> GameObject::explodeSection(osg::Group* n, int depth, int maxDepth, float splitChance, float vanishChance, osg::Matrixf currentTransform, osg::Node* root)
+std::vector<Debris*> GameObject::explodeSection(osg::Group* n, int depth, int maxDepth, float splitChance, float vanishChance, osg::Matrixf currentTransform, osg::Node* root, int maxPieces)
 {
 	std::vector<Debris*> debris;
 	if(!n || !depth) return debris;
@@ -141,12 +142,15 @@ std::vector<Debris*> GameObject::explodeSection(osg::Group* n, int depth, int ma
 			//add all the pieces onto this debris
 		//	printf("(split)\n");
 			
-			std::vector<Debris*> more = explodeSection(node->asGroup(), depth+1, maxDepth, splitChance, vanishChance, currentTransform, root);
+			std::vector<Debris*> more = explodeSection(node->asGroup(), depth+1, maxDepth, splitChance, vanishChance, currentTransform, root, maxPieces);
 			for(size_t j = 0; j < more.size(); j++)
+			{
 				debris.push_back(more[j]);
-				
+				maxPieces--;
+			}
+		
 		}
-		else
+		else if(maxPieces > 0)
 		{
 		//	printf("(debris)\n");
 			
@@ -165,6 +169,7 @@ std::vector<Debris*> GameObject::explodeSection(osg::Group* n, int depth, int ma
 			h->setTransformAndOffset(local * currentTransform, Vec3());
 //			printf("CG:  %.2f, %.2f, %.2f, weight:  %.1f\n", cg.x()/cg.w(), cg.y()/cg.w(), cg.z()/cg.w(), cg.w());
 			debris.push_back(h);
+			maxPieces--;
 
 		
 		}

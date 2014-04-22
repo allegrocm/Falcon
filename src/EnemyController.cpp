@@ -57,12 +57,14 @@ void EnemyController::update(float dt)
 	{
 		int diff = mMaxEnemies - mEnemies.size();		//how many more enemies can we put in play?
 		float chance = 0.1 * diff;
+		chance = 100.0;		//HACK for fast spawning for testing cull speed
 		if(1.0 * rand() /  RAND_MAX < chance * dt)
 		{
 			//spawn a ship!
 			mLeftToSpawn--;
 			StupidPlaceholderShip* sps = new StupidPlaceholderShip();
 			sps->setCircleOrigin(Vec3(Util::random(-40, 40), Util::random(-10, 40), Util::random(-50, -150)));
+			sps->update(0);		//send a zero update so this ship positions itself immediately
 			addShip(sps);
 			printf("Spawn ship!\n");
 		}

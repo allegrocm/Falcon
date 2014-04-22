@@ -13,6 +13,10 @@
 #include "FalconApp.h"
 #include "ParticleFX.h"
 #include "Defaults.h"
+#include "GameController.h"
+#include <osg/Shape>
+#include <osg/ShapeDrawable>
+#include <osgUtil/Optimizer>
 using namespace osg;
 
 
@@ -22,24 +26,40 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	mRadius = 50 + rand()%50;
 	mOffset = 6.28 * rand() / RAND_MAX;
 	//load a ship model.  we can also pre-transform the model into our coordinate system
+	Sphere* sphere = new Sphere(Vec3(0, 0, 0), 5);
+	ShapeDrawable* sd = new ShapeDrawable(sphere);
+	Geode* g = new Geode;
+	g->addDrawable(sd);
+	MatrixTransform* red = Util::loadModel("data/models/tief3DS/TIEFReduced.3DS", 1.0, -90);
 	MatrixTransform* nbest = Util::loadModel("data/models/tief3DS/TIEF.3DS", 1.0, -90);
 	MatrixTransform* n = Util::loadModel("data/models/tief3DS/TIEF_50.3DS", 1.0, -90);
 	MatrixTransform* lod = Util::loadModel("data/models/tief3DS/TIEF_10.3DS", 1.0, -90);
 	
 	//use an LOD to reduce render time
 	osg::LOD* l = new LOD();
-	
+//	l->addChild(g, 0, 100000);
 	//set the LOD for farther away rendering, and the main model for close up
-	l->addChild(lod, 100, 99999);
-	l->addChild(n, 20, 100);
-	l->addChild(nbest, 0, 20);
-//	Util::printNodeHierarchy(n);
+	l->addChild(lod, 150, 100000);
+	l->addChild(n, 50, 150);
+	l->addChild(nbest, 0, 50);
+//	l->addChild(red, 0, 2000);
+	Util::cullSmallGeodes(n, 1.0);
+	Util::cullSmallGeodes(lod, 2.0);
+	osgUtil::Optimizer* o = new osgUtil::Optimizer();
+	o->optimize(n);
+	o->optimize(lod);
+	Util::printNodeHierarchy(n);
+	
 	mPat->addChild(l);
 //	n = Util::loadModel("data/models/TieWing.3ds", 10.0, -90,0,0, Vec3(8, 0, 0));
 //	mPat->addChild(n);
 	setName("Placeholder Ship");
-	Vec4 center = Util::getNodeCG(n, n);
-	center /= center.w();
+//	for(int i = 0; i < 50; i++)
+	{
+		Vec4 center = Util::getNodeCG(n, n);
+		center /= center.w();
+	}
+	mHP = 2;
 //	printf("COG:  %.2f, %.2f, %.2f\n", center.x(), center.y(), center.z());
 	
 	std::string engineSound;
@@ -75,7 +95,10 @@ bool StupidPlaceholderShip::update(float dt)
 
 void StupidPlaceholderShip::wasHit(Bullet* b)
 {
-	explode();
+	GameController::instance().enemyWasHit(this);
+	mHP--;
+	if(mHP <= 0)
+		explode();
 }
 
 void StupidPlaceholderShip::explode()
@@ -95,7 +118,7 @@ void StupidPlaceholderShip::explode()
 //	printf("my mat:\n");
 //	Util::printMatrix(getTransform());
 	osg::MatrixTransform* debrisRoot = Util::loadModel("data/models/tief3DS/TieFighterDebris.3DS", 1.0, -90);
-	std::vector<Debris*> debris = explodeSection(debrisRoot, 1, 3, .5, .5, getTransform(), debrisRoot);
+	std::vector<Debris*> debris = explodeSection(debrisRoot, 1, 3, .5, .5, getTransform(), debrisRoot, 5);
 	for(size_t i = 0; i < debris.size(); i++)
 	{
 		Debris* h = debris[i];
@@ -141,6 +164,7 @@ void StupidPlaceholderShip::explode()
 */
 
 	mDead = true;
+	GameController::instance().enemyWasKilled(this);
 
 }
 
