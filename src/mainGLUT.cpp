@@ -5,7 +5,7 @@
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
-#  include <GL/glut.h>
+#include <GL/glut.h>
 #endif
 #ifdef KENS_MIDI_CONTROLLER
 	#include "magicjoystick.h"

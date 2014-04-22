@@ -54,14 +54,14 @@ void Bullet::addGeometry()
 
 bool Bullet::checkHit()
 {
-
+	#define TimeStep 0.01
 	osgUtil::IntersectVisitor iv;
 	
 	//TODO:  collisions
 	Vec3 dir = getForward();
 	Vec3 pos = getPos();
 	float length = 2.0;
-	float travelLength = mVel.length() * FalconApp::TimeStep;
+	float travelLength = mVel.length() * TimeStep;
 	
 	//if our length is shorter than our velocity * dt, lengthen it so we don't pass through something
 	if(travelLength > length)

@@ -9,6 +9,10 @@
 
 #ifndef __UTIL__
 #define __UTIL__
+#ifdef _WIN32
+#include <windows.h>
+#include <gl/glut.h>
+#endif
 
 #include <iostream>
 #include <osg/MatrixTransform>

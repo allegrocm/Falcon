@@ -7,6 +7,11 @@
  *
  */
 
+#ifdef _WIN32
+#include <windows.h>
+#include <gl/glut.h>
+#endif
+
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
@@ -33,14 +38,14 @@
 #include "GameController.h"
 
 using namespace osg;
-float FalconApp::TimeStep;
+
 
 void FalconApp::init()
 {
 	PROFILER.init();		//init profiling
 	__FUNCTION_HEADER__
 	ROM::load();			//load our "ROM" right off the bat so we have access to its data
-	TimeStep = mTimeStep = 0.01;
+	mTimeStep = 0.01;
 	mGameController = new GameController();
 	
 	//set up our OSGDB search paths

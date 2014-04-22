@@ -9,6 +9,8 @@
 
 #ifndef FalconAppCUZKENLOVESYOU
 #define FalconAppCUZKENLOVESYOU
+
+
 #include <osg/Group>
 #include <osg/Geode>
 #include <osg/LightSource>
@@ -26,7 +28,7 @@ class GameController;
 class FalconApp
 {
 public:
-	static float TimeStep;
+
 	enum ButtonState {OFF, ON, TOGGLE_OFF, TOGGLE_ON};		//the four possible states of your standard button
 	static FalconApp& instance()	{static FalconApp a;  return a;}				//singleton instance
 	void init();
@@ -59,7 +61,7 @@ protected:
 	//put very little in the constructor so we don't risk a recurisive call
 	FalconApp()
 	{
-		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = TimeStep;
+		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = 0.01;
 	}
 	
 	//update our calculated frame rate
