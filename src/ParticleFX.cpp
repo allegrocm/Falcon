@@ -50,7 +50,7 @@ ParticleFX::ParticleFX()
 	explosionProgram->setParticleSystem(mSystems[EXPLOSION]);
 	explosionProgram->addOperator(op3);
 	mRoot->addChild(explosionProgram);
-	mSystems[EXPLOSION]->setDefaultAttributes("data/textures/Fire.png");
+	mSystems[EXPLOSION]->setDefaultAttributes("data/textures/FireWhite.png");
 //	mSystems[EXPLOSION]->setDefaultAttributes("data/textures/RingSS.png");
 	mSystems[EXPLOSION]->getOrCreateStateSet()->setAttribute(new Depth(Depth::LESS, 0, 1, false));		//don't write to the depth buffer
 	g->getOrCreateStateSet()->setAttribute(new BlendFunc(GL_SRC_ALPHA, GL_ONE));		//additive blending for the display hologram
@@ -90,7 +90,7 @@ void ParticleFX::makeExplosion(Vec3 pos, float size, float countMult, float life
 
 	for(int i = 0; i < numParticles; i++)
 	{
-		basicParticle.setColorRange(osgParticle::range<Vec4>(Vec4(1.0, .9, 0.5, 1.0), Vec4(0.5, 0.3, 0.0, 0.0)));
+		basicParticle.setColorRange(osgParticle::range<Vec4>(Vec4(1.0, .9, 0.5, 1.0), Vec4(0.5, 0.2, 0.1, 0.0)));
 
 
 		//local position of this particle within the explosion

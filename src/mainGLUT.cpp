@@ -16,6 +16,7 @@
 #include <osgViewer/ViewerEventHandlers>
 #include <stdarg.h>
 #include "FalconApp.h"
+#include "quickprof.h"
 
 int screenWidth = 1024;
 int screenHeight = 768;
@@ -28,9 +29,9 @@ float aspect;
 bool gPaused = false;
 bool gFullScreen;
 int gMouseX, gMouseY;
-
+float gTime = 0.0;
 bool gShowC6 = false;
-
+bool gSloMo = false;
 
 #include "CameraController.h"
 
@@ -224,6 +225,7 @@ void display(void)
 {
     // update and render the scene graph
 	osg::Camera* currentCam = viewer->getCamera();
+	currentCam->setCullingActive(false);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -288,8 +290,9 @@ void display(void)
 	FalconApp::instance().setWandMatrix(osg::Matrixf(wandMat.m));
 
 	currentCam->setViewMatrix(osg::Matrixf(view.m));
-    if (viewer.valid()) viewer->frame();
-	
+	PROFILER.beginBlock("OSG Frame");
+    if (viewer.valid()) viewer->frame(gTime);
+	PROFILER.endBlock("OSG Frame");
 	//go back to our view so we can draw some extras
 	glViewport(0, 0, screenWidth, screenHeight);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -308,6 +311,7 @@ void display(void)
 	if(gCamera.getViewMode() != CameraController::FPS_VIEW)
 		drawTheFPSGuy();
 	glDisable(GL_LIGHTING);
+	FalconApp::instance().drawDebug();
 	if(gShowC6)
 		drawC6(false);
 	drawStatus();
@@ -388,6 +392,7 @@ void keyboard(unsigned char key, int x, int y)
 		case 'e': gCamera.setStrafeRight(true);	break;
 		case 'a': gCamera.setLeft(true);	break;
 		case 's': gCamera.setDown(true);	break;
+		case 'S': gSloMo = !gSloMo; break;
 		case 'd': gCamera.setRight(true);	break;
 		case 'z': gCamera.setLower(true);		break;
 		case 'x': gCamera.setRaise(true);		break;
@@ -448,14 +453,22 @@ void timer(int bl)
 	static int lastTime = glutGet(GLUT_ELAPSED_TIME);
 	int thisTime = glutGet(GLUT_ELAPSED_TIME);
 	float dt = 0.001 * ((float) thisTime - lastTime);
+
 	lastTime = thisTime;
 	gCamera.update(dt);
+	if(gSloMo)
+		dt *= 0.1;
 #ifdef KENS_MIDI_CONTROLLER
+
+
 	MagicJoystick::update();
 #endif
 
 	if(!gPaused)
+	{
 		FalconApp::instance().update(dt);		//send the timestep to the app class
+		gTime += dt;
+	}
 	glutTimerFunc(0, timer, 0);
 	glutPostRedisplay();
 

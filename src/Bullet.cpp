@@ -12,6 +12,7 @@
 #include "Spacecraft.h"
 #include "ParticleFX.h"
 #include "Debris.h"
+#include "EnemyController.h"
 
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
@@ -70,7 +71,7 @@ bool Bullet::checkHit()
 	iv.addLineSegment(seg.get());
 //	printf("Seg:  %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
 	//dunno if this is the best way to do it or not, but we're gonna just check each ship individually
-	std::vector<Spacecraft*> ships = FalconApp::instance().getShips();
+	std::vector<Spacecraft*> ships = EnemyController::instance().getShips();
 
 	bool hitSometing = false;		//stop after any collision
 	Vec3 hitPos;

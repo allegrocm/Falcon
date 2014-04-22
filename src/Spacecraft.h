@@ -11,8 +11,9 @@
 
 #include <iostream>
 #include "GameObject.h"
-
+#include "KSoundManager.h"
 class Bullet;
+
 class Spacecraft: public GameObject
 {
 public:
@@ -24,11 +25,16 @@ public:
 	virtual void wasHit(Bullet* b)		{}
 	virtual osg::Vec3 getVel()	{return mVel;}
 	virtual void setVel(osg::Vec3 v)	{mVel = v;}
+	virtual int getHP()					{return mHP;}
+	virtual int getScore()				{return mScore;}
 protected:
 	//basic things might go here, like ammo count, firing rate, speed/acceleration/turning stats, allegiance, etc
 	bool			mIsEnemy;
 	bool mDead;		//should we be deleted now?
 	osg::Vec3 mVel;		//velocity
+	SkySound* mEngineSound;
+	int mScore;				//score for blowing this up
+	int mHP;				//hitpoints
 };
 
 

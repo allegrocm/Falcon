@@ -5,15 +5,20 @@
 //  Created by Ken Kopecky II on 3/7/14.
 //
 //
+<<<<<<< HEAD
 #ifdef _WIN32
 #include <windows.h>
 #include <gl/glut.h>
 #endif
 
+=======
+>>>>>>> 4c4d226cbde397be5c7186491567c7c1e9a945b2
 #include "Falcon.h"
 #include "Util.h"
 #include "Bullet.h"
 #include "FalconApp.h"
+#include "ROM.h"
+#include "KSoundManager.h"
 
 using namespace osg;
 
@@ -63,6 +68,7 @@ void Falcon::fire()
 	b->setForward(fireDir);
 	b->mIsEnemy = false;
 	float speed = 500.0;
+	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::FALCON_FIRE_SOUND, ROM::FALCON_FIRE_VOLUME, shootFrom.x(), shootFrom.y(), shootFrom.z());
 //	printf("new bullet at %.2f, %.2f, %.2f\n", wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]);
 	b->mVel = b->getForward() * speed;
 //	FalconApp::instance().getBullets().push_back(b);

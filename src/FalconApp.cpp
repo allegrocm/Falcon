@@ -7,6 +7,13 @@
  *
  */
 
+<<<<<<< HEAD
+=======
+#ifdef _WIN32
+#include <windows.h>
+#include <gl/glut.h>
+#endif
+>>>>>>> 4c4d226cbde397be5c7186491567c7c1e9a945b2
 
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
@@ -28,6 +35,11 @@
 #include "XML/KenXML.h"
 #include "Util.h"
 #include "SpaceBox.h"
+#include "ROM.h"
+#include "ComputerScreen.h"
+#include "EnemyController.h"
+#include "GameController.h"
+
 using namespace osg;
 
 
@@ -35,7 +47,10 @@ void FalconApp::init()
 {
 	PROFILER.init();		//init profiling
 	__FUNCTION_HEADER__
-
+	ROM::load();			//load our "ROM" right off the bat so we have access to its data
+	mTimeStep = 0.01;
+	mGameController = new GameController();
+	
 	//set up our OSGDB search paths
 	osgDB::getDataFilePathList().push_back("data");
 	osgDB::getDataFilePathList().push_back("data/models");
@@ -51,7 +66,9 @@ void FalconApp::init()
 	mAvgFrameRate = 30;
 	mModelGroup = new osg::Group;
 	mNavigation->addChild(mModelGroup.get());
-	
+	mScreen = new ComputerScreen();
+	mModelGroup->addChild(mScreen->getRoot());
+	mScreen->setPos(Vec3(0, 5, 0));
 	//quickly add a lil spacebox
  	mModelGroup->addChild((new SpaceBox())->getRoot());
 	
@@ -65,19 +82,10 @@ void FalconApp::init()
 	mWandXForm = new osg::MatrixTransform;
 	mModelGroup->addChild(mWandXForm);
 
-	//just add a few generic spaceships for now
-	for(int i = 0; i < 5; i++)
-	{
-		StupidPlaceholderShip* sps = new StupidPlaceholderShip();
-		sps->setCircleOrigin(Vec3(-85 + 20 * i, 15, -100));
-		mShips.push_back(sps);
-	}
-//	mShips.push_back(new StupidPlaceholderShip());
-	for(size_t i = 0; i < mShips.size(); i++)
-		mModelGroup->addChild(mShips[i]->getRoot());
+	mEnemyController = new EnemyController;
 
 	mFalcon = new Falcon();
-		mModelGroup->addChild(mFalcon->getRoot());
+	mModelGroup->addChild(mFalcon->getRoot());
 
 	mParticleFX = new ParticleFX();
 	mModelGroup->addChild(mParticleFX->getRoot());
@@ -100,6 +108,7 @@ void FalconApp::update(float fulldt)
 	mTargetTime += fulldt;
 	while(mTotalTime < mTargetTime)
 	{
+		KSoundManager::instance()->updateListener(mTimeStep, mHeadMatrix.ptr(), 0, 0, 0);
 		mTotalTime += mTimeStep;
 		//process navigation, etc
 		if(mButtons[0] == TOGGLE_ON)
@@ -109,21 +118,11 @@ void FalconApp::update(float fulldt)
 		//	printf("BAM!\n");
 		}
 
+		mScreen->update(mTimeStep);
 		mParticleFX->update(mTimeStep);
 		mFalcon->update(mTimeStep);
-		for(size_t i = 0; i < mShips.size(); i++)
-		{
-			if(!mShips[i]->update(mTimeStep))
-			{
-				mModelGroup->removeChild(mShips[i]->getRoot());
-				delete mShips[i];
-				mShips[i] = mShips.back();
-				mShips.pop_back();
-
-			}
-		}
-		
-		
+		mEnemyController->update(mTimeStep);
+		mGameController->update(mTimeStep);
 		//update bullets. when one is "finished", delete it
 		for(size_t i = 0; i < mBullets.size(); i++)
 		{
@@ -169,6 +168,7 @@ void FalconApp::deToggleButtons()
 void FalconApp::setHeadMatrix(osg::Matrixf mat)
 {
 	mHeadMatrix = mat*mNavigation->getInverseMatrix();
+
 }
 
 void FalconApp::setWandMatrix(osg::Matrixf mat)
@@ -297,7 +297,7 @@ void FalconApp::shutdown()
 {
 	//print out our profiler summary and important errors
 	std::string prof = PROFILER.getSummary();
-	printf("Final Profiler Summary:  \n%s\n", prof.c_str());
+	printf("__________________Final Profiler Summary:____________________  \n%s\n", prof.c_str());
 	Util::printErrors();
 }
 
@@ -313,9 +313,12 @@ bool FalconApp::addThis(GameObject* g)
 		return true;
 	}
 	
+	if(ship)
+		mEnemyController->addShip(ship);
+	
 	if(g)
 	{
-		printf("add some other object\n");
+//		printf("add some other object\n");
 		mJunk.push_back(g);
 		mModelGroup->addChild(g->getRoot());
 
@@ -323,4 +326,12 @@ bool FalconApp::addThis(GameObject* g)
 	return false;
 }
 
+void FalconApp::drawDebug()
+{
+	for(size_t i = 0; i < mJunk.size(); i++)
+	{
+		mJunk[i]->drawDebug();
+	}
+	
+}
 

@@ -13,9 +13,14 @@
 #include <windows.h>
 #include <gl/glut.h>
 #endif
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4c4d226cbde397be5c7186491567c7c1e9a945b2
 #include <iostream>
 #include <osg/MatrixTransform>
 #include "quickprof.h"
+#include <osg/Geometry>
 
 //for tracking crashes when we don't have an easily accessible stacktrace
 //uncomment this line for tons of info to be dumped into the console and/or log file
@@ -46,15 +51,38 @@
 
 
 
+//holds a triangle for field calculations
+class OSGTri
+{
+public:
+	OSGTri(){}
+	OSGTri(osg::Vec3 V0, osg::Vec3 V1, osg::Vec3 V2){v0 = V0; v1 = V1; v2 = V2;}
+	void setTexes(osg::Vec2 t, osg::Vec2 tt, osg::Vec2 ttt)	{t0 = t; t1 = tt; t2 = ttt;}
+	osg::Vec3 v0;
+	osg::Vec3 v1;
+	osg::Vec3 v2;
+	
+	osg::Vec2 t0;
+	osg::Vec2 t1;
+	osg::Vec2 t2;
+	
+	float getArea();
+	float getTextureArea();
+	osg::Vec3 getCenter();
+};
+
+
 //some utility functions!  We'll add more as we need them
 namespace Util
 {
+
+
 	//error reporting function.  Re-prints important messages when the program is about to shut down
 	//use this from anywhere in the program for when something happens that needs attention
 	void logError(const char* format, ...);
-	
+	void printMatrix(osg::Matrixf m);
 	void printNodeHierarchy(osg::Node* n);							//for looking at a node's structure within your app
-
+	void cullSmallGeodes(osg::Node* n, float threshold);
 	osg::Node* findNodeWithName(osg::Group* g, std::string name);	//find a node in this group with the given name
 
 	std::string findDataFile(std::string name);						//error reporting version of OSG"s finddatafile function
@@ -72,6 +100,15 @@ namespace Util
 	void printErrors();
 
 	void clearLoadedModels();		//calling this before exit may help us exit more smoothly
+	std::string stringWithFormat(const char* format, ...);
+	osg::Matrixf getCumulativeTransform(osg::Node* from, osg::Node* to);		//transform from into to's space
+	//for finding the "center" of an object
+	float areaOfTriangle(osg::Vec3 v0, osg::Vec3 v1, osg::Vec3 v2);
+	std::vector<OSGTri> turnNodeToTriangles(osg::Node* node);
+	osg::Vec4 getNodeCG(osg::Node* node, osg::Node* topLevel);	//get the center of gravity of this node relative to the topLevel node
+	
+	osg::Matrixf getTransform(osg::Node* n);				//gets matrix from a matrixtransform, or turns a PAT into a matrix
+	void deCull(osg::Node* n);					//recursively turn off culling.  experimenting with using no culling
 };
 #endif /* defined(__OSGSample__Util__) */
 

@@ -9,7 +9,9 @@
 
 
 #include "GameObject.h"
-
+#include "Debris.h"
+#include "Util.h"
+#include "FalconApp.h"
 
 using namespace osg;
 
@@ -22,6 +24,7 @@ GameObject::GameObject()
 	mPat->setName("GameObject Pat");
 	mRoot->addChild(mPat);
 	setName("GameObject");
+
 }
 
 GameObject::~GameObject()
@@ -78,4 +81,121 @@ void GameObject::setName(std::string s)
 	mName = s;
 	mRoot->setName(s);
 }
+
+std::vector<Debris*> GameObject::explodeSection(osg::Group* n, int depth, int maxDepth, float splitChance, float vanishChance, osg::Matrixf currentTransform, osg::Node* root, int maxPieces)
+{
+	std::vector<Debris*> debris;
+	if(!n || !depth) return debris;
+		//if this has a child transform, multiply it on
+	Matrixf thisMat;
+	MatrixTransform* mt = dynamic_cast<MatrixTransform*>(n);
+	if(mt)
+	{
+		thisMat = mt->getMatrix();
+//		printf("MatrixTransform:\n");
+//		Util::printMatrix(thisMat);
+	}
+	
+//	currentTransform = thisMat * currentTransform;
+	if(mt)
+	{
+//		printf("Current transform:\n");
+//		Util::printMatrix(currentTransform);
+	}
+	//make a line of dashes to show our hierarchy
+	std::string line = "-----------------";
+	line[depth+1] = 0;
+	int numChildren = n->getNumChildren();
+	for(int i = 0; i < numChildren; i++)
+	{
+		Node* node = n->getChild(i);
+		//printf("%s: %s"   , line.c_str(), node->getName().c_str());
+
+		//skip empty groups
+		if(node->asGroup() && node->asGroup()->getNumChildren() == 0)
+		{
+		//	printf("Skip)\n");
+			continue;
+		}
+
+
+
+		//top tier stuff can't vanish
+		bool vanish = (1.0 * rand() / RAND_MAX < vanishChance) && (depth > 2);
+//		printf("Depth:  %i\n", depth);
+		if(vanish)
+		{
+		//	printf("(vanish)\n");
+			continue;
+		}
+		
+		//only groups can split, and only if there's still depth to go
+		float splitVal = 1.0 * rand() / RAND_MAX;
+//		printf("Split val:  %.2f vs %.2f\n", splitVal, splitChance);
+		float thisSplitChance = splitChance;
+		if(depth == 1) thisSplitChance = 1.0;		//top level always splits
+		bool split = ((splitVal < thisSplitChance) && node->asGroup() != NULL && depth <= maxDepth);
+
+
+		if(split)
+		{
+			//add all the pieces onto this debris
+		//	printf("(split)\n");
+			
+			std::vector<Debris*> more = explodeSection(node->asGroup(), depth+1, maxDepth, splitChance, vanishChance, currentTransform, root, maxPieces);
+			for(size_t j = 0; j < more.size(); j++)
+			{
+				debris.push_back(more[j]);
+				maxPieces--;
+			}
+		
+		}
+		else if(maxPieces > 0)
+		{
+		//	printf("(debris)\n");
+			
+			//set the proper offset and direction for this debris
+			Vec4 cg = Util::getNodeCG(node, root);
+			Vec3 cgDir = Vec3(cg.x()/cg.w(), cg.y()/cg.w(), cg.z()/cg.w());
+			
+			Debris* h = new Debris(node, cgDir, 20, 20.0 + 40.0 * rand() / RAND_MAX, 120 * depth);
+			
+			
+//			printf("Cum matrix:  \n");
+			Matrixf local = Util::getCumulativeTransform(n, root);		//our transform within the debris model
+//			printf("Current:  \n");
+//			Util::printMatrix(currentTransform);
+//			h->setTransformAndOffset(local * currentTransform, cgDir);
+			h->setTransformAndOffset(local * currentTransform, Vec3());
+//			printf("CG:  %.2f, %.2f, %.2f, weight:  %.1f\n", cg.x()/cg.w(), cg.y()/cg.w(), cg.z()/cg.w(), cg.w());
+			debris.push_back(h);
+			maxPieces--;
+
+		
+		}
+		
+	
+	}
+	
+	return debris;
+}
+
+void GameObject::drawDebug()
+{
+	glPushMatrix();
+		glMultMatrixf(getTransform().ptr());
+		glBegin(GL_LINES);
+			float size = 2;
+			for(int i = 0; i < 3; i++)
+			{
+				glColor3f(i==0, i==1, i==2);
+				glVertex3f(0, 0, 0);
+				glVertex3f(size*(i==0), size*(i==1), size*(i==2));
+			}
+		glEnd();
+	glPopMatrix();
+	
+
+}
+
 
