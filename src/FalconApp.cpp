@@ -42,6 +42,7 @@ using namespace osg;
 
 void FalconApp::init()
 {
+	srand(65);
 	PROFILER.init();		//init profiling
 	__FUNCTION_HEADER__
 	ROM::load();			//load our "ROM" right off the bat so we have access to its data

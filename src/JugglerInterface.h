@@ -34,6 +34,7 @@ class JugglerInterface : public vrj::OsgApp
 	gadget::PositionInterface  mWand;    /**< Positional interface for Wand position */
 	gadget::PositionInterface  mHead;    /**< Positional interface for Head position */
 	gadget::DigitalInterface   mButton[6]; /**< Digital interface for button 0 */
+	gadget::DigitalInterface   mPadButtons[6];
 	osg::ref_ptr<osg::FrameStamp> _frameStamp;
 };
 
