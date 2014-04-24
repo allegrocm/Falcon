@@ -11,6 +11,7 @@
 #include "FalconApp.h"
 #include "ROM.h"
 #include "KSoundManager.h"
+#include <stdarg.h>
 
 using namespace osg;
 
@@ -60,7 +61,8 @@ void Falcon::fire()
 	b->setForward(fireDir);
 	b->mIsEnemy = false;
 	float speed = ROM::FALCON_LASER_SPEED;
-	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::FALCON_FIRE_SOUND, ROM::FALCON_FIRE_VOLUME, shootFrom.x(), shootFrom.y(), shootFrom.z());
+	//printf("soundvolume: %f\n", ROM::FALCON_FIRE_VOLUME);
+	KSoundManager::instance()->playSound(std::string("data/sounds/") + ROM::FALCON_FIRE_SOUND, ROM::FALCON_FIRE_VOLUME, 0);
 //	printf("new bullet at %.2f, %.2f, %.2f\n", wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]);
 	b->mVel = b->getForward() * speed;
 //	FalconApp::instance().getBullets().push_back(b);

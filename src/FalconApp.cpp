@@ -20,7 +20,7 @@
 #include <osg/Geometry>
 #include <osg/Geode>
 #include <osgDB/FileUtils>
-
+#include <stdarg.h>
 
 
 #include "FalconApp.h"

@@ -11,6 +11,7 @@
 #include "EnemyController.h"
 #include "Spacecraft.h"
 #include "ComputerScreen.h"
+#include <stdio.h>
 
 GameController& GameController::instance()
 {

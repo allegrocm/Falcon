@@ -104,7 +104,7 @@ void JugglerInterface::configSceneView(osgUtil::SceneView* newSceneViewer)
 void JugglerInterface::draw()
 {
 	//printf("Begin draw\n");
-	OsgApp::draw();
+	vrj::OsgApp::draw();
 	//printf("end draw\n");
 
 }
