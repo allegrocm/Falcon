@@ -50,12 +50,15 @@ public:
 //	std::vector<Spacecraft*> getShips()				{return mShips;}
 	EnemyController*		getEnemyController()	{return mEnemyController;}
 	GameController*			getGameController()		{return mGameController;}
+	ComputerScreen*			getScreen()				{return mScreen;}
 //	std::vector<Bullet*>	getBullets()			{return mBullets;}
 
 	bool addThis(GameObject* g);					//adds this to the proper group.  returns false if couldn't be added
 
 	Falcon* getFalcon()								{return mFalcon;}
 	ParticleFX*			getFX()						{return mParticleFX;}
+	
+	ButtonState getButton(int which)				{return (ButtonState)mButtons[which];}
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call

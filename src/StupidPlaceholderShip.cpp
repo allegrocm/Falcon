@@ -48,7 +48,7 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	osgUtil::Optimizer* o = new osgUtil::Optimizer();
 	o->optimize(n);
 	o->optimize(lod);
-	Util::printNodeHierarchy(n);
+//	Util::printNodeHierarchy(n);
 	
 	mPat->addChild(l);
 //	n = Util::loadModel("data/models/TieWing.3ds", 10.0, -90,0,0, Vec3(8, 0, 0));

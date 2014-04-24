@@ -12,6 +12,7 @@
 #include "StupidPlaceholderShip.h"
 #include "Defaults.h"
 #include "Util.h"
+#include "GameController.h"
 
 using namespace osg;
 EnemyController& EnemyController::instance()
@@ -52,12 +53,12 @@ void EnemyController::update(float dt)
 
 	}
 		
-	//should we spawn new enemies?
-	if(mLeftToSpawn)
+	//should we spawn new enemies?  Don't spawn unless we're actually playing
+	if(mLeftToSpawn && GameController::instance().getMode() == GameController::MAIN_GAME)
 	{
 		int diff = mMaxEnemies - mEnemies.size();		//how many more enemies can we put in play?
 		float chance = 0.1 * diff;
-		chance = 100.0;		//HACK for fast spawning for testing cull speed
+
 		if(1.0 * rand() /  RAND_MAX < chance * dt)
 		{
 			//spawn a ship!

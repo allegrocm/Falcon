@@ -23,7 +23,7 @@ class ComputerScreen : public GameObject
 public:
 	ComputerScreen();
 	bool update(float dt);
-
+	void setStatusText(std::string s);
 protected:
 	PrerenderCamera* mCamera;			//renders the display contents to a texture
 	osg::ref_ptr<osgText::Text>			mStatusText;

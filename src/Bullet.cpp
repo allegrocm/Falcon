@@ -13,7 +13,7 @@
 #include "ParticleFX.h"
 #include "Debris.h"
 #include "EnemyController.h"
-
+#include "ROM.h"
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 #include <osg/Geode>
@@ -28,6 +28,7 @@ Bullet::Bullet()
 	mLife = 5;
 	mDamage = 1;
 	mIsEnemy = false;
+	mLength = ROM::FALCON_LASER_LENGTH;
 	addGeometry();
 }
 
@@ -41,7 +42,7 @@ bool Bullet::update(float dt)
 
 void Bullet::addGeometry()
 {
-	Cylinder* cyl = new Cylinder(Vec3(), 0.25, 8.0);
+	Cylinder* cyl = new Cylinder(Vec3(), 0.25, mLength);
 //	cyl->setRotation(Quat(3.14159/2.0, Vec3(1, 0, 0)));
 	ShapeDrawable* sd = new ShapeDrawable(cyl);
 	sd->setColor(Vec4(.4, .9, .4, 1));
@@ -60,7 +61,7 @@ bool Bullet::checkHit()
 	//TODO:  collisions
 	Vec3 dir = getForward();
 	Vec3 pos = getPos();
-	float length = 2.0;
+	float length = mLength;
 	float travelLength = mVel.length() * TimeStep;
 	
 	//if our length is shorter than our velocity * dt, lengthen it so we don't pass through something
