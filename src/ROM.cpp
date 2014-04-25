@@ -17,11 +17,14 @@ float ROM::FALCON_FIRE_VOLUME;
 
 void ROM::load()
 {
+
 	Defaults::instance().load("data/Settings.txt");
 	//put in some defaults
 	FALCON_FIRE_VOLUME = 0.25;
-	
+	FALCON_FIRE_SOUND =  "cheeseyBlaster.wav";
+		
 	getDefault("falconShootSound", FALCON_FIRE_SOUND);
 	getDefault("falconShootVolume", FALCON_FIRE_VOLUME);
+	printf("FFV:  %.2f\n", FALCON_FIRE_VOLUME);
 
 }

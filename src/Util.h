@@ -13,10 +13,6 @@
 #include <windows.h>
 #include <gl/glut.h>
 #endif
-<<<<<<< HEAD
-=======
-
->>>>>>> 4c4d226cbde397be5c7186491567c7c1e9a945b2
 #include <iostream>
 #include <osg/MatrixTransform>
 #include "quickprof.h"

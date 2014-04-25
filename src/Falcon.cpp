@@ -5,14 +5,11 @@
 //  Created by Ken Kopecky II on 3/7/14.
 //
 //
-<<<<<<< HEAD
 #ifdef _WIN32
 #include <windows.h>
 #include <gl/glut.h>
 #endif
 
-=======
->>>>>>> 4c4d226cbde397be5c7186491567c7c1e9a945b2
 #include "Falcon.h"
 #include "Util.h"
 #include "Bullet.h"

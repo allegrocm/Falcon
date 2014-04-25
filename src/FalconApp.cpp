@@ -7,13 +7,10 @@
  *
  */
 
-<<<<<<< HEAD
-=======
 #ifdef _WIN32
 #include <windows.h>
 #include <gl/glut.h>
 #endif
->>>>>>> 4c4d226cbde397be5c7186491567c7c1e9a945b2
 
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
