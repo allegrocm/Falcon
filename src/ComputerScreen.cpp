@@ -35,7 +35,7 @@ ComputerScreen::ComputerScreen()
 	
 	//add some text
 	mStatusText = new osgText::Text();
-	mStatusText->setCharacterSize(0.1);
+	mStatusText->setCharacterSize(0.075);
 	mStatusText->setColor(Vec4(0.7, .7, 1, 1.0));
 
 	
@@ -56,11 +56,6 @@ ComputerScreen::ComputerScreen()
 	textGeode->addDrawable(mScoreText);
 	mCamera->addChild(textGeode);
 	ScreenImage* image = new ScreenImage();
-	mCamera->addChild(image->transform);
-	image->setImage("data/textures/RingSS.png");
-	image->setHeight(0.25);
-	image->setPos(Vec3(.7, 0.0, 0));
-	image = new ScreenImage();
 	mCamera->addChild(image->transform);
 	image->setImage("data/textures/curve.png");
 	image->setHeight(.95);
@@ -116,9 +111,13 @@ void ComputerScreen::makeScreenGeometry()
 bool ComputerScreen::update(float dt)
 {
 	GameObject::update(dt);
-	mStatusText->setText(Util::stringWithFormat("Time:  %2.2f", mAge).c_str());
+//	mStatusText->setText(Util::stringWithFormat("Time:  %2.2f", mAge).c_str());
 	mScoreText->setText(Util::stringWithFormat("Score:  %i", GameController::instance().getStats().score).c_str());
 	mRadar->update(dt);
 	return true;
 }
 
+void ComputerScreen::setStatusText(std::string t)
+{
+	mStatusText->setText(t.c_str());
+}

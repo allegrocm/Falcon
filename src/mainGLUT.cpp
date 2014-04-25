@@ -409,6 +409,7 @@ void keyboard(unsigned char key, int x, int y)
 			gFullScreen = !gFullScreen;
 			break;
 		case 27:	viewer = NULL;  exit(1);	break;
+		case 13: FalconApp::instance().buttonInput(1, true);break;		//return key is button 1
 		case 'F':
 		{
 			printf("fstats!\n");
@@ -490,6 +491,7 @@ void keyUpBoard(unsigned char key, int x, int y)
 		case 'x': gCamera.setRaise(false);		break;
 		
 		case ' ':	FalconApp::instance().buttonInput(0, false);	break;		//space bar controls the main wand button
+		case 13: FalconApp::instance().buttonInput(1, false);		break;		//return key is button 1
 	}
 
 	glutPostRedisplay();
