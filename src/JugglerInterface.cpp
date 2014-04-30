@@ -17,12 +17,14 @@ void JugglerInterface::init()
 	mHead.init("VJHead");		
 	mWand.init("VJWand");
 
-	mButton[0].init("VJButton0");
+	mButton[0].init("VJButton5");
 	mButton[1].init("VJButton1");
 	mButton[2].init("VJButton2");
 	mButton[3].init("VJButton3");
 	mButton[4].init("VJButton4");
-	mButton[5].init("VJButton5");
+	mButton[5].init("VJButton0");
+	
+	mPadButtons[0].init("Button 6");
 	 vrj::OsgApp::init();
 
 }
@@ -56,9 +58,13 @@ void JugglerInterface::latePreFrame()
 	//pass changes in button state on to the app
 	for(int i = 0; i < 6; i++)
 	{
-		if(mButton[i]->getData() == gadget::Digital::TOGGLE_ON)
+		//use gamepad buttons if they're available
+		gadget::DigitalInterface* button = &mButton[i];
+		if(mPadButtons[i]->isStupefied() == false)
+			button = &mPadButtons[i];
+		if((*button)->getData() == gadget::Digital::TOGGLE_ON)
 			FalconApp::instance().buttonInput(i, true);
-		else if(mButton[i]->getData() == gadget::Digital::TOGGLE_OFF)
+		else if((*button)->getData() == gadget::Digital::TOGGLE_OFF)
 			FalconApp::instance().buttonInput(i, false);
 	}
 
@@ -104,7 +110,7 @@ void JugglerInterface::configSceneView(osgUtil::SceneView* newSceneViewer)
 void JugglerInterface::draw()
 {
 	//printf("Begin draw\n");
-	OsgApp::draw();
+	vrj::OsgApp::draw();
 	//printf("end draw\n");
 
 }

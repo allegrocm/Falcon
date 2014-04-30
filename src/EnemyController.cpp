@@ -14,6 +14,9 @@
 #include "Util.h"
 #include "GameController.h"
 
+
+#include <stdlib.h>
+
 using namespace osg;
 EnemyController& EnemyController::instance()
 {

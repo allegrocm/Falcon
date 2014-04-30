@@ -32,8 +32,8 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	g->addDrawable(sd);
 	MatrixTransform* red = Util::loadModel("data/models/tief3DS/TIEFReduced.3DS", 1.0, -90);
 	MatrixTransform* nbest = Util::loadModel("data/models/tief3DS/TIEF.3DS", 1.0, -90);
-	MatrixTransform* n = Util::loadModel("data/models/tief3DS/TIEF_50.3DS", 1.0, -90);
-	MatrixTransform* lod = Util::loadModel("data/models/tief3DS/TIEF_10.3DS", 1.0, -90);
+	MatrixTransform* n = Util::loadModel("data/models/tief3DS/TIEF_50.3ds", 1.0, -90);
+	MatrixTransform* lod = Util::loadModel("data/models/tief3DS/TIEF_10.3ds", 1.0, -90);
 	
 	//use an LOD to reduce render time
 	osg::LOD* l = new LOD();
@@ -46,8 +46,10 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	Util::cullSmallGeodes(n, 1.0);
 	Util::cullSmallGeodes(lod, 2.0);
 	osgUtil::Optimizer* o = new osgUtil::Optimizer();
-	o->optimize(n);
-	o->optimize(lod);
+	if(n)
+		o->optimize(n);
+	if(lod)
+		o->optimize(lod);
 //	Util::printNodeHierarchy(n);
 	
 	mPat->addChild(l);

@@ -9,7 +9,7 @@
 
 // Local
 #include "JugglerInterface.h"
-#include "SceneManager.h"
+#include "FalconApp.h"
 
 using namespace vrj;
 int main(int argc, char* argv[])
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
-	SceneManager::instance().handleArguments(&argc, argv);
+	FalconApp::instance().handleArguments(&argc, argv);
 	// Figure out if this node is the slave or master
 	// so that master can handle any information needing
 	// synced across all nodes.
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 //	}
 //	
 //	//the app needs to know if it's the master node or a slave node
-//	SceneManager::instance().setIsMaster(!slave);
+//	FalconApp::instance().setIsMaster(!slave);
 
 	// Initialize the kernel object
 	kernel->init(argc, argv);
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
 /*		if(std::string("--noComputer") == argv[i])
 		{
-			SceneManager::instance().setNoComputer();
+			FalconApp::instance().setNoComputer();
 			printf("Forcing noComputer\n");
 			continue;
 		}
