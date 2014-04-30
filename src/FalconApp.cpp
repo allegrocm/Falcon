@@ -65,8 +65,8 @@ void FalconApp::init()
 	mModelGroup = new osg::Group;
 	mNavigation->addChild(mModelGroup.get());
 	mScreen = new ComputerScreen();
-	mModelGroup->addChild(mScreen->getRoot());
-	mScreen->setPos(Vec3(0, 5, 0));
+
+	mScreen->setPos(Vec3(0, 0, 0));
 	//quickly add a lil spacebox
  	mModelGroup->addChild((new SpaceBox())->getRoot());
 	
@@ -84,7 +84,7 @@ void FalconApp::init()
 
 	mFalcon = new Falcon();
 	mModelGroup->addChild(mFalcon->getRoot());
-
+	mFalcon->getAimedPart()->addChild(mScreen->getRoot());
 	mParticleFX = new ParticleFX();
 	mModelGroup->addChild(mParticleFX->getRoot());
 }
