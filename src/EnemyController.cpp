@@ -86,5 +86,10 @@ void EnemyController::addShip(Spacecraft* s)
 	FalconApp::instance().getModelGroup()->addChild(s->getRoot());		//remove the enemy from the scenegraph
 }
 
+bool EnemyController::isDone()
+{
+	return (mEnemies.size() == 0 && mLeftToSpawn <= 0);
+}
+
 
 

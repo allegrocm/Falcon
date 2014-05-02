@@ -106,7 +106,14 @@ void GameController::mainGame(float dt)
 	{
 		printf("Main Game started!\n");
 		FalconApp::instance().getScreen()->setStatusText("UNDER ATTACK");
+		mJumpTime = 3;
 	}
+	
+	if(EnemyController::instance().isDone())
+	{
+	
+	}
+	
 	
 
 

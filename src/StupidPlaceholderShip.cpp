@@ -13,6 +13,7 @@
 #include "FalconApp.h"
 #include "ParticleFX.h"
 #include "Defaults.h"
+#include "ROM.h"
 #include "GameController.h"
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
@@ -117,6 +118,8 @@ void StupidPlaceholderShip::explode()
 
 		FalconApp::instance().getFX()->makeExplosion(pos * getTransform(), Util::random(.5, 2.0));
 	}
+	
+	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::PLACEHOLDER_EXPLOSION_SOUND, 0.5, getPos().x(), getPos().y(), getPos().z(), false, 30);
 //	printf("my mat:\n");
 //	Util::printMatrix(getTransform());
 	osg::MatrixTransform* debrisRoot = Util::loadModel("data/models/tief3DS/TieFighterDebris.3DS", 1.0, -90);

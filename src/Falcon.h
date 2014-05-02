@@ -22,7 +22,9 @@ public:
 	bool update(float dt);
 	void aimAt(osg::Vec3 location);			//point the gun at a specific spot
 	osg::PositionAttitudeTransform* getAimedPart()	{return mAimedPart;}		//for connecting things to the turret
+	void jump();		//initiate hyperjump!
 protected:
+
 	osg::Vec3 mAimTarget;		//where is the gun aiming?
 	float mFireRate;			//max fire rate
 	float mFireTimer;			//time since we last fired

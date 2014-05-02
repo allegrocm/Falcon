@@ -16,12 +16,9 @@
 #include "FalconApp.h"
 #include "ROM.h"
 #include "KSoundManager.h"
-<<<<<<< HEAD
 #include "ScreenImage.h"
 #include "Hyperspace.h"
-=======
 #include <stdarg.h>
->>>>>>> 483d5e78385500af3251ce47e5f0ededdc022066
 
 using namespace osg;
 
@@ -54,7 +51,7 @@ Falcon::Falcon()
 	
 	mHyperspace = new Hyperspace();
 	mPat->addChild(mHyperspace->getRoot());
-	
+
 }
 
 bool Falcon::update(float dt)
@@ -106,3 +103,9 @@ void Falcon::aimAt(Vec3 target)
 	mAimTarget = target;
 	
 }
+
+void Falcon::jump()
+{
+	mHyperspace->go();
+}
+

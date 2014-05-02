@@ -19,7 +19,11 @@ class Hyperspace : public GameObject
 public:
 	Hyperspace();
 	bool update(float dt);
+	void go();
+	bool done();		//have we finished the jump?
+
 protected:
+	float mHSTime;				//used to time hyperspace things
 	float mPhase;			//what phase of the jump are we in?
 
 };

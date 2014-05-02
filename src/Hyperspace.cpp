@@ -46,21 +46,33 @@ Hyperspace::Hyperspace()
 	}
 	mPat->setPosition(Vec3(0, 0, -250));
 	mPat->addChild(geode);
+	mHSTime = -1;
 	update(0);
+	
 }
 
 bool Hyperspace::update(float dt)
 {
 	mAge += dt;
-	
+	if(mHSTime >= 0)
+	{
+		mHSTime += dt;
+		mPhase = mHSTime / 2.0;
+	}
+	else
+	{
+		mPhase = 1.0;
+	}
+//	mPhase= mAge / 2.0;
 	//just loop our animation for now
-	mPhase = mAge / 2.0;
+
 	mPhase -= (int)mPhase;
 	
 	mPat->setScale(Vec3(1, 1, 10.0 * mPhase * mPhase));
 	float z = -250;
 	float moveStart = 0.5;
 	
+	if(mHSTime > 2) z = 10000;
 	//start moving towards the camera after a certain amount of time
 	if(mPhase > moveStart)
 	{
@@ -72,4 +84,8 @@ bool Hyperspace::update(float dt)
 	return true;
 }
 
+void Hyperspace::go()
+{
+	mHSTime = 0.0;
+}
 
