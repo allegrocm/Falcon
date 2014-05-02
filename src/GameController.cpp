@@ -11,6 +11,7 @@
 #include "EnemyController.h"
 #include "Spacecraft.h"
 #include "ComputerScreen.h"
+#include "Falcon.h"
 #include <stdio.h>
 
 GameController& GameController::instance()
@@ -106,7 +107,19 @@ void GameController::mainGame(float dt)
 	{
 		printf("Main Game started!\n");
 		FalconApp::instance().getScreen()->setStatusText("UNDER ATTACK");
+		mJumpTime = 3;
 	}
+	
+	if(EnemyController::instance().isDone())
+	{
+		mJumpTime -= dt;
+		if(mJumpTime < 0 && mJumpTime + dt >= 0)		//did jumptime just pass zero?
+		{
+			FalconApp::instance().getFalcon()->jump();
+		}
+		
+	}
+	
 	
 
 

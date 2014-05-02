@@ -57,6 +57,7 @@ public:
 	void mainGame(float dt);
 protected:
 	float mTime;
+	float mJumpTime;			//we've initialized hyperjump.  how long till it happens?
 	GameMode mMode;
 	Stats mStats;					//holds score, etc
 	float mSwitchTime;				//if this is >0, we're getting ready to switch to a new game mode

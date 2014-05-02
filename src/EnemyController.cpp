@@ -26,7 +26,7 @@ EnemyController& EnemyController::instance()
 EnemyController::EnemyController()
 {
 	//just add a few generic spaceships for now
-	int numToMake = 5;
+	int numToMake = 3;
 	Defaults::instance().getValue("InitialShipCount", numToMake);
 	for(int i = 0; i < numToMake; i++)
 	{
@@ -35,7 +35,7 @@ EnemyController::EnemyController()
 		addShip(sps);
 	}
 
-	mLeftToSpawn = 10;
+	mLeftToSpawn = 3;
 	mMaxEnemies = 15;
 }
 
@@ -84,6 +84,11 @@ void EnemyController::addShip(Spacecraft* s)
 		if(mEnemies[i] == s) return;
 	mEnemies.push_back(s);
 	FalconApp::instance().getModelGroup()->addChild(s->getRoot());		//remove the enemy from the scenegraph
+}
+
+bool EnemyController::isDone()
+{
+	return (mEnemies.size() == 0 && mLeftToSpawn <= 0);
 }
 
 

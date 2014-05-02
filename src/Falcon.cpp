@@ -5,12 +5,19 @@
 //  Created by Ken Kopecky II on 3/7/14.
 //
 //
+#ifdef _WIN32
+#include <windows.h>
+#include <gl/glut.h>
+#endif
+
 #include "Falcon.h"
 #include "Util.h"
 #include "Bullet.h"
 #include "FalconApp.h"
 #include "ROM.h"
 #include "KSoundManager.h"
+#include "ScreenImage.h"
+#include "Hyperspace.h"
 #include <stdarg.h>
 
 using namespace osg;
@@ -25,12 +32,34 @@ Falcon::Falcon()
 	mPat->addChild(n);
 	mFireTimer = 0;
 	mFireRate = 6;
+	mAimedPart = new PositionAttitudeTransform();
+
+	//make some rings with which to aim
+	int numRings = 3;
+	for(int i = 0; i < numRings; i++)
+	{
+		ScreenImage* reticle1 = new ScreenImage();
+		reticle1->setImage(Util::findDataFile("data/textures/reticleSingle.png"));
+		reticle1->setPos(Vec3(0, 0, -50 * (1+i)));
+		reticle1->setHeight(2);
+		reticle1->transform->getOrCreateStateSet()->setMode(GL_LIGHTING, GL_FALSE);
+		mAimedPart->addChild(reticle1->transform);
+	}
 	
+	mPat->addChild(mAimedPart);
+	mAimedPart->setPosition(Vec3(0, 4, 0));
+	
+	mHyperspace = new Hyperspace();
+	mPat->addChild(mHyperspace->getRoot());
+
 }
 
 bool Falcon::update(float dt)
 {
 	mFireTimer -= dt;
+	Matrix wand = FalconApp::instance().getWandMatrix();
+	mAimedPart->setAttitude(wand.getRotate());
+	mHyperspace->update(dt);
 	return true;
 
 }
@@ -53,7 +82,7 @@ void Falcon::fire()
 
 	mAimTarget = Vec3(wand.ptr()[12], wand.ptr()[13], wand.ptr()[14]) +
 		Vec3(wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]) * -100;
-	Vec3 shootFrom = getTransform() * Vec3(0, -2, 0);
+	Vec3 shootFrom = getTransform() * Vec3(0, 4, 0);
 	Vec3 fireDir = mAimTarget - shootFrom;			//actual direction our shot will travel
 	fireDir.normalize();
 	b->setTransform(wand);
@@ -74,3 +103,9 @@ void Falcon::aimAt(Vec3 target)
 	mAimTarget = target;
 	
 }
+
+void Falcon::jump()
+{
+	mHyperspace->go();
+}
+

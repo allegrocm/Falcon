@@ -25,7 +25,7 @@ public:
 	static float FALCON_FIRE_VOLUME;			//default volume for falcon shooting
 	static float FALCON_LASER_LENGTH;			//how long is a laser shot?
 	static float FALCON_LASER_SPEED;			//how fast does it move?
-	
+	static std::string PLACEHOLDER_EXPLOSION_SOUND;
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

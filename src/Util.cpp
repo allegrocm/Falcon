@@ -8,7 +8,6 @@
  */
 
 // OSG Headers
-
 #include <osg/Geode>
 #include <osg/Geometry>
 #include <osgDB/FileUtils>
