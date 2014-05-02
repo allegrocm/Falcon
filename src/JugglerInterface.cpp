@@ -25,6 +25,7 @@ void JugglerInterface::init()
 	mButton[5].init("VJButton0");
 	
 	mPadButtons[0].init("Button 6");
+	mPadButtons[1].init("Button 2");
 	 vrj::OsgApp::init();
 
 }

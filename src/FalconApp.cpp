@@ -66,7 +66,10 @@ void FalconApp::init()
 	mNavigation->addChild(mModelGroup.get());
 	mScreen = new ComputerScreen();
 
-	mScreen->setPos(Vec3(0, 0, 0));
+	mScreen->setPos(Vec3(0, -.5, -2));
+	Quat q;
+	q.makeRotate(-0.8, Vec3(1, 0, 0));
+	mScreen->setQuat(q);
 	//quickly add a lil spacebox
  	mModelGroup->addChild((new SpaceBox())->getRoot());
 	

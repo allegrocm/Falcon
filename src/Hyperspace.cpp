@@ -10,6 +10,8 @@
 
 #include "Hyperspace.h"
 #include "Util.h"
+#include <stdlib.h>
+
 using namespace osg;
 
 Hyperspace::Hyperspace()
