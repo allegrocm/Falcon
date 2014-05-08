@@ -25,11 +25,14 @@ public:
 protected:
 
 	bool movingAway;
+<<<<<<< Updated upstream
 	bool turning;
 	osg::Vec3 targetPosition;
 	float currentTurnTime;
 	float timeToTurn;
 
+=======
+>>>>>>> Stashed changes
 	int speed;
 	osg::Vec3 mCenter;			//center of our ship
 };
