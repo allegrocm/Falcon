@@ -58,6 +58,8 @@ void GameObject::setTransform(Matrixf m)
 	
 }
 
+
+//todo:  make this work better and not screw up "up"
 void GameObject::setForward(osg::Vec3 f)
 {
 	if(f.length() < 0.001)
@@ -67,9 +69,22 @@ void GameObject::setForward(osg::Vec3 f)
 	}
 	
 	f.normalize();
+	Vec3 posIn = getPos();
 	Vec3 currentForward = getForward();
+	
 	Matrixf m = Matrixf::rotate(currentForward, f);
-	setTransform(getTransform() * m);
+//	Util::printMatrix(m);
+	Quat q; q.makeRotate(currentForward, f);
+	
+	setQuat(getQuat() * q);
+//	setTransform(m*getTransform());
+	
+	Vec3 posOut = getPos();
+	currentForward = f;
+//	printf("set forward to %.2f, %.2f, %.2f\n", currentForward.x(), currentForward.y(), currentForward.z());
+	currentForward = getForward();
+//	printf("now forward is %.2f, %.2f, %.2f\n", currentForward.x(), currentForward.y(), currentForward.z());
+//	printf("pos start:  %.2f, %.2f, %.2f.  end:  %.2f, %.2f, %.2f\n", posIn.x(), posIn.y(), posIn.z(), posOut.x(), posOut.y(), posOut.z());
 }
 
 osg::Vec3 GameObject::getForward()

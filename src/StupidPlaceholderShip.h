@@ -22,18 +22,16 @@ public:
 	void wasHit(Bullet* b);
 	float mRadius;
 	float mOffset;
+	virtual void drawDebug();
 protected:
 
-	bool movingAway;
-<<<<<<< Updated upstream
-	bool turning;
+	bool mMovingAway;
+	bool mTurning;
 	osg::Vec3 targetPosition;
-	float currentTurnTime;
-	float timeToTurn;
+	float mCurrentTurnTime;
+	float mTimeToTurn;
 
-=======
->>>>>>> Stashed changes
-	int speed;
+	float mSpeed;
 	osg::Vec3 mCenter;			//center of our ship
 };
 
