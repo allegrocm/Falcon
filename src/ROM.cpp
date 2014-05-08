@@ -12,16 +12,24 @@
 //instantiate static member variables
 std::string ROM::FALCON_FIRE_SOUND;
 float ROM::FALCON_FIRE_VOLUME;
-
+float ROM::FALCON_LASER_LENGTH;
+float ROM::FALCON_LASER_SPEED;
+std::string ROM::PLACEHOLDER_EXPLOSION_SOUND;
 
 
 void ROM::load()
 {
+
 	Defaults::instance().load("data/Settings.txt");
 	//put in some defaults
 	FALCON_FIRE_VOLUME = 0.25;
-	
+	FALCON_FIRE_SOUND =  "cheeseyBlaster.wav";
+	PLACEHOLDER_EXPLOSION_SOUND = "cheeseyBoom.wav";
+	FALCON_LASER_SPEED = 800;
+	FALCON_LASER_LENGTH = 16;
 	getDefault("falconShootSound", FALCON_FIRE_SOUND);
 	getDefault("falconShootVolume", FALCON_FIRE_VOLUME);
+	getDefault("placeholderExplosionSound", PLACEHOLDER_EXPLOSION_SOUND);
+	printf("FFV:  %.2f\n", FALCON_FIRE_VOLUME);
 
 }

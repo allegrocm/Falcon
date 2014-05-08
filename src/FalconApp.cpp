@@ -20,7 +20,7 @@
 #include <osg/Geometry>
 #include <osg/Geode>
 #include <osgDB/FileUtils>
-
+#include <stdarg.h>
 
 
 #include "FalconApp.h"
@@ -42,6 +42,7 @@ using namespace osg;
 
 void FalconApp::init()
 {
+	srand(65);
 	PROFILER.init();		//init profiling
 	__FUNCTION_HEADER__
 	ROM::load();			//load our "ROM" right off the bat so we have access to its data
@@ -64,8 +65,11 @@ void FalconApp::init()
 	mModelGroup = new osg::Group;
 	mNavigation->addChild(mModelGroup.get());
 	mScreen = new ComputerScreen();
-	mModelGroup->addChild(mScreen->getRoot());
-	mScreen->setPos(Vec3(0, 5, 0));
+
+	mScreen->setPos(Vec3(0, -.5, -2));
+	Quat q;
+	q.makeRotate(-0.8, Vec3(1, 0, 0));
+	mScreen->setQuat(q);
 	//quickly add a lil spacebox
  	mModelGroup->addChild((new SpaceBox())->getRoot());
 	
@@ -83,7 +87,7 @@ void FalconApp::init()
 
 	mFalcon = new Falcon();
 	mModelGroup->addChild(mFalcon->getRoot());
-
+	mFalcon->getAimedPart()->addChild(mScreen->getRoot());
 	mParticleFX = new ParticleFX();
 	mModelGroup->addChild(mParticleFX->getRoot());
 }

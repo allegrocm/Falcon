@@ -31,6 +31,7 @@ public:
 	float					mLife;		//how long can this last before it peters out?
 	int						mDamage;	//how hard does this hit?
 	bool					mIsEnemy;	//was this fired by an enemy?
+	float mLength;						//how long is this laser beam?
 };
 
 

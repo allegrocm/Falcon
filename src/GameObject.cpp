@@ -13,6 +13,8 @@
 #include "Util.h"
 #include "FalconApp.h"
 
+#include <stdlib.h>
+
 using namespace osg;
 
 GameObject::GameObject()

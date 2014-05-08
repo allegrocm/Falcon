@@ -45,15 +45,22 @@ public:
 	static GameController& instance();
 
 	GameController();
-	void start();
+	void startGame();
 	void end();
 	void update(float dt);
 	void enemyWasKilled(Spacecraft* c);		//called whenever an enemy dies
 	void enemyWasHit(Spacecraft* c);		//called whenever an enemy is hit
 	Stats& getStats()	{return mStats;}
+	bool isSwitching()					{return mSwitchTime >0;}		//are we already getting ready to switch game modes?
+	GameMode	getMode()				{return mMode;}
+	void preGame(float dt);				//do pregame mode stuff
+	void mainGame(float dt);
 protected:
 	float mTime;
+	float mJumpTime;			//we've initialized hyperjump.  how long till it happens?
 	GameMode mMode;
 	Stats mStats;					//holds score, etc
+	float mSwitchTime;				//if this is >0, we're getting ready to switch to a new game mode
+	float mModeTime;				//how long have we been in this mode?
 };
 #endif /* defined(__Millennium_Falcon__GameController__) */

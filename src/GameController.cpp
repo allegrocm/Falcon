@@ -10,7 +10,9 @@
 #include "FalconApp.h"
 #include "EnemyController.h"
 #include "Spacecraft.h"
-
+#include "ComputerScreen.h"
+#include "Falcon.h"
+#include <stdio.h>
 
 GameController& GameController::instance()
 {
@@ -20,7 +22,10 @@ GameController& GameController::instance()
 GameController::GameController()
 {
 	mTime = 0;
-	mMode = MAIN_GAME;
+	mMode = PRE_GAME;
+	mSwitchTime = 0;
+	mModeTime = 0;
+	mStats.reset();
 }
 
 
@@ -28,12 +33,37 @@ GameController::GameController()
 void GameController::update(float dt)
 {
 	mTime += dt;
+	
+	mSwitchTime -= dt;
+	
+	if(mMode == PRE_GAME)
+	{
+		preGame(dt);
+	}
+	else if(mMode == MAIN_GAME)
+	{
+		mainGame(dt);
+	}
+	
+	
+	mModeTime += dt;
+	
+	if(mSwitchTime + dt > 0 && mSwitchTime <= 0)		//is it time to switch modes?
+	{
+		if(mMode == PRE_GAME)
+		{
+			startGame();
+		}
+		
+	}
+	
 }
 
-void GameController::start()
+void GameController::startGame()
 {
 	mMode = MAIN_GAME;
 	mStats.reset();
+	mModeTime = 0;
 }
 
 void GameController::end()
@@ -52,6 +82,48 @@ void GameController::enemyWasHit(Spacecraft* c)
 	mStats.shotsHit++;
 }
 
+void GameController::preGame(float dt)
+{
+	//the start of pregame
+	if(mModeTime == 0)
+	{
+		printf("Pregame started!\n");
+		FalconApp::instance().getScreen()->setStatusText("All systems normal");
+	}
+	
+	//button 1 will start the fight!
+	if(FalconApp::instance().getButton(1) == FalconApp::TOGGLE_ON && !isSwitching())
+	{
+		mSwitchTime = 3.0;
+		FalconApp::instance().getScreen()->setStatusText("Incoming enemies detected!");
+	}
+}
+
+
+void GameController::mainGame(float dt)
+{
+	//the start of pregame
+	if(mModeTime == 0)
+	{
+		printf("Main Game started!\n");
+		FalconApp::instance().getScreen()->setStatusText("UNDER ATTACK");
+		mJumpTime = 3;
+	}
+	
+	if(EnemyController::instance().isDone())
+	{
+		mJumpTime -= dt;
+		if(mJumpTime < 0 && mJumpTime + dt >= 0)		//did jumptime just pass zero?
+		{
+			FalconApp::instance().getFalcon()->jump();
+		}
+		
+	}
+	
+	
+
+
+}
 
 
 

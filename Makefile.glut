@@ -1,0 +1,41 @@
+APP_NAME=	FalconGLUT
+all: $(APP_NAME)
+
+BUILD_TYPE = opt
+# Basic options.
+srcdir=		src/ \
+
+
+SRCS=	Bullet.cpp  FalconApp.cpp       Settings.cpp        ParticleFX.cpp  tinyxml.cpp        Util.cpp\
+SpaceBox.cpp                Debris.cpp     PrerenderCamera.cpp  RadarScreen.cpp   tinyxmlerror.cpp\
+       Spacecraft.cpp    tinystr.cpp   tinyxmlparser.cpp ROM.cpp ScreenImage.cpp KSoundManager.cpp Defaults.cpp EnemyController.cpp\
+StupidPlaceholderShip.cpp KenXML.cpp GameObject.cpp GameController.cpp ComputerScreen.cpp Falcon.cpp\
+mainGLUT.cpp
+
+
+OBJDIR = GLUTBuild
+DEPDIR = GLUTBuild
+OSGHOME = /home/vr/apps/watch-libs/rhel6/openscenegraph-3.0.1
+
+DZR_BASE_DIR=	$(shell flagpoll doozer --get-prefix)
+include $(DZR_BASE_DIR)/ext/vrjuggler/dzr.vrjuggler.mk
+
+#set OSGHOME if it isn't already set
+OSGHOME |=  /usr/local/OpenSceneGraph-2.8.1/
+OSG_LIB_DIR = $(OSGHOME)/lib64
+OPENTHREADS_LIB_DIR = $(OSG_LIB_DIR)
+
+EXTRA_INCLUDES+=        -I${OSGHOME}/include -I/home/users/kennyk/Graphics_Programming/lib/Linux/fmodex/fmodex -Isrc/XML
+EXTRA_LIBS+=            -L${OSG_LIB_DIR} -losg -losgDB -losgGA -losgUtil -lOpenThreads -losgViewer -losgParticle -lglut -lGLU
+EXTRA_LIBS+=            -L${OPENTHREADS_LIB_DIR} -lfmodex64 -L/home/users/kennyk/Graphics_Programming/lib/Linux/fmodex
+
+VPATH += src/XML
+
+# -----------------------------------------------------------------------------
+# Application build targets.
+# -----------------------------------------------------------------------------
+$(APP_NAME):  $(OBJS)
+	$(LINK) $(LINK_OUT)$@ $(OBJS) $(formats_LDADD) $(EXTRA_LIBS) $(LIBS)
+	
+clean:
+	rm -f $(OBJDIR)/*.o $(DEPDIR)/*.d $(APP_NAME)

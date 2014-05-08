@@ -12,6 +12,10 @@
 #include "StupidPlaceholderShip.h"
 #include "Defaults.h"
 #include "Util.h"
+#include "GameController.h"
+
+
+#include <stdlib.h>
 
 using namespace osg;
 EnemyController& EnemyController::instance()
@@ -22,7 +26,7 @@ EnemyController& EnemyController::instance()
 EnemyController::EnemyController()
 {
 	//just add a few generic spaceships for now
-	int numToMake = 5;
+	int numToMake = 3;
 	Defaults::instance().getValue("InitialShipCount", numToMake);
 	for(int i = 0; i < numToMake; i++)
 	{
@@ -31,7 +35,7 @@ EnemyController::EnemyController()
 		addShip(sps);
 	}
 
-	mLeftToSpawn = 10;
+	mLeftToSpawn = 3;
 	mMaxEnemies = 15;
 }
 
@@ -52,12 +56,12 @@ void EnemyController::update(float dt)
 
 	}
 		
-	//should we spawn new enemies?
-	if(mLeftToSpawn)
+	//should we spawn new enemies?  Don't spawn unless we're actually playing
+	if(mLeftToSpawn && GameController::instance().getMode() == GameController::MAIN_GAME)
 	{
 		int diff = mMaxEnemies - mEnemies.size();		//how many more enemies can we put in play?
 		float chance = 0.1 * diff;
-		chance = 100.0;		//HACK for fast spawning for testing cull speed
+
 		if(1.0 * rand() /  RAND_MAX < chance * dt)
 		{
 			//spawn a ship!
@@ -80,6 +84,11 @@ void EnemyController::addShip(Spacecraft* s)
 		if(mEnemies[i] == s) return;
 	mEnemies.push_back(s);
 	FalconApp::instance().getModelGroup()->addChild(s->getRoot());		//remove the enemy from the scenegraph
+}
+
+bool EnemyController::isDone()
+{
+	return (mEnemies.size() == 0 && mLeftToSpawn <= 0);
 }
 
 

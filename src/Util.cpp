@@ -8,15 +8,16 @@
  */
 
 // OSG Headers
-
 #include <osg/Geode>
 #include <osg/Geometry>
-#include <osgdb/FileUtils>
+#include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
 #include <osg/PositionAttitudeTransform>
 
 // STL Headers
 #include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
 
 // Project Headers
 #include "Util.h"
@@ -519,6 +520,12 @@ float areaOfTriangle(osg::Vec3 v0, osg::Vec3 v1, osg::Vec3 v2)
 std::map<osg::Node*, osg::Vec4> gCOGCache;			//cache this so we only need to calculate it once
 osg::Vec4 getNodeCG(osg::Node* node, osg::Node* topLevel)
 {
+	if(!node)
+	{
+		Util::logError("GetNodeCG received NULL node!\n");
+		return Vec4(0, 0, 0, 1);	
+	}
+
 	static Matrixf cumulative;
 	__FUNCTION_HEADER__
 	Vec4 soFar;		//use homogeneous coordinates so we know what to divide by
