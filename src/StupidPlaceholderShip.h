@@ -26,7 +26,7 @@ public:
 	float mOffset;
 protected:
 
-	boolean movingAway;
+	bool movingAway;
 	int speed;
 	osg::Vec3 mCenter;			//center of our ship
 };
