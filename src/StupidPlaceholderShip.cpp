@@ -76,6 +76,11 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	speed = 100;
 	this->setVel(Vec3(0, 0, -speed));
 	this->movingAway = true;
+	this->turning = false;
+
+	this->targetPosition = Vec3();
+	this->currentTurnTime = 0;
+	this->timeToTurn = 0;
 }
 
 
@@ -102,32 +107,46 @@ bool StupidPlaceholderShip::update(float dt)
 	}
 */
 
+	this->setPos(this->getVel() * dt + this->getPos());
+	Vec3 desiredDirection = this->targetPosition - this->getPos();
+	desiredDirection.normalize();
+	Vec3 adjustedVelocity = this->getVel() + (desiredDirection * speed - this->getVel()) * dt; //dt when coded was .01
+	adjustedVelocity.normalize();
+	Vec3 error = desiredDirection * speed - this->getVel();
+	std::cout << "Velocity change: " << error.x() << ", " << error.y() << ", " << error.z() << "\n";
+	if(abs(error.x()) < 1 && abs(error.y()) < 1 && abs(error.z()) < 1 && Util::random(0, 100) < 50) {
+		this->shoot();
+	}
+	this->setVel(adjustedVelocity*speed);
+
 	FalconApp app = FalconApp::instance();
 	Falcon* falcon = app.getFalcon();
 	Vec3 distanceToFalcon = falcon->getPos() - this->getPos();
-
+	
 	if(movingAway) {
-		if(distanceToFalcon.length() < 500) {
-			this->setPos(this->getVel() * dt + this->getPos());
+		if(distanceToFalcon.length() < 600) {
+			//nothing special
 		} else {
 			std::cout << "Turning around to attack!\n";
 			movingAway = false;
-			distanceToFalcon.normalize();
-			this->setVel(distanceToFalcon*speed);
-			//this->setForward(distanceToFalcon);
+			turning = true;
+			this->targetPosition = falcon->getPos();
+			this->currentTurnTime = 0;
+			this->timeToTurn = 3;
 		}
 	} else {
-		if(distanceToFalcon.length() > 100) {
-			this->setPos(this->getVel() * dt + this->getPos());
+		if(distanceToFalcon.length() > 200) {
+			//nothing special
 		} else {
 			std::cout << "Turning around to retreat!\n";
 			movingAway = true;
+			turning = true;
 			float theta = Util::random(0.0, 3.14159265);
 			float phi = Util::random(0.0, 6.28318531);
 			Vec3 target = Vec3(500*cosf(theta), 500*sinf(theta), 500*cosf(phi));
-			target.normalize();
-			this->setVel(target * speed);
-			//this->setForward(target);
+			this->targetPosition = target;
+			this->currentTurnTime = 0;
+			this->timeToTurn = 3;
 		}
 	}
 
