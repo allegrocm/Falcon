@@ -5,6 +5,7 @@
 //  Created by Ken Kopecky II on 3/7/14.
 //
 //
+#include "Falcon.h"
 #include "Util.h"
 #include <osg/LOD>
 #include "StupidPlaceholderShip.h"
@@ -70,13 +71,20 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 		mEngineSound = KSoundManager::instance()->play3DSound(std::string("data/sounds/") + engineSound, 0.5, 1000, 1000, 1000, true, 30);
 	}
 	
-	
+	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
+	this->setPos(pos);
+	speed = 100;
+	this->setVel(Vec3(0, 0, -speed));
+	this->movingAway = true;
 }
 
 
 bool StupidPlaceholderShip::update(float dt)
 {
 	bool up = Spacecraft::update(dt);
+
+/*	
+	//Fly in circle
 	float radius = mRadius;
 	float dTheta = -1.0;
 //	dTheta = 0;		//hack for explosion testing
@@ -92,6 +100,37 @@ bool StupidPlaceholderShip::update(float dt)
 		forward.normalize();
 		setForward(forward);
 	}
+*/
+
+	FalconApp app = FalconApp::instance();
+	Falcon* falcon = app.getFalcon();
+	Vec3 distanceToFalcon = falcon->getPos() - this->getPos();
+
+	if(movingAway) {
+		if(distanceToFalcon.length() < 500) {
+			this->setPos(this->getVel() * dt + this->getPos());
+		} else {
+			std::cout << "Turning around to attack!\n";
+			movingAway = false;
+			distanceToFalcon.normalize();
+			this->setVel(distanceToFalcon*speed);
+			//this->setForward(distanceToFalcon);
+		}
+	} else {
+		if(distanceToFalcon.length() > 100) {
+			this->setPos(this->getVel() * dt + this->getPos());
+		} else {
+			std::cout << "Turning around to retreat!\n";
+			movingAway = true;
+			float theta = Util::random(0.0, 3.14159265);
+			float phi = Util::random(0.0, 6.28318531);
+			Vec3 target = Vec3(500*cosf(theta), 500*sinf(theta), 500*cosf(phi));
+			target.normalize();
+			this->setVel(target * speed);
+			//this->setForward(target);
+		}
+	}
+
 	return up;
 }
 
