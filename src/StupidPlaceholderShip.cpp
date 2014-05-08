@@ -5,10 +5,9 @@
 //  Created by Ken Kopecky II on 3/7/14.
 //
 //
-
+#include "Util.h"
 #include <osg/LOD>
 #include "StupidPlaceholderShip.h"
-#include "Util.h"
 #include "Debris.h"
 #include "FalconApp.h"
 #include "ParticleFX.h"

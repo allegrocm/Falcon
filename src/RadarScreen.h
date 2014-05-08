@@ -10,7 +10,7 @@
 #define __Millennium_Falcon__RadarScreen__
 
 #include <osg/Drawable>
-#include <PrerenderCamera.h>
+#include "PrerenderCamera.h"
 #include "ScreenImage.h"
 class RadarScreen;
 
