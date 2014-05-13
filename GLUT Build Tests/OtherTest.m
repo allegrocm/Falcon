@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-
+#include "Util.h"
 @interface OtherTest : XCTestCase
 
 @end
@@ -16,6 +16,7 @@
 
 - (void)setUp
 {
+	printf("other setup\n");
     [super setUp];
     // Put setup code here. This method is called before the invocation of each test method in the class.
 }
@@ -24,11 +25,17 @@
 {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
+	printf("other teardown!\n");
 }
 
 - (void)testExample
 {
-    XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+	osg::MatrixTransform* mt = Util::loadModel("data/models/falcon3DS/milfalcon.3ds", 1.0);
+//	osg::MatrixTransform* mt = new osg::MatrixTransform;
+	
+	if(!mt)
+	   XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+	else printf("falcon loaded\n");
 }
 
 @end

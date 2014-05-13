@@ -35,7 +35,7 @@ Falcon::Falcon()
 	mFireRate = 6;
 	mAimedPart = new PositionAttitudeTransform();
 	osg::Node* turretNode = Util::findNodeWithName(n, "mf GunBody");
-	mAimedPart->addChild(turretNode);
+//	mAimedPart->addChild(turretNode);
 	//make some rings with which to aim
 	int numRings = 3;
 	for(int i = 0; i < numRings; i++)
