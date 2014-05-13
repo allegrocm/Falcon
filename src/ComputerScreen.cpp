@@ -78,6 +78,8 @@ ComputerScreen::ComputerScreen()
 		mButtonText[i]->setFont(where.c_str());
 		textGeode->addDrawable(mButtonText[i]);
 		mButtonTimer[i] = 10;
+		
+
 	}
 	
 
@@ -92,6 +94,18 @@ ComputerScreen::ComputerScreen()
 	mButtonText[2]->setPosition(Vec3(buttonX+buttonDX, buttonY, 0));
 	mButtonText[3]->setPosition(Vec3(buttonX, buttonY+buttonDY, 0));
 
+	for(int i = 0; i < 4; i++)
+	{
+			//add circles behind the buttons
+		ScreenImage* image = new ScreenImage();
+		mCamera->addChild(image->transform);
+		image->setImage("data/textures/Circle.png");
+		image->setHeight(.25);
+		image->setColor(Vec4(0.7, 0.7, .7, 1));
+		image->setPos(mButtonText[i]->getPosition());
+
+	}
+	
 }
 
 void ComputerScreen::makeScreenGeometry()
@@ -181,6 +195,7 @@ void ComputerScreen::buttonPressed(int which)
 	if(which >= 0 && which < 4)
 		mButtonTimer[which] = 0;
 }
+
 
 void ComputerScreen::setButtonText(int which, std::string text)
 {

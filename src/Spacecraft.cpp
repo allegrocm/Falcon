@@ -7,7 +7,7 @@
 //
 
 #include "Spacecraft.h"
-
+#include "KSoundManager.h"
 
 using namespace osg;
 
@@ -35,7 +35,8 @@ bool Spacecraft::update(float dt)
 	Vec3 vel = getVel();
 	
 
-	
+	if(mEngineSound)
+		KSoundManager::instance()->setSound3DInfo(mEngineSound, pos.x(), pos.y(), pos.z(), vel.x(), vel.y(), vel.z());
 	return !mDead;
 }
 

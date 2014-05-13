@@ -10,5 +10,5 @@ musicVolume = 0.25
 falconShootSound = torret_2.mp3
 falconShootVolume = 0.25
 initialShipCount = 7
-placeholderShipSound = flyby_3.mp3
+placeholderShipSound = elephant.wav
 placeholderExplosionSound = explosion_3.mp3

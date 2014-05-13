@@ -86,7 +86,7 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 
 bool StupidPlaceholderShip::update(float dt)
 {
-	bool up = Spacecraft::update(dt);
+
 
 /*	
 	//Fly in circle
@@ -152,7 +152,7 @@ bool StupidPlaceholderShip::update(float dt)
 	}
 	
 	setForward(mVel);
-
+	bool up = Spacecraft::update(dt);
 	return up;
 }
 
@@ -179,7 +179,7 @@ void StupidPlaceholderShip::explode()
 		FalconApp::instance().getFX()->makeExplosion(pos * getTransform(), Util::random(.5, 2.0));
 	}
 	
-	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::PLACEHOLDER_EXPLOSION_SOUND, 1, getPos().x(), getPos().y(), getPos().z(), false, 30);
+	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::PLACEHOLDER_EXPLOSION_SOUND, 1, getPos().x(), getPos().y(), getPos().z(), false, 100);
 //	printf("my mat:\n");
 //	Util::printMatrix(getTransform());
 	osg::MatrixTransform* debrisRoot = Util::loadModel("data/models/tief3DS/TieFighterDebris.3DS", 1.0, -90);
