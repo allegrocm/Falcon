@@ -11,7 +11,9 @@
 #include "EnemyController.h"
 #include "Spacecraft.h"
 #include "ComputerScreen.h"
+#include "KSoundManager.h"
 #include "Falcon.h"
+#include "ROM.h"
 #include <stdio.h>
 
 GameController& GameController::instance()
@@ -26,6 +28,7 @@ GameController::GameController()
 	mSwitchTime = 0;
 	mModeTime = 0;
 	mStats.reset();
+	KSoundManager::instance()->setMusicVolume(ROM::MUSIC_VOLUME);
 }
 
 
@@ -64,6 +67,7 @@ void GameController::startGame()
 	mMode = MAIN_GAME;
 	mStats.reset();
 	mModeTime = 0;
+
 }
 
 void GameController::end()
@@ -87,8 +91,14 @@ void GameController::preGame(float dt)
 	//the start of pregame
 	if(mModeTime == 0)
 	{
-		printf("Pregame started!\n");
+//		printf("Pregame started!\n");
 		FalconApp::instance().getScreen()->setStatusText("All systems normal");
+		KSoundManager::instance()->fadeIntoSong(1.0, std::string("data/sounds/") + ROM::MAIN_MUSIC);
+		//set up text for the computer screen
+		FalconApp::instance().getScreen()->setButtonText(0, "Begin");
+		FalconApp::instance().getScreen()->setButtonText(1, "");
+		FalconApp::instance().getScreen()->setButtonText(2, "");
+		FalconApp::instance().getScreen()->setButtonText(3, "");
 	}
 	
 	//button 1 will start the fight!
@@ -96,6 +106,7 @@ void GameController::preGame(float dt)
 	{
 		mSwitchTime = 3.0;
 		FalconApp::instance().getScreen()->setStatusText("Incoming enemies detected!");
+		FalconApp::instance().getScreen()->setButtonChangeText(0, "");
 	}
 }
 
@@ -108,6 +119,8 @@ void GameController::mainGame(float dt)
 		printf("Main Game started!\n");
 		FalconApp::instance().getScreen()->setStatusText("UNDER ATTACK");
 		mJumpTime = 3;
+		KSoundManager::instance()->fadeIntoSong(2.0, std::string("data/sounds/") + ROM::COMBAT_MUSIC);
+
 	}
 	
 	if(EnemyController::instance().isDone())
@@ -120,9 +133,6 @@ void GameController::mainGame(float dt)
 		
 	}
 	
-	
-
-
 }
 
 

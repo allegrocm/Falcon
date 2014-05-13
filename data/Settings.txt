@@ -3,6 +3,10 @@
 #the parameter names are NOT case sensitive, but if you provide a filename for a sound or texture or model, that IS.
 
 falconShootSound = cheeseyBlaster.wav
-falconShootVolume = 0.125
-initialShipCount = 2
+falconShootVolume = 0.25
+initialShipCount = 5
 placeholderShipSound = engine.wav
+hyperspaceSound = LAZER.WAV
+mainMusic =	imperialProbe.mp3
+combatMusic = asteroidField.mp3
+musicVolume = 0.25

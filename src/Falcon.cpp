@@ -28,12 +28,14 @@ Falcon::Falcon()
 	//load a ship model.  we can also pre-transform the model into our coordinate system
 	float scaleFactor = 0.56 * 8.4;			//found through trial, error, and online MF specs
 	MatrixTransform* n = Util::loadModel("data/models/falcon3DS/milfalcon.3ds", scaleFactor, -90, 180, 0, Vec3(0, -8, 0));
-	
+
+	Util::printNodeHierarchy(n);
 	mPat->addChild(n);
 	mFireTimer = 0;
 	mFireRate = 6;
 	mAimedPart = new PositionAttitudeTransform();
-
+	osg::Node* turretNode = Util::findNodeWithName(n, "mf GunBody");
+	mAimedPart->addChild(turretNode);
 	//make some rings with which to aim
 	int numRings = 3;
 	for(int i = 0; i < numRings; i++)
@@ -47,7 +49,7 @@ Falcon::Falcon()
 	}
 	
 	mPat->addChild(mAimedPart);
-	mAimedPart->setPosition(Vec3(0, 4, 0));
+	mAimedPart->setPosition(Vec3(0, 5, 0));
 	
 	mHyperspace = new Hyperspace();
 	mPat->addChild(mHyperspace->getRoot());

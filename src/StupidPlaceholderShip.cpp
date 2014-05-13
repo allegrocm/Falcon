@@ -127,7 +127,7 @@ bool StupidPlaceholderShip::update(float dt)
 		if(distanceToFalcon.length() < 600) {
 			//nothing special
 		} else {
-			std::cout << "Turning around to attack!\n";
+//			std::cout << "Turning around to attack!\n";
 			mMovingAway = false;
 			mTurning = true;
 			this->targetPosition = falcon->getPos();
@@ -138,7 +138,7 @@ bool StupidPlaceholderShip::update(float dt)
 		if(distanceToFalcon.length() > 200) {
 			//nothing special
 		} else {
-			std::cout << "Turning around to retreat!\n";
+//			std::cout << "Turning around to retreat!\n";
 			mMovingAway = true;
 			mTurning = true;
 			float theta = Util::random(0.0, 3.14159265);
