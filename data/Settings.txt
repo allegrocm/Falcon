@@ -2,7 +2,8 @@
 #use it to tweak parameters and assign things like sound file names
 #the parameter names are NOT case sensitive, but if you provide a filename for a sound or texture or model, that IS.
 
-falconShootSound = cheeseyBlaster.wav
-falconShootVolume = 0.125
-initialShipCount = 2
-placeholderShipSound = engine.wav
+falconShootSound = gunfire_1.mp3
+falconShootVolume = 0.25
+initialShipCount = 7
+placeholderShipSound = flyby_3.mp3
+placeholderExplosionSound = explosion_3.mp3
