@@ -134,7 +134,7 @@ public:
 		mOrbitZoom = 1.0;
 		mOrbitPitch = 45;
 		
-		mFPPos = KVec3(0, 5.5, 4);
+		mFPPos = KVec3(0, 5.5, 0);
 		mFPYaw = 0;
 		mFPPitch = 0;
 		mFPMaxSpeed = 27.0;

@@ -73,14 +73,14 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	
 	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
 	this->setPos(pos);
-	speed = 100;
-	this->setVel(Vec3(0, 0, -speed));
-	this->movingAway = true;
-	this->turning = false;
+	mSpeed = 100;
+	this->setVel(Vec3(0, 0, -mSpeed));
+	this->mMovingAway = true;
+	this->mTurning = false;
 
 	this->targetPosition = Vec3();
-	this->currentTurnTime = 0;
-	this->timeToTurn = 0;
+	this->mCurrentTurnTime = 0;
+	this->mTimeToTurn = 0;
 }
 
 
@@ -110,45 +110,48 @@ bool StupidPlaceholderShip::update(float dt)
 	this->setPos(this->getVel() * dt + this->getPos());
 	Vec3 desiredDirection = this->targetPosition - this->getPos();
 	desiredDirection.normalize();
-	Vec3 adjustedVelocity = this->getVel() + (desiredDirection * speed - this->getVel()) * dt; //dt when coded was .01
+	Vec3 adjustedVelocity = this->getVel() + (desiredDirection * mSpeed - this->getVel()) * dt; //dt when coded was .01
 	adjustedVelocity.normalize();
-	Vec3 error = desiredDirection * speed - this->getVel();
-	//std::cout << "Velocity change: " << error.x() << ", " << error.y() << ", " << error.z() << "\n";
+
+	Vec3 error = desiredDirection * mSpeed - this->getVel();
+//	std::cout << "Velocity change: " << error.x() << ", " << error.y() << ", " << error.z() << "\n";
 	if(abs(error.x()) < 1 && abs(error.y()) < 1 && abs(error.z()) < 1 && Util::random(0, 100) < 50) {
 		this->shoot();
 	}
-	this->setVel(adjustedVelocity*speed);
+	this->setVel(adjustedVelocity*mSpeed);
 
 	FalconApp app = FalconApp::instance();
 	Falcon* falcon = app.getFalcon();
 	Vec3 distanceToFalcon = falcon->getPos() - this->getPos();
 	
-	if(movingAway) {
+	if(mMovingAway) {
 		if(distanceToFalcon.length() < 600) {
 			//nothing special
 		} else {
-			std::cout << "Turning around to attack!\n";
-			movingAway = false;
-			turning = true;
+//			std::cout << "Turning around to attack!\n";
+			mMovingAway = false;
+			mTurning = true;
 			this->targetPosition = falcon->getPos();
-			this->currentTurnTime = 0;
-			this->timeToTurn = 3;
+			this->mCurrentTurnTime = 0;
+			this->mTimeToTurn = 3;
 		}
 	} else {
 		if(distanceToFalcon.length() > 200) {
 			//nothing special
 		} else {
-			std::cout << "Turning around to retreat!\n";
-			movingAway = true;
-			turning = true;
+//			std::cout << "Turning around to retreat!\n";
+			mMovingAway = true;
+			mTurning = true;
 			float theta = Util::random(0.0, 3.14159265);
 			float phi = Util::random(0.0, 6.28318531);
 			Vec3 target = Vec3(500*cosf(theta), 500*sinf(theta), 500*cosf(phi));
 			this->targetPosition = target;
-			this->currentTurnTime = 0;
-			this->timeToTurn = 3;
+			this->mCurrentTurnTime = 0;
+			this->mTimeToTurn = 3;
 		}
 	}
+	
+	setForward(mVel);
 
 	return up;
 }
@@ -230,4 +233,8 @@ void StupidPlaceholderShip::explode()
 
 }
 
+void StupidPlaceholderShip::drawDebug()
+{
 
+
+}

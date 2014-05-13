@@ -66,9 +66,10 @@ void FalconApp::init()
 	mNavigation->addChild(mModelGroup.get());
 	mScreen = new ComputerScreen();
 
-	mScreen->setPos(Vec3(0, -.5, -2));
+
 	Quat q;
 	q.makeRotate(-0.8, Vec3(1, 0, 0));
+	mScreen->setPos(Vec3(0, -.25, -3));
 	mScreen->setQuat(q);
 	//quickly add a lil spacebox
  	mModelGroup->addChild((new SpaceBox())->getRoot());
@@ -77,7 +78,7 @@ void FalconApp::init()
 	osg::Light* light = mLightSource->getLight();
 	light->setDiffuse(osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
 	light->setSpecular(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	light->setAmbient(osg::Vec4(0.05f, 0.05f, 0.05f, 1.0f));
+	light->setAmbient(osg::Vec4(0.25f, 0.2f, 0.15f, 1.0f));
 	light->setPosition(osg::Vec4(100.0f, 100.0f, 100.0f, 0.0f));
 
 	mWandXForm = new osg::MatrixTransform;
@@ -97,7 +98,12 @@ void FalconApp::buttonInput(unsigned int button, bool pressed)
 {
 	if(button < NUMBUTTONS)
 	{
-		mButtons[button] = pressed ? TOGGLE_ON : TOGGLE_OFF;
+		if(pressed && (mButtons[button] == TOGGLE_OFF || mButtons[button] == OFF))
+			mButtons[button] = TOGGLE_ON;
+		if(!pressed && (mButtons[button] == TOGGLE_ON || mButtons[button] == ON))
+			mButtons[button] = TOGGLE_OFF;
+
+
 	}
 
 }
