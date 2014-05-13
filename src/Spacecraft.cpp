@@ -33,10 +33,8 @@ bool Spacecraft::update(float dt)
 	//send our position and velocity to the SoundManager so we can have stereo and doppler and all that good stuff
 	Vec3 pos = getPos();
 	Vec3 vel = getVel();
-	if(mEngineSound)
-	{
-		KSoundManager::instance()->setSound3DInfo(mEngineSound, pos.x(), pos.y(), pos.z(), vel.x(), vel.y(), vel.z());
-	}
+	
+
 	
 	return !mDead;
 }

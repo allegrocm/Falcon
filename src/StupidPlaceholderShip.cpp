@@ -112,6 +112,7 @@ bool StupidPlaceholderShip::update(float dt)
 	desiredDirection.normalize();
 	Vec3 adjustedVelocity = this->getVel() + (desiredDirection * mSpeed - this->getVel()) * dt; //dt when coded was .01
 	adjustedVelocity.normalize();
+
 	Vec3 error = desiredDirection * mSpeed - this->getVel();
 //	std::cout << "Velocity change: " << error.x() << ", " << error.y() << ", " << error.z() << "\n";
 	if(abs(error.x()) < 1 && abs(error.y()) < 1 && abs(error.z()) < 1 && Util::random(0, 100) < 50) {
@@ -178,7 +179,7 @@ void StupidPlaceholderShip::explode()
 		FalconApp::instance().getFX()->makeExplosion(pos * getTransform(), Util::random(.5, 2.0));
 	}
 	
-	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::PLACEHOLDER_EXPLOSION_SOUND, 0.5, getPos().x(), getPos().y(), getPos().z(), false, 30);
+	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::PLACEHOLDER_EXPLOSION_SOUND, 1, getPos().x(), getPos().y(), getPos().z(), false, 30);
 //	printf("my mat:\n");
 //	Util::printMatrix(getTransform());
 	osg::MatrixTransform* debrisRoot = Util::loadModel("data/models/tief3DS/TieFighterDebris.3DS", 1.0, -90);

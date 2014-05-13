@@ -513,7 +513,7 @@ void quitski()
 int main( int argc, char **argv )
 {
     glutInit(&argc, argv);
-
+	//osg::setNotifyLevel(osg::DEBUG_FP);
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ALPHA );
     glutInitWindowPosition( 100, 100 );
     glutInitWindowSize( 800, 600 );
