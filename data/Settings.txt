@@ -3,6 +3,6 @@
 #the parameter names are NOT case sensitive, but if you provide a filename for a sound or texture or model, that IS.
 
 falconShootSound = cheeseyBlaster.wav
-falconShootVolume = 0.125
+falconShootVolume = 0.5
 initialShipCount = 2
 placeholderShipSound = engine.wav
