@@ -19,6 +19,9 @@ float ROM::MUSIC_VOLUME;
 std::string ROM::MAIN_MUSIC;
 std::string ROM::COMBAT_MUSIC;
 
+
+float ROM::TIE_HITBOX_SIZE;
+
 void ROM::load()
 {
 
@@ -38,6 +41,9 @@ void ROM::load()
 	getDefault("placeholderExplosionSound", PLACEHOLDER_EXPLOSION_SOUND);
 	getDefault("mainMusic", MAIN_MUSIC);
 	getDefault("combatMusic", COMBAT_MUSIC);
-	printf("FFV:  %.2f\n", FALCON_FIRE_VOLUME);
+
+
+	TIE_HITBOX_SIZE = 10;
+	getDefault("tieHitboxSize", TIE_HITBOX_SIZE);
 
 }

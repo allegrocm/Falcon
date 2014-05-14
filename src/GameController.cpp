@@ -31,10 +31,15 @@ GameController::GameController()
 	KSoundManager::instance()->setMusicVolume(ROM::MUSIC_VOLUME);
 }
 
-
+bool GameController::modeTimeJustPassed(float t)
+{
+	if(mModeTime >= t && mModeTime - mLastDT < t) return true;
+	return false;
+}
 
 void GameController::update(float dt)
 {
+	mLastDT = dt;
 	mTime += dt;
 	
 	mSwitchTime -= dt;
@@ -107,6 +112,7 @@ void GameController::preGame(float dt)
 		mSwitchTime = 3.0;
 		FalconApp::instance().getScreen()->setStatusText("Incoming enemies detected!");
 		FalconApp::instance().getScreen()->setButtonChangeText(0, "");
+		KSoundManager::instance()->fadeIntoSong(2.0, std::string("data/sounds/") + ROM::COMBAT_MUSIC);
 	}
 }
 
@@ -119,7 +125,7 @@ void GameController::mainGame(float dt)
 		printf("Main Game started!\n");
 		FalconApp::instance().getScreen()->setStatusText("UNDER ATTACK");
 		mJumpTime = 3;
-		KSoundManager::instance()->fadeIntoSong(2.0, std::string("data/sounds/") + ROM::COMBAT_MUSIC);
+		
 
 	}
 	

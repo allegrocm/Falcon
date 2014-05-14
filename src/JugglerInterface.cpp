@@ -92,21 +92,25 @@ osg::Group* JugglerInterface::getScene()
 	return _rootNode.get();
 }
 
-/*
+
 // Override OsgApp::configSceneView to add FrameStamp to SceneView.
 // This helps animations and shaders work properly in OSG.
 void JugglerInterface::configSceneView(osgUtil::SceneView* newSceneViewer)
 {
-	 newSceneViewer->setDefaults();
-  	 // newSceneViewer->setClearColor(osg::Vec4(0.7f, 0.7f, 0.8f, 0.0f));
-	 
-	 // Needed for stereo to work.
-	 newSceneViewer->setDrawBufferValue(GL_NONE);
 
-	 _frameStamp = new osg::FrameStamp;
-	 newSceneViewer->setFrameStamp(_frameStamp.get());
+	__FUNCTION_HEADER__
+	vrj::OsgApp::configSceneView(newSceneViewer);
+
+
+//	newSceneViewer->setClearColor(osg::Vec4(0.3f, 0.2f, 0.5f, 1.0f));
+	printf("line %i\n", __LINE__);
+	if(!newSceneViewer) return;
+	osg::Camera* cam = newSceneViewer->getCamera();
+	printf("line %i\n", __LINE__);
+	//set the cull mask of our camera so that we don't draw invisible hitboxes
+	newSceneViewer->setCullMask((1 << NON_GLOW_LAYER) | (1 << GLOW_LAYER) | (1 << BACKGROUND_LAYER));
+	printf("line %i\n", __LINE__);
 }
-*/
 
 void JugglerInterface::draw()
 {

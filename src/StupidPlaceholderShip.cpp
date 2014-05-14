@@ -18,6 +18,8 @@
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 #include <osgUtil/Optimizer>
+#include "Layers.h"
+
 using namespace osg;
 
 
@@ -27,15 +29,12 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	mRadius = 50 + rand()%50;
 	mOffset = 6.28 * rand() / RAND_MAX;
 	//load a ship model.  we can also pre-transform the model into our coordinate system
-	Sphere* sphere = new Sphere(Vec3(0, 0, 0), 5);
-	ShapeDrawable* sd = new ShapeDrawable(sphere);
-	Geode* g = new Geode;
-	g->addDrawable(sd);
-	MatrixTransform* red = Util::loadModel("data/models/tief3DS/TIEFReduced.3DS", 1.0, -90);
+//	MatrixTransform* red = Util::loadModel("data/models/tief3DS/TIEFReduced.3DS", 1.0, -90);
 	MatrixTransform* nbest = Util::loadModel("data/models/tief3DS/TIEF.3DS", 1.0, -90);
 	MatrixTransform* n = Util::loadModel("data/models/tief3DS/TIEF_50.3ds", 1.0, -90);
 	MatrixTransform* lod = Util::loadModel("data/models/tief3DS/TIEF_10.3ds", 1.0, -90);
 	
+
 	//use an LOD to reduce render time
 	osg::LOD* l = new LOD();
 //	l->addChild(g, 0, 100000);
@@ -52,7 +51,19 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	if(lod)
 		o->optimize(lod);
 //	Util::printNodeHierarchy(n);
-	
+
+
+	//add a sphere so it's easier to hit the far-away version
+	Sphere* sphere = new Sphere(Vec3(0, 0, 0), ROM::TIE_HITBOX_SIZE);
+	ShapeDrawable* sd = new ShapeDrawable(sphere);
+	Geode* g = new Geode;
+	g->addDrawable(sd);
+
+	mPat->addChild(g);
+	g->setNodeMask(1 << COLLISION_LAYER);			//don't draw the sphere
+
+
+	//n->addChild(g);
 	mPat->addChild(l);
 //	n = Util::loadModel("data/models/TieWing.3ds", 10.0, -90,0,0, Vec3(8, 0, 0));
 //	mPat->addChild(n);

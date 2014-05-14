@@ -17,6 +17,7 @@
 #include <stdarg.h>
 #include "FalconApp.h"
 #include "quickprof.h"
+#include "Layers.h"
 
 int screenWidth = 1024;
 int screenHeight = 768;
@@ -225,7 +226,7 @@ void display(void)
 {
     // update and render the scene graph
 	osg::Camera* currentCam = viewer->getCamera();
-	currentCam->setCullingActive(false);
+	currentCam->setCullMask((1 << NON_GLOW_LAYER) | (1 << GLOW_LAYER) | (1 << BACKGROUND_LAYER));
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -442,12 +443,33 @@ void keySpecial(int key, int x, int y)
 {
 	switch(key)
 	{
+		case GLUT_KEY_LEFT: FalconApp::instance().buttonInput(1, true); break;
+		case GLUT_KEY_DOWN: FalconApp::instance().buttonInput(2, true); break;
+		case GLUT_KEY_RIGHT: FalconApp::instance().buttonInput(3, true); break;
+		case GLUT_KEY_UP: FalconApp::instance().buttonInput(4, true); break;
 		default: break;
 
 	}
 	
 
 }
+
+void keySpecialUp(int key, int x, int y)
+{
+	switch(key)
+	{
+		case GLUT_KEY_LEFT: FalconApp::instance().buttonInput(1, false); break;
+		case GLUT_KEY_DOWN: FalconApp::instance().buttonInput(2, false); break;
+		case GLUT_KEY_RIGHT: FalconApp::instance().buttonInput(3, false); break;
+		case GLUT_KEY_UP: FalconApp::instance().buttonInput(4, false); break;
+
+		default: break;
+
+	}
+	
+
+}
+
 
 void timer(int bl)
 {
@@ -526,6 +548,7 @@ int main( int argc, char **argv )
 	glutKeyboardFunc( keyboard );
 	glutKeyboardUpFunc(keyboardUp);
 	glutSpecialFunc(keySpecial);
+	glutSpecialUpFunc(keySpecialUp);
 	glutKeyboardUpFunc(keyUpBoard);
 
     // create the view of the scene.

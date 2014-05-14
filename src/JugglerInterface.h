@@ -27,7 +27,7 @@ class JugglerInterface : public vrj::OsgApp
 
     virtual osg::Group* getScene();
 
-//	void configSceneView(osgUtil::SceneView* newSceneViewer);
+	void configSceneView(osgUtil::SceneView* newSceneViewer);
 
   private:
 	osg::ref_ptr<osg::Group> _rootNode;

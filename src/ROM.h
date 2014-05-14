@@ -20,7 +20,8 @@ class ROM
 {
 public:
 	static void load();		//loads the settings file
-	//sound effects
+
+	//sound effects and music
 	static std::string FALCON_FIRE_SOUND;		//sound file used
 	static float FALCON_FIRE_VOLUME;			//default volume for falcon shooting
 	static float FALCON_LASER_LENGTH;			//how long is a laser shot?
@@ -29,6 +30,10 @@ public:
 	static std::string PLACEHOLDER_EXPLOSION_SOUND;
 	static std::string MAIN_MUSIC;
 	static std::string COMBAT_MUSIC;
+	
+	
+	//difficulty
+	static float TIE_HITBOX_SIZE;		//hitbox size of a TIE fighter
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

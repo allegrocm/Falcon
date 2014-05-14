@@ -18,7 +18,7 @@
 #include <osg/ShapeDrawable>
 #include <osg/Geode>
 #include <osgUtil/IntersectVisitor>
-
+#include "Layers.h"
 using namespace osg;
 
 Bullet::Bullet()
@@ -69,6 +69,7 @@ bool Bullet::checkHit()
 		length = travelLength;
 	//make a line segment representing the laser beam
 	ref_ptr<LineSegment> seg = new LineSegment(pos - dir * length * 0.5, pos + dir * length * 0.5);
+	iv.setTraversalMask(1 << COLLISION_LAYER);		//DON'T check collisions with other lazer beams
 	iv.addLineSegment(seg.get());
 //	printf("Seg:  %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
 	//dunno if this is the best way to do it or not, but we're gonna just check each ship individually
