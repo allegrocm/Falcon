@@ -17,6 +17,7 @@
 #include <stdarg.h>
 #include "FalconApp.h"
 #include "quickprof.h"
+#include "Layers.h"
 
 int screenWidth = 1024;
 int screenHeight = 768;
@@ -225,7 +226,7 @@ void display(void)
 {
     // update and render the scene graph
 	osg::Camera* currentCam = viewer->getCamera();
-	currentCam->setCullingActive(false);
+	currentCam->setCullMask((1 << NON_GLOW_LAYER) | (1 << GLOW_LAYER) | (1 << BACKGROUND_LAYER));
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -409,7 +410,7 @@ void keyboard(unsigned char key, int x, int y)
 			gFullScreen = !gFullScreen;
 			break;
 		case 27:	viewer = NULL;  exit(1);	break;
-		case 13: FalconApp::instance().buttonInput(1, true);break;		//return key is button 1
+		//case 13: FalconApp::instance().buttonInput(1, true);break;		//return key is button 1
 		case 'F':
 		{
 			printf("fstats!\n");
@@ -442,12 +443,33 @@ void keySpecial(int key, int x, int y)
 {
 	switch(key)
 	{
+		case GLUT_KEY_LEFT: FalconApp::instance().buttonInput(1, true); break;
+		case GLUT_KEY_DOWN: FalconApp::instance().buttonInput(2, true); break;
+		case GLUT_KEY_RIGHT: FalconApp::instance().buttonInput(3, true); break;
+		case GLUT_KEY_UP: FalconApp::instance().buttonInput(4, true); break;
 		default: break;
 
 	}
 	
 
 }
+
+void keySpecialUp(int key, int x, int y)
+{
+	switch(key)
+	{
+		case GLUT_KEY_LEFT: FalconApp::instance().buttonInput(1, false); break;
+		case GLUT_KEY_DOWN: FalconApp::instance().buttonInput(2, false); break;
+		case GLUT_KEY_RIGHT: FalconApp::instance().buttonInput(3, false); break;
+		case GLUT_KEY_UP: FalconApp::instance().buttonInput(4, false); break;
+
+		default: break;
+
+	}
+	
+
+}
+
 
 void timer(int bl)
 {
@@ -463,6 +485,13 @@ void timer(int bl)
 
 
 	MagicJoystick::update();
+	if(MagicJoystick::sticks())
+	{
+		//send gamepad button presses to the app
+		MagicJoystick& gamepad = MagicJoystick::stick(0);
+		for(int i = 0; i < 4; i++)
+			FalconApp::instance().buttonInput(1+i, gamepad.button[i]);
+	}
 #endif
 
 	if(!gPaused)
@@ -491,7 +520,7 @@ void keyUpBoard(unsigned char key, int x, int y)
 		case 'x': gCamera.setRaise(false);		break;
 		
 		case ' ':	FalconApp::instance().buttonInput(0, false);	break;		//space bar controls the main wand button
-		case 13: FalconApp::instance().buttonInput(1, false);		break;		//return key is button 1
+	//	case 13: FalconApp::instance().buttonInput(1, false);		break;		//return key is button 1
 	}
 
 	glutPostRedisplay();
@@ -506,7 +535,7 @@ void quitski()
 int main( int argc, char **argv )
 {
     glutInit(&argc, argv);
-
+	//osg::setNotifyLevel(osg::DEBUG_FP);
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ALPHA );
     glutInitWindowPosition( 100, 100 );
     glutInitWindowSize( 800, 600 );
@@ -519,6 +548,7 @@ int main( int argc, char **argv )
 	glutKeyboardFunc( keyboard );
 	glutKeyboardUpFunc(keyboardUp);
 	glutSpecialFunc(keySpecial);
+	glutSpecialUpFunc(keySpecialUp);
 	glutKeyboardUpFunc(keyUpBoard);
 
     // create the view of the scene.

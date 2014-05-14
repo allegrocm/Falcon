@@ -6,10 +6,10 @@
 //
 //
 
+#include "Util.h"
 #include "ComputerScreen.h"
 #include "PrerenderCamera.h"
 #include "FalconApp.h"
-#include "Util.h"
 #include <osgDB/FileUtils>
 #include <osg/BlendFunc>
 #include "ScreenImage.h"
@@ -17,7 +17,7 @@
 #include "GameController.h"
 
 using namespace osg;
-float gScreenAspect = 1.25;
+float gScreenAspect = 1.75;
 ComputerScreen::ComputerScreen()
 {
 	mCamera = new PrerenderCamera(1024, 1, GL_RGBA);
@@ -67,6 +67,45 @@ ComputerScreen::ComputerScreen()
 	mCamera->addChild(mRadar->transform);
 	mRadar->setHeight(0.5);
 	mRadar->setPos(Vec3(-.2, -.2, 0));
+	
+	for(int i = 0; i < 4; i++)		//set up button indicators
+	{
+		mButtonText[i] = new osgText::Text();
+		mButtonText[i]->setCharacterSize(0.05);
+		mButtonText[i]->setColor(Vec4(.7, .7, 1, 1));
+		mButtonText[i]->setAlignment(osgText::TextBase::CENTER_CENTER);
+		mButtonText[i]->setText(Util::stringWithFormat("Button%i", i+1));
+		mButtonText[i]->setFont(where.c_str());
+		textGeode->addDrawable(mButtonText[i]);
+		mButtonTimer[i] = 10;
+		
+
+	}
+	
+
+	
+	//position the button texts in a plus layout
+	float buttonX = 0.5;
+	float buttonY = -0.3;
+	float buttonDX = 0.2;
+	float buttonDY = 0.1;
+	mButtonText[0]->setPosition(Vec3(buttonX-buttonDX, buttonY, 0));
+	mButtonText[1]->setPosition(Vec3(buttonX, buttonY-buttonDY, 0));
+	mButtonText[2]->setPosition(Vec3(buttonX+buttonDX, buttonY, 0));
+	mButtonText[3]->setPosition(Vec3(buttonX, buttonY+buttonDY, 0));
+
+	for(int i = 0; i < 4; i++)
+	{
+			//add circles behind the buttons
+		ScreenImage* image = new ScreenImage();
+		mCamera->addChild(image->transform);
+		image->setImage("data/textures/Circle.png");
+		image->setHeight(.25);
+		image->setColor(Vec4(0.7, 0.7, .7, 1));
+		image->setPos(mButtonText[i]->getPosition());
+
+	}
+	
 }
 
 void ComputerScreen::makeScreenGeometry()
@@ -114,6 +153,34 @@ bool ComputerScreen::update(float dt)
 //	mStatusText->setText(Util::stringWithFormat("Time:  %2.2f", mAge).c_str());
 	mScoreText->setText(Util::stringWithFormat("Score:  %i", GameController::instance().getStats().score).c_str());
 	mRadar->update(dt);
+	for(int i = 0; i < 4; i++)		//update buttons!
+	{
+		mButtonTimer[i] += dt;
+		
+		//if they've just been pressed, button flicker between two colors
+		Vec4 color1 = Vec4(.7, .7, 1, 1);
+		Vec4 color2 = Vec4(1, .2, .2, 1);
+		float t = 0.5 + 0.5 * sinf(mButtonTimer[i] * 60.0);
+		if(FalconApp::instance().getButton(i+1) == FalconApp::TOGGLE_ON)
+			buttonPressed(i);
+		float flashTime = 0.75;
+		if(mButtonTimer[i] > flashTime)
+		{
+			if(mButtonTimer[i] - dt <= flashTime)		//did we just stop flashing?  might need to change the text
+			{
+			
+				if(mNextText[i] != "")
+				{
+					mButtonText[i]->setText(mNextText[i]);
+					mNextText[i] = "";						//clear the "next text" so we don't switch it next time it's pressed
+				}
+			}
+			
+			t = 1.0;
+		}
+		mButtonText[i]->setColor(color2 * (1.0-t) + color1 * t);
+	}
+	
 	return true;
 }
 
@@ -121,3 +188,24 @@ void ComputerScreen::setStatusText(std::string t)
 {
 	mStatusText->setText(t.c_str());
 }
+
+void ComputerScreen::buttonPressed(int which)
+{
+	printf("Pressed button %i!\n", which);
+	if(which >= 0 && which < 4)
+		mButtonTimer[which] = 0;
+}
+
+
+void ComputerScreen::setButtonText(int which, std::string text)
+{
+	mButtonText[which]->setText(text);
+}
+
+void ComputerScreen::setButtonChangeText(int which, std::string text)
+{
+	if(text == "") text = " ";		//empty strings are ignored when the button changes, so put a space in
+	mNextText[which] = text;
+}
+
+

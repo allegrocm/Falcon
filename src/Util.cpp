@@ -344,7 +344,7 @@ std::vector<OSGTri> turnGeodeToTriangles(osg::Geode &node)
 
 		// Cast the drawable to a geometry object.
 		osg::Geometry* geom = dynamic_cast<osg::Geometry*>(drawable);
-
+		if(!geom) continue;
 		// Copy the geometry object's vertex and texCoord data
 		const osg::Vec3Array* vertexArray = 
 			(const osg::Vec3Array*)(geom->getVertexArray());

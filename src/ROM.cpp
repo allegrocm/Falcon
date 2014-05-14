@@ -15,7 +15,12 @@ float ROM::FALCON_FIRE_VOLUME;
 float ROM::FALCON_LASER_LENGTH;
 float ROM::FALCON_LASER_SPEED;
 std::string ROM::PLACEHOLDER_EXPLOSION_SOUND;
+float ROM::MUSIC_VOLUME;
+std::string ROM::MAIN_MUSIC;
+std::string ROM::COMBAT_MUSIC;
 
+
+float ROM::TIE_HITBOX_SIZE;
 
 void ROM::load()
 {
@@ -25,11 +30,20 @@ void ROM::load()
 	FALCON_FIRE_VOLUME = 0.25;
 	FALCON_FIRE_SOUND =  "cheeseyBlaster.wav";
 	PLACEHOLDER_EXPLOSION_SOUND = "cheeseyBoom.wav";
+	MAIN_MUSIC = "mainTheme.mp3";
+	COMBAT_MUSIC = "mainTheme.mp3";
 	FALCON_LASER_SPEED = 800;
 	FALCON_LASER_LENGTH = 16;
+	MUSIC_VOLUME = 0.2;
+	getDefault("musicVolume", MUSIC_VOLUME);
 	getDefault("falconShootSound", FALCON_FIRE_SOUND);
 	getDefault("falconShootVolume", FALCON_FIRE_VOLUME);
 	getDefault("placeholderExplosionSound", PLACEHOLDER_EXPLOSION_SOUND);
-	printf("FFV:  %.2f\n", FALCON_FIRE_VOLUME);
+	getDefault("mainMusic", MAIN_MUSIC);
+	getDefault("combatMusic", COMBAT_MUSIC);
+
+
+	TIE_HITBOX_SIZE = 10;
+	getDefault("tieHitboxSize", TIE_HITBOX_SIZE);
 
 }

@@ -5,10 +5,10 @@
 //  Created by Ken Kopecky II on 3/7/14.
 //
 //
-
+#include "Falcon.h"
+#include "Util.h"
 #include <osg/LOD>
 #include "StupidPlaceholderShip.h"
-#include "Util.h"
 #include "Debris.h"
 #include "FalconApp.h"
 #include "ParticleFX.h"
@@ -18,6 +18,8 @@
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 #include <osgUtil/Optimizer>
+#include "Layers.h"
+
 using namespace osg;
 
 
@@ -27,15 +29,12 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	mRadius = 50 + rand()%50;
 	mOffset = 6.28 * rand() / RAND_MAX;
 	//load a ship model.  we can also pre-transform the model into our coordinate system
-	Sphere* sphere = new Sphere(Vec3(0, 0, 0), 5);
-	ShapeDrawable* sd = new ShapeDrawable(sphere);
-	Geode* g = new Geode;
-	g->addDrawable(sd);
-	MatrixTransform* red = Util::loadModel("data/models/tief3DS/TIEFReduced.3DS", 1.0, -90);
+//	MatrixTransform* red = Util::loadModel("data/models/tief3DS/TIEFReduced.3DS", 1.0, -90);
 	MatrixTransform* nbest = Util::loadModel("data/models/tief3DS/TIEF.3DS", 1.0, -90);
 	MatrixTransform* n = Util::loadModel("data/models/tief3DS/TIEF_50.3ds", 1.0, -90);
 	MatrixTransform* lod = Util::loadModel("data/models/tief3DS/TIEF_10.3ds", 1.0, -90);
 	
+
 	//use an LOD to reduce render time
 	osg::LOD* l = new LOD();
 //	l->addChild(g, 0, 100000);
@@ -52,7 +51,19 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	if(lod)
 		o->optimize(lod);
 //	Util::printNodeHierarchy(n);
-	
+
+
+	//add a sphere so it's easier to hit the far-away version
+	Sphere* sphere = new Sphere(Vec3(0, 0, 0), ROM::TIE_HITBOX_SIZE);
+	ShapeDrawable* sd = new ShapeDrawable(sphere);
+	Geode* g = new Geode;
+	g->addDrawable(sd);
+
+	mPat->addChild(g);
+	g->setNodeMask(1 << COLLISION_LAYER);			//don't draw the sphere
+
+
+	//n->addChild(g);
 	mPat->addChild(l);
 //	n = Util::loadModel("data/models/TieWing.3ds", 10.0, -90,0,0, Vec3(8, 0, 0));
 //	mPat->addChild(n);
@@ -71,13 +82,25 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 		mEngineSound = KSoundManager::instance()->play3DSound(std::string("data/sounds/") + engineSound, 0.5, 1000, 1000, 1000, true, 30);
 	}
 	
-	
+	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
+	this->setPos(pos);
+	mSpeed = 100;
+	this->setVel(Vec3(0, 0, -mSpeed));
+	this->mMovingAway = true;
+	this->mTurning = false;
+
+	this->targetPosition = Vec3();
+	this->mCurrentTurnTime = 0;
+	this->mTimeToTurn = 0;
 }
 
 
 bool StupidPlaceholderShip::update(float dt)
 {
-	bool up = Spacecraft::update(dt);
+
+
+/*	
+	//Fly in circle
 	float radius = mRadius;
 	float dTheta = -1.0;
 //	dTheta = 0;		//hack for explosion testing
@@ -93,6 +116,54 @@ bool StupidPlaceholderShip::update(float dt)
 		forward.normalize();
 		setForward(forward);
 	}
+*/
+
+	this->setPos(this->getVel() * dt + this->getPos());
+	Vec3 desiredDirection = this->targetPosition - this->getPos();
+	desiredDirection.normalize();
+	Vec3 adjustedVelocity = this->getVel() + (desiredDirection * mSpeed - this->getVel()) * dt; //dt when coded was .01
+	adjustedVelocity.normalize();
+
+	Vec3 error = desiredDirection * mSpeed - this->getVel();
+//	std::cout << "Velocity change: " << error.x() << ", " << error.y() << ", " << error.z() << "\n";
+	if(abs(error.x()) < 1 && abs(error.y()) < 1 && abs(error.z()) < 1 && Util::random(0, 100) < 50) {
+		this->shoot();
+	}
+	this->setVel(adjustedVelocity*mSpeed);
+
+	FalconApp app = FalconApp::instance();
+	Falcon* falcon = app.getFalcon();
+	Vec3 distanceToFalcon = falcon->getPos() - this->getPos();
+	
+	if(mMovingAway) {
+		if(distanceToFalcon.length() < 600) {
+			//nothing special
+		} else {
+//			std::cout << "Turning around to attack!\n";
+			mMovingAway = false;
+			mTurning = true;
+			this->targetPosition = falcon->getPos();
+			this->mCurrentTurnTime = 0;
+			this->mTimeToTurn = 3;
+		}
+	} else {
+		if(distanceToFalcon.length() > 200) {
+			//nothing special
+		} else {
+//			std::cout << "Turning around to retreat!\n";
+			mMovingAway = true;
+			mTurning = true;
+			float theta = Util::random(0.0, 3.14159265);
+			float phi = Util::random(0.0, 6.28318531);
+			Vec3 target = Vec3(500*cosf(theta), 500*sinf(theta), 500*cosf(phi));
+			this->targetPosition = target;
+			this->mCurrentTurnTime = 0;
+			this->mTimeToTurn = 3;
+		}
+	}
+	
+	setForward(mVel);
+	bool up = Spacecraft::update(dt);
 	return up;
 }
 
@@ -119,7 +190,7 @@ void StupidPlaceholderShip::explode()
 		FalconApp::instance().getFX()->makeExplosion(pos * getTransform(), Util::random(.5, 2.0));
 	}
 	
-	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::PLACEHOLDER_EXPLOSION_SOUND, 0.5, getPos().x(), getPos().y(), getPos().z(), false, 30);
+	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::PLACEHOLDER_EXPLOSION_SOUND, 1, getPos().x(), getPos().y(), getPos().z(), false, 100);
 //	printf("my mat:\n");
 //	Util::printMatrix(getTransform());
 	osg::MatrixTransform* debrisRoot = Util::loadModel("data/models/tief3DS/TieFighterDebris.3DS", 1.0, -90);
@@ -173,4 +244,8 @@ void StupidPlaceholderShip::explode()
 
 }
 
+void StupidPlaceholderShip::drawDebug()
+{
 
+
+}

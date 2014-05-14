@@ -9,7 +9,7 @@ srcdir=		src/ \
 SRCS=	Bullet.cpp  FalconApp.cpp       Settings.cpp        ParticleFX.cpp  tinyxml.cpp        Util.cpp\
 SpaceBox.cpp                Debris.cpp     PrerenderCamera.cpp  RadarScreen.cpp   tinyxmlerror.cpp\
        Spacecraft.cpp    tinystr.cpp   tinyxmlparser.cpp ROM.cpp ScreenImage.cpp KSoundManager.cpp Defaults.cpp EnemyController.cpp\
-StupidPlaceholderShip.cpp KenXML.cpp GameObject.cpp GameController.cpp ComputerScreen.cpp Falcon.cpp\
+StupidPlaceholderShip.cpp KenXML.cpp GameObject.cpp GameController.cpp ComputerScreen.cpp Falcon.cpp Hyperspace.cpp\
 mainGLUT.cpp
 
 

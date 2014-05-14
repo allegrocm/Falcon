@@ -11,8 +11,6 @@
 
 #include "Spacecraft.h"
 
-
-
 //this spaceship flies around in a circle and sometimes maybe shoots.
 class StupidPlaceholderShip : public Spacecraft
 {
@@ -24,9 +22,17 @@ public:
 	void wasHit(Bullet* b);
 	float mRadius;
 	float mOffset;
+	virtual void drawDebug();
 protected:
 
-	osg::Vec3 mCenter;			//center of our
+	bool mMovingAway;
+	bool mTurning;
+	osg::Vec3 targetPosition;
+	float mCurrentTurnTime;
+	float mTimeToTurn;
+
+	float mSpeed;
+	osg::Vec3 mCenter;			//center of our ship
 };
 
 

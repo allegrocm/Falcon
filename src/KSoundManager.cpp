@@ -301,11 +301,12 @@ void KSoundManager::update(float dt)
 	if(mSilent) return;
 	mSystem->update();
 
-	if (fading && song)
+	if (fading)
 	{
 		musicFadeTimeCounter -= dt;
 		if (musicFadeTimeCounter < 0)
 		{
+			printf("fade song to %s\n", nextSong.c_str());
 			stopSong();
 			if(nextSong != "")
 				playSong(nextSong, mMusicVolume, 0);
