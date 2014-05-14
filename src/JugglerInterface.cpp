@@ -1,5 +1,6 @@
 #include "JugglerInterface.h"
 #include "FalconApp.h"
+#include "Util.h"
 
 
 JugglerInterface::JugglerInterface(vrj::Kernel* kern, int& argc, char** argv) : vrj::OsgApp(kern)
@@ -17,12 +18,12 @@ void JugglerInterface::init()
 	mHead.init("VJHead");		
 	mWand.init("VJWand");
 
-	mButton[0].init("VJButton5");
+	mButton[0].init("VJButton0");
 	mButton[1].init("VJButton1");
 	mButton[2].init("VJButton2");
 	mButton[3].init("VJButton3");
 	mButton[4].init("VJButton4");
-	mButton[5].init("VJButton0");
+	mButton[5].init("VJButton5");
 	
 	mPadButtons[0].init("Button 6");
 	mPadButtons[1].init("Button 2");
@@ -75,6 +76,12 @@ void JugglerInterface::latePreFrame()
 	FalconApp::instance().setWandMatrix(wandMatrix);
 	osg::Matrixf headMatrix	(mHead->getData().mData);
 	FalconApp::instance().setHeadMatrix(headMatrix);
+	
+		//KK:  on Mac, the first time this is called, the Kernel has zero users, and latePreFrame crashes. 
+
+	if(mKernel->getUsers().size())
+		vrj::osg::App::latePreFrame();
+	fflush(stdout);
 
 }
 

@@ -17,6 +17,7 @@
 #include <osg/MatrixTransform>
 #include "quickprof.h"
 #include <osg/Geometry>
+#include "Layers.h"
 
 //for tracking crashes when we don't have an easily accessible stacktrace
 //uncomment this line for tons of info to be dumped into the console and/or log file

@@ -33,6 +33,8 @@ protected:
 
 	float mSpeed;
 	osg::Vec3 mCenter;			//center of our ship
+	
+
 };
 
 

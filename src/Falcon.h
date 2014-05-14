@@ -10,6 +10,8 @@
 #define __Millennium_Falcon__Falcon__
 
 #include "Spacecraft.h"
+#include "Falcon.h"
+#include "Gun.h"
 
 //the Millennium Falcon.  Will eventually include an interior, maybe can take damage, whatever
 
@@ -30,5 +32,6 @@ protected:
 	float mFireTimer;			//time since we last fired
 	osg::ref_ptr<osg::PositionAttitudeTransform> mAimedPart;	//this is the part that moves when we aim
 	Hyperspace* mHyperspace;
+	Gun mGun;
 };
 #endif /* defined(__Millennium_Falcon__Falcon__) */

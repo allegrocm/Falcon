@@ -70,6 +70,11 @@ void FalconApp::init()
 	Quat q;
 	q.makeRotate(-0.8, Vec3(1, 0, 0));
 	mScreen->setPos(Vec3(0, -.25, -3));
+	
+#ifdef USE_VRJ
+	mScreen->setPos(Vec3(0, -1.5, -2));
+#endif
+
 	mScreen->setQuat(q);
 	//quickly add a lil spacebox
  	mModelGroup->addChild((new SpaceBox())->getRoot());
@@ -96,6 +101,7 @@ void FalconApp::init()
 
 void FalconApp::buttonInput(unsigned int button, bool pressed)
 {
+	//printf("Button %i: %i\n", button, pressed);
 	if(button < NUMBUTTONS)
 	{
 		if(pressed && (mButtons[button] == TOGGLE_OFF || mButtons[button] == OFF))

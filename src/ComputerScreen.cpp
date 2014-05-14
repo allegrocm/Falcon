@@ -15,6 +15,8 @@
 #include "ScreenImage.h"
 #include "RadarScreen.h"
 #include "GameController.h"
+#include "Defaults.h"
+
 
 using namespace osg;
 float gScreenAspect = 1.75;
@@ -111,9 +113,10 @@ ComputerScreen::ComputerScreen()
 void ComputerScreen::makeScreenGeometry()
 {
 	osg::Vec3Array* verts = new osg::Vec3Array;
-	
-	float width = gScreenAspect;
-	float height = 1.0;
+	float hite = 1.0;
+	getDefault("screenSize", hite);
+	float width = gScreenAspect * hite;
+	float height = hite;
 	float x0 = -width*0.5;
 	float y0 = -height*0.5;
 	verts->push_back(osg::Vec3(x0, y0, 0));

@@ -27,7 +27,7 @@ Falcon::Falcon()
 	
 	//load a ship model.  we can also pre-transform the model into our coordinate system
 	float scaleFactor = 0.56 * 8.4;			//found through trial, error, and online MF specs
-	MatrixTransform* n = Util::loadModel("data/models/falcon3DS/milfalcon.3ds", scaleFactor, -90, 180, 0, Vec3(0, -8, 0));
+	MatrixTransform* n = Util::loadModel("data/models/falcon3DS/milfalcon.3ds", scaleFactor, -90, 180, 0, Vec3(0, -9, 0));
 
 	Util::printNodeHierarchy(n);
 	mPat->addChild(n);
@@ -53,6 +53,8 @@ Falcon::Falcon()
 	
 	mHyperspace = new Hyperspace();
 	mPat->addChild(mHyperspace->getRoot());
+	
+	mGun.mAutoburst = true;
 
 }
 
@@ -62,6 +64,8 @@ bool Falcon::update(float dt)
 	Matrix wand = FalconApp::instance().getWandMatrix();
 	mAimedPart->setAttitude(wand.getRotate());
 	mHyperspace->update(dt);
+	mGun.update(dt);
+	if(mGun.canAutofire()) fire();		//if we've started a burst shot, finish it
 	return true;
 
 }
@@ -70,10 +74,11 @@ bool Falcon::update(float dt)
 
 void Falcon::fire()
 {
+	if(!mGun.fire()) return;
 //	printf("Fire!  (timer:  %.3f\n", mFireTimer);
 	if(mFireTimer > 0)
 	{
-		return;		//can't shoot yet
+	//	return;		//can't shoot yet
 	}
 	
 	mFireTimer = 1.0 / mFireRate;

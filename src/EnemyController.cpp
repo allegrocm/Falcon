@@ -35,7 +35,7 @@ EnemyController::EnemyController()
 		addShip(sps);
 	}
 
-	mLeftToSpawn = 3;
+	mLeftToSpawn = 10;
 	mMaxEnemies = 15;
 }
 
