@@ -12,6 +12,8 @@
 #include <iostream>
 #include "GameObject.h"
 #include "KSoundManager.h"
+#include "Gun.h"
+
 class Bullet;
 
 class Spacecraft: public GameObject
@@ -35,6 +37,7 @@ protected:
 	SkySound* mEngineSound;
 	int mScore;				//score for blowing this up
 	int mHP;				//hitpoints
+	Gun mGun;
 };
 
 

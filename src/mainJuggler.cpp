@@ -32,14 +32,14 @@ int main(int argc, char* argv[])
 	// Figure out if this node is the slave or master
 	// so that master can handle any information needing
 	// synced across all nodes.
-//	bool slave = false;
-//	for( int i = 1; i < argc; ++i )
-//	{
-//		if(std::string("--vrjslave") == argv[i]) slave = true;
-//	}
-//	
-//	//the app needs to know if it's the master node or a slave node
-//	FalconApp::instance().setIsMaster(!slave);
+	bool slave = false;
+	for( int i = 1; i < argc; ++i )
+	{
+		if(std::string("--vrjslave") == argv[i]) slave = true;
+	}
+	
+	//the app needs to know if it's the master node or a slave node
+	FalconApp::instance().setIsMaster(!slave);
 
 	// Initialize the kernel object
 	kernel->init(argc, argv);

@@ -9,7 +9,7 @@ combatMusic = asteroidField.mp3
 musicVolume = 0.25
 falconShootSound = torret_2.mp3
 falconShootVolume = 0.25
-initialShipCount = 7
+initialShipCount = 1
 placeholderShipSound = elephant.wav
 placeholderExplosionSound = explosion_3.mp3
 

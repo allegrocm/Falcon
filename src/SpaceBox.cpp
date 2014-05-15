@@ -43,6 +43,7 @@ SpaceBox::SpaceBox()
 	//we render the spacebox to a separate camera so we can have it very, very far away without it
 	//interfering with close-range depth testing
 	Camera* c = new Camera;
+	c->setName("Spacebox Camera");
 	mRoot->addChild(c);
 	c->addChild(g);
 	c->setRenderOrder(Camera::NESTED_RENDER, -1);

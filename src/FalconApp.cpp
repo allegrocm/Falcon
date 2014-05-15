@@ -59,8 +59,6 @@ void FalconApp::init()
 	mNavigation = new osg::MatrixTransform;
 	mRoot->addChild(mNavigation.get());
 	mRoot->getOrCreateStateSet()->setMode(GL_NORMALIZE, true);
-	mLightSource = new osg::LightSource;
-	mNavigation->addChild(mLightSource.get());
 	mAvgFrameRate = 30;
 	mModelGroup = new osg::Group;
 	mNavigation->addChild(mModelGroup.get());
@@ -69,22 +67,34 @@ void FalconApp::init()
 
 	Quat q;
 	q.makeRotate(-0.8, Vec3(1, 0, 0));
-	mScreen->setPos(Vec3(0, -.25, -3));
-	
-#ifdef USE_VRJ
 	mScreen->setPos(Vec3(0, -1.5, -2));
-#endif
+	
 
 	mScreen->setQuat(q);
 	//quickly add a lil spacebox
  	mModelGroup->addChild((new SpaceBox())->getRoot());
 	
-	
+	mLightSource = new osg::LightSource;
+	mNavigation->addChild(mLightSource.get());
+
 	osg::Light* light = mLightSource->getLight();
 	light->setDiffuse(osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
 	light->setSpecular(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	light->setAmbient(osg::Vec4(0.25f, 0.2f, 0.15f, 1.0f));
 	light->setPosition(osg::Vec4(100.0f, 100.0f, 100.0f, 0.0f));
+
+
+	mLightSource = new osg::LightSource;
+	mNavigation->addChild(mLightSource.get());
+
+	light = mLightSource->getLight();
+	light->setLightNum(1);
+	light->setDiffuse(osg::Vec4(0.3f, 0.3f, 0.3f, 1.0f));
+	light->setSpecular(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	light->setAmbient(osg::Vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	light->setPosition(osg::Vec4(-10.0f, -100.0f, 0.0f, 0.0f));
+
+
 
 	mWandXForm = new osg::MatrixTransform;
 	mModelGroup->addChild(mWandXForm);
@@ -101,7 +111,7 @@ void FalconApp::init()
 
 void FalconApp::buttonInput(unsigned int button, bool pressed)
 {
-	//printf("Button %i: %i\n", button, pressed);
+//	printf("Button %i: %i\n", button, pressed);
 	if(button < NUMBUTTONS)
 	{
 		if(pressed && (mButtons[button] == TOGGLE_OFF || mButtons[button] == OFF))
@@ -127,7 +137,7 @@ void FalconApp::update(float fulldt)
 		if(mButtons[0] == TOGGLE_ON)
 		{
 			//fire!
-			mFalcon->fire();
+			mFalcon->shoot();
 		//	printf("BAM!\n");
 		}
 
@@ -345,6 +355,8 @@ void FalconApp::drawDebug()
 	{
 		mJunk[i]->drawDebug();
 	}
+	
+	mEnemyController->drawDebug();
 	
 }
 

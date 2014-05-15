@@ -19,6 +19,7 @@
 #include <osg/ShapeDrawable>
 #include <osgUtil/Optimizer>
 #include "Layers.h"
+#include "Bullet.h"
 
 using namespace osg;
 
@@ -92,6 +93,8 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	this->targetPosition = Vec3();
 	this->mCurrentTurnTime = 0;
 	this->mTimeToTurn = 0;
+	mTimeTillShoot = Util::random(0.0, 2.0);
+	mGun = ROM::TIE_FIGHTER_GUN;
 }
 
 
@@ -117,7 +120,7 @@ bool StupidPlaceholderShip::update(float dt)
 		setForward(forward);
 	}
 */
-
+	
 	this->setPos(this->getVel() * dt + this->getPos());
 	Vec3 desiredDirection = this->targetPosition - this->getPos();
 	desiredDirection.normalize();
@@ -131,7 +134,7 @@ bool StupidPlaceholderShip::update(float dt)
 	}
 	this->setVel(adjustedVelocity*mSpeed);
 
-	FalconApp app = FalconApp::instance();
+	FalconApp& app = FalconApp::instance();
 	Falcon* falcon = app.getFalcon();
 	Vec3 distanceToFalcon = falcon->getPos() - this->getPos();
 	
@@ -142,13 +145,29 @@ bool StupidPlaceholderShip::update(float dt)
 //			std::cout << "Turning around to attack!\n";
 			mMovingAway = false;
 			mTurning = true;
+			mTimeTillShoot = Util::random(0.0, 2.0);		//attack after a random amount of time
 			this->targetPosition = falcon->getPos();
 			this->mCurrentTurnTime = 0;
 			this->mTimeToTurn = 3;
 		}
 	} else {
-		if(distanceToFalcon.length() > 200) {
-			//nothing special
+		if(distanceToFalcon.length() > 200)		//flying toward the Falcon
+		{
+			Vec3 falconDir = distanceToFalcon;
+			falconDir.normalize();
+			float dot = falconDir * getForward();		//get the dot product of our direction with the millennium falcon
+			if(dot > 0.9)		//are we mostly heading towards the falcon?  OPEN FIRE
+			{
+//				printf("time till shoot:  %.2f\n", mTimeTillShoot);
+				mTimeTillShoot -= dt;		//but wait for our shoot timer to run out
+				if(mTimeTillShoot <= 0)
+				{
+					shoot();
+				}
+			}
+	
+			
+			
 		} else {
 //			std::cout << "Turning around to retreat!\n";
 			mMovingAway = true;
@@ -159,6 +178,7 @@ bool StupidPlaceholderShip::update(float dt)
 			this->targetPosition = target;
 			this->mCurrentTurnTime = 0;
 			this->mTimeToTurn = 3;
+			
 		}
 	}
 	
@@ -249,3 +269,35 @@ void StupidPlaceholderShip::drawDebug()
 
 
 }
+
+bool StupidPlaceholderShip::shoot()
+{
+	if(!mGun.fire()) return false;
+	
+
+	Bullet* b = new Bullet();
+	b->mShooter = this;
+	//align the new bullet more or less with the wand, since that's our turret
+	//each of the four barrels has a different position
+	int whichBarrel = mGun.mBurstCounter%2;
+	Vec3 barrelPos = Vec3(2.5 * (-1 + 2*(whichBarrel%2)), 0, -4) * getTransform();
+	Vec3 fireDir = getForward();
+	fireDir.normalize();
+//	b->setTransform(wand);
+	b->setPos(barrelPos);
+	b->setForward(fireDir);
+	b->mIsEnemy = true;
+
+	float speed = ROM::FALCON_LASER_SPEED;
+//	printf("new bullet at %.2f, %.2f, %.2f\n", wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]);
+	b->mVel = b->getForward() * speed;
+//	FalconApp::instance().getBullets().push_back(b);
+	FalconApp::instance().addThis(b);
+//	printf("shoot from %.2f, %.2f, %.2f\n", barrelPos.x(), barrelPos.y(), barrelPos.z());
+	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + mGun.mFireSound, mGun.mFireVolume,
+		getPos().x(), getPos().y(), getPos().z(), false, 200);
+	return true;
+	
+}
+
+

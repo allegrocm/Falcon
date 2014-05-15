@@ -23,6 +23,7 @@ public:
 	float mRadius;
 	float mOffset;
 	virtual void drawDebug();
+	virtual bool shoot();
 protected:
 
 	bool mMovingAway;
@@ -30,7 +31,7 @@ protected:
 	osg::Vec3 targetPosition;
 	float mCurrentTurnTime;
 	float mTimeToTurn;
-
+	float mTimeTillShoot;		//how long till we open fire once we're facing the falcon?
 	float mSpeed;
 	osg::Vec3 mCenter;			//center of our ship
 	

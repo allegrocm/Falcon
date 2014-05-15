@@ -34,7 +34,14 @@ bool Spacecraft::update(float dt)
 	Vec3 pos = getPos();
 	Vec3 vel = getVel();
 	
-
+	mGun.update(dt);
+	
+	//shoot if our gun is firing bursts
+	if(mGun.canAutofire())
+	{
+//		printf("autofire shot %i\n", mGun.mBurstCounter+1);
+		shoot();
+	}
 	if(mEngineSound)
 		KSoundManager::instance()->setSound3DInfo(mEngineSound, pos.x(), pos.y(), pos.z(), vel.x(), vel.y(), vel.z());
 	return !mDead;

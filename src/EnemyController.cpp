@@ -36,7 +36,7 @@ EnemyController::EnemyController()
 	}
 
 	mLeftToSpawn = 10;
-	mMaxEnemies = 15;
+	mMaxEnemies = 7;
 }
 
 
@@ -92,4 +92,9 @@ bool EnemyController::isDone()
 }
 
 
+void EnemyController::drawDebug()
+{
+	for(size_t i = 0; i < mEnemies.size(); i++)
+		mEnemies[i]->drawDebug();
+}
 
