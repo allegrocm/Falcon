@@ -10,6 +10,7 @@
 #define __Millennium_Falcon__Bullet__
 
 #include "GameObject.h"
+#include <osg/ShapeDrawable>
 
 //a Bullet is the base class for anything fired from a weapon
 
@@ -22,7 +23,7 @@ public:
 	virtual bool checkHit();		//did we hit something of the same affiliation as our target?
 	virtual void peter();			//poof or vanish or whatever this does when it doesn't hit anything
 	virtual void explode(osg::Vec3 whereExactly);			//kboom!  Pass in the exact hit position
-
+	virtual void setColor(osg::Vec4 c);
 //these are pretty much invariant so I'm gonna be a rebel and make them public
 //I don't feel like putting in a bunch of getters that will only be used once
 	osg::Vec3				mVel;			//velocity
@@ -32,6 +33,7 @@ public:
 	int						mDamage;	//how hard does this hit?
 	bool					mIsEnemy;	//was this fired by an enemy?
 	float mLength;						//how long is this laser beam?
+	osg::ref_ptr<osg::ShapeDrawable>							mSD;		//for setting color
 };
 
 

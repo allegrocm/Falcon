@@ -10,6 +10,9 @@
 
 #include "Hyperspace.h"
 #include "Util.h"
+#include "KSoundManager.h"
+#include "Defaults.h"
+
 #include <stdlib.h>
 
 using namespace osg;
@@ -56,10 +59,17 @@ Hyperspace::Hyperspace()
 bool Hyperspace::update(float dt)
 {
 	mAge += dt;
+	float HSDelay = 3;		//when does the animation start, so we time the sound properly
+	float HSDuration = 3.0;			//how long does the animation last?
+	float moveStart = 0.5;			//when do the stars shoot towards us?  relative to the whole animation, not in seconds
 	if(mHSTime >= 0)
 	{
 		mHSTime += dt;
-		mPhase = mHSTime / 2.0;
+	}
+	
+	if(mHSTime > HSDelay)
+	{
+		mPhase = (mHSTime-HSDelay) / HSDuration;
 	}
 	else
 	{
@@ -72,9 +82,9 @@ bool Hyperspace::update(float dt)
 	
 	mPat->setScale(Vec3(1, 1, 10.0 * mPhase * mPhase));
 	float z = -250;
-	float moveStart = 0.5;
+
 	
-	if(mHSTime > 2) z = 10000;
+	if(mHSTime > HSDuration + HSDelay) z = 10000;
 	//start moving towards the camera after a certain amount of time
 	if(mPhase > moveStart)
 	{
@@ -88,6 +98,9 @@ bool Hyperspace::update(float dt)
 
 void Hyperspace::go()
 {
+	std::string hyperspaceSound;
+	getDefault("hyperspaceSound", hyperspaceSound);
+	KSoundManager::instance()->playSound(std::string("data/sounds/") + hyperspaceSound, 1.0);
 	mHSTime = 0.0;
 }
 

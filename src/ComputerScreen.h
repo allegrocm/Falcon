@@ -14,6 +14,7 @@
 #include "GameObject.h"
 class PrerenderCamera;
 class RadarScreen;
+class ScreenImage;
 
 //A display that shows status and possibly radar or something for the Millennium Falcon App
 
@@ -33,9 +34,11 @@ protected:
 	osg::ref_ptr<osgText::Text>			mScoreText;
 	osg::ref_ptr<osgText::Text>			mButtonText[4];		//the text fields displaying what our gamepad buttons do right now
 	std::string							mNextText[4];		//a button can change its text after it stops flashing
+	ScreenImage*						mHealthImage;		//shows the hull integrity of the Falcon
 	float mButtonTimer[4];				//how long since each button has been pressed?  flashes if a button was pressed recently
 	RadarScreen* mRadar;
 	void makeScreenGeometry();
+	float mPulseTime;					//for flashing our health indicator
 	
 };
 

@@ -15,6 +15,7 @@
 //One place to get at constants and stuff. Dunno if
 //it's useful in C++, but we'll find out.
 
+#include "Gun.h"
 
 class ROM
 {
@@ -26,14 +27,18 @@ public:
 	static float FALCON_FIRE_VOLUME;			//default volume for falcon shooting
 	static float FALCON_LASER_LENGTH;			//how long is a laser shot?
 	static float FALCON_LASER_SPEED;			//how fast does it move?
+	static float TIE_FIGHTER_LASER_SPEED;
+	static float TIE_FIGHTER_LASER_LENGTH;
 	static float MUSIC_VOLUME;					//for all music
 	static std::string PLACEHOLDER_EXPLOSION_SOUND;
 	static std::string MAIN_MUSIC;
 	static std::string COMBAT_MUSIC;
-	
-	
+
 	//difficulty
+	static Gun TIE_FIGHTER_GUN;					//the basic gun used by TIE fighters
+	static int FALCON_HITPOINTS;
 	static float TIE_HITBOX_SIZE;		//hitbox size of a TIE fighter
+
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

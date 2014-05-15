@@ -216,6 +216,7 @@ void setLight(float x, float y, float z)
 {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
 	float lightPosition[] = {x, y, z, 1};
 	glLightfv (GL_LIGHT0, GL_POSITION, lightPosition);
 }
@@ -226,14 +227,15 @@ void display(void)
 {
     // update and render the scene graph
 	osg::Camera* currentCam = viewer->getCamera();
+//	printf("camera name:  %s\n", currentCam->getName().c_str());
 	currentCam->setCullMask((1 << NON_GLOW_LAYER) | (1 << GLOW_LAYER) | (1 << BACKGROUND_LAYER));
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 500.0);
+	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 8500.0);
 	
 
-//	currentCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+	currentCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 	gluPerspective(60, aspect, 0.2, 200.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -261,7 +263,7 @@ void display(void)
 
 	//next we'll send the app a wand matrix based on the mouse position
 
-	KMatrix wandMat = gCamera.getWandMatrix(KVec3(-1.0 + 2.0 * gMouseX / screenWidth, -1.0 + 2.0 * gMouseY / screenHeight, -2));
+	KMatrix wandMat = gCamera.getWandMatrix(KVec3(-1.0 + 2.0 * gMouseX / screenWidth, -2.0 + 2.0 * gMouseY / screenHeight, -2));
 
 	//get a directional wand by projecting our mouse position
 	double px, py, pz;
@@ -443,6 +445,7 @@ void keySpecial(int key, int x, int y)
 {
 	switch(key)
 	{
+	
 		case GLUT_KEY_LEFT: FalconApp::instance().buttonInput(1, true); break;
 		case GLUT_KEY_DOWN: FalconApp::instance().buttonInput(2, true); break;
 		case GLUT_KEY_RIGHT: FalconApp::instance().buttonInput(3, true); break;
@@ -536,6 +539,7 @@ int main( int argc, char **argv )
 {
     glutInit(&argc, argv);
 	//osg::setNotifyLevel(osg::DEBUG_FP);
+	osg::setNotifyLevel(osg::FATAL);
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ALPHA );
     glutInitWindowPosition( 100, 100 );
     glutInitWindowSize( 800, 600 );

@@ -2,13 +2,29 @@
 #use it to tweak parameters and assign things like sound file names
 #the parameter names are NOT case sensitive, but if you provide a filename for a sound or texture or model, that IS.
 
-initialShipCount = 5
-hyperspaceSound = LAZER.WAV
+#how many shots to kill the Falcon?
+FalconHitPoints = 30
+
+hyperspaceSound = hyperspace.mp3
 mainMusic =	imperialProbe.mp3
 combatMusic = asteroidField.mp3
 musicVolume = 0.25
 falconShootSound = torret_2.mp3
 falconShootVolume = 0.25
-initialShipCount = 7
 placeholderShipSound = TIEEngine1.wav
 placeholderExplosionSound = explosion_3.mp3
+
+
+
+tieHitboxSize = 12
+screenSize = 0.4
+
+
+#for the demo...how many ships?
+initialShipCount = 0
+
+#how many ships do we have to kill to win the demo battle?
+demoBattleTotalShipCount = 5
+
+#how many simultaneous ships can there be during the demo battle?
+demoBattleMaxShipCount = 4

@@ -15,6 +15,8 @@
 #include "ScreenImage.h"
 #include "RadarScreen.h"
 #include "GameController.h"
+#include "Defaults.h"
+
 
 using namespace osg;
 float gScreenAspect = 1.75;
@@ -35,19 +37,19 @@ ComputerScreen::ComputerScreen()
 	
 	//add some text
 	mStatusText = new osgText::Text();
-	mStatusText->setCharacterSize(0.075);
+	mStatusText->setCharacterSize(0.05);
 	mStatusText->setColor(Vec4(0.7, .7, 1, 1.0));
 
 	
 	mStatusText->setMaximumWidth(5.0);
 	mStatusText->setAlignment(osgText::TextBase::LEFT_TOP);
 	mStatusText->setText("Hi Ken");
-	mStatusText->setPosition(Vec3(-.4, .3, 0));
+	mStatusText->setPosition(Vec3(-.6, .3, 0));
 	std::string where = osgDB::findDataFile("../Models/tarzeau_ocr_a.ttf");
 //	std::string where = "../Models/arial.ttf";
 	mStatusText->setFont(where.c_str());
 	mScoreText = (osgText::Text*)mStatusText->clone(CopyOp::SHALLOW_COPY);		//copy the parameters for the status text
-	mScoreText->setPosition(Vec3(-.4, .15, 0));
+	mScoreText->setPosition(Vec3(-.6, .15, 0));
 	
 	Geode* textGeode = new Geode();
 
@@ -62,16 +64,27 @@ ComputerScreen::ComputerScreen()
 	image->setAspect(gScreenAspect);
 	image->setColor(Vec4(0.7, 0.7, 1.0, 1));
 	image->setTopLeft(Vec3(-.5 * gScreenAspect + 0.05, 0.45, 0));
+
+	//add the Falcon diagram
+	mHealthImage = new ScreenImage();
+	mCamera->addChild(mHealthImage->transform);
+	mHealthImage->setImage("data/textures/falconOutlineInverted.png");
+	mHealthImage->setHeight(.7);
+	mHealthImage->transform->getOrCreateStateSet()->setAttribute(new BlendFunc(GL_SRC_ALPHA, GL_ONE));
+	mHealthImage->setColor(Vec4(0.7, 0.7, 1.0, 0.75));
+	mHealthImage->setPos(Vec3(.3 * gScreenAspect, -0.1, 0));
+
+
 	
 	mRadar = new RadarScreen();
 	mCamera->addChild(mRadar->transform);
 	mRadar->setHeight(0.5);
-	mRadar->setPos(Vec3(-.2, -.2, 0));
+	mRadar->setPos(Vec3(0, -.2, 0));
 	
 	for(int i = 0; i < 4; i++)		//set up button indicators
 	{
 		mButtonText[i] = new osgText::Text();
-		mButtonText[i]->setCharacterSize(0.05);
+		mButtonText[i]->setCharacterSize(0.04);
 		mButtonText[i]->setColor(Vec4(.7, .7, 1, 1));
 		mButtonText[i]->setAlignment(osgText::TextBase::CENTER_CENTER);
 		mButtonText[i]->setText(Util::stringWithFormat("Button%i", i+1));
@@ -85,10 +98,10 @@ ComputerScreen::ComputerScreen()
 
 	
 	//position the button texts in a plus layout
-	float buttonX = 0.5;
+	float buttonX = -0.5;
 	float buttonY = -0.3;
-	float buttonDX = 0.2;
-	float buttonDY = 0.1;
+	float buttonDX = 0.15;
+	float buttonDY = 0.075;
 	mButtonText[0]->setPosition(Vec3(buttonX-buttonDX, buttonY, 0));
 	mButtonText[1]->setPosition(Vec3(buttonX, buttonY-buttonDY, 0));
 	mButtonText[2]->setPosition(Vec3(buttonX+buttonDX, buttonY, 0));
@@ -100,7 +113,7 @@ ComputerScreen::ComputerScreen()
 		ScreenImage* image = new ScreenImage();
 		mCamera->addChild(image->transform);
 		image->setImage("data/textures/Circle.png");
-		image->setHeight(.25);
+		image->setHeight(.2);
 		image->setColor(Vec4(0.7, 0.7, .7, 1));
 		image->setPos(mButtonText[i]->getPosition());
 
@@ -111,9 +124,10 @@ ComputerScreen::ComputerScreen()
 void ComputerScreen::makeScreenGeometry()
 {
 	osg::Vec3Array* verts = new osg::Vec3Array;
-	
-	float width = gScreenAspect;
-	float height = 1.0;
+	float hite = 1.0;
+	getDefault("screenSize", hite);
+	float width = gScreenAspect * hite;
+	float height = hite;
 	float x0 = -width*0.5;
 	float y0 = -height*0.5;
 	verts->push_back(osg::Vec3(x0, y0, 0));
@@ -181,6 +195,36 @@ bool ComputerScreen::update(float dt)
 		mButtonText[i]->setColor(color2 * (1.0-t) + color1 * t);
 	}
 	
+	
+	//update color for the health readout
+	int hp = GameController::instance().getStats().health;
+	int maxHP = GameController::instance().getStats().maxHealth;
+	float percent = 1.0 * hp / maxHP;
+	
+	Vec4 healthColor(0, 1, 0, 1);
+
+	//start off green, fade to yellow, then red
+	if(percent > 0.5)
+	{
+		healthColor.x() = (1.0 - percent) * 2.0;
+	}
+	else
+	{
+		healthColor.x() = 1.0;
+		healthColor.y() = 2.0 * percent;
+	}
+	
+	if(percent < 0.25)		//getting bad.  start pulsing or something
+	{
+		mPulseTime += dt;
+		float pulse = 0.75 + 0.25 * cosf(mPulseTime * 12.0);
+		healthColor.x() *= pulse;
+		healthColor.y() *= pulse;
+	}
+	else mPulseTime = 0;
+//	printf("Health:  %i/%i (%.2f).  (%.2f, %.2f)\n", hp, maxHP, percent, healthColor.x(), healthColor.y());
+	
+	mHealthImage->setColor(healthColor);
 	return true;
 }
 

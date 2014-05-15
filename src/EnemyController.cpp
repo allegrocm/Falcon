@@ -27,7 +27,15 @@ EnemyController::EnemyController()
 {
 	//just add a few generic spaceships for now
 	int numToMake = 3;
+
+	mLeftToSpawn = 10;
+	mMaxEnemies = 7;
+	
 	Defaults::instance().getValue("InitialShipCount", numToMake);
+	Defaults::instance().getValue("demoBattleTotalShipCount", mLeftToSpawn);
+	Defaults::instance().getValue("demoBattleMaxShipCount", mMaxEnemies);
+
+
 	for(int i = 0; i < numToMake; i++)
 	{
 		StupidPlaceholderShip* sps = new StupidPlaceholderShip();
@@ -35,8 +43,6 @@ EnemyController::EnemyController()
 		addShip(sps);
 	}
 
-	mLeftToSpawn = 3;
-	mMaxEnemies = 15;
 }
 
 
@@ -60,8 +66,11 @@ void EnemyController::update(float dt)
 	if(mLeftToSpawn && GameController::instance().getMode() == GameController::MAIN_GAME)
 	{
 		int diff = mMaxEnemies - mEnemies.size();		//how many more enemies can we put in play?
-		float chance = 0.1 * diff;
-
+		float chance = 0.4 * diff;
+		
+		//never let us have no enemies
+		if(!mEnemies.size())
+			chance = 10000;
 		if(1.0 * rand() /  RAND_MAX < chance * dt)
 		{
 			//spawn a ship!
@@ -92,4 +101,9 @@ bool EnemyController::isDone()
 }
 
 
+void EnemyController::drawDebug()
+{
+	for(size_t i = 0; i < mEnemies.size(); i++)
+		mEnemies[i]->drawDebug();
+}
 

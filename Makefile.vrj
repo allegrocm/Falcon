@@ -9,7 +9,7 @@ srcdir=		src/ \
 SRCS=	Bullet.cpp  FalconApp.cpp       Settings.cpp        ParticleFX.cpp  tinyxml.cpp        Util.cpp\
 SpaceBox.cpp                Debris.cpp     PrerenderCamera.cpp  RadarScreen.cpp   tinyxmlerror.cpp\
        Spacecraft.cpp    tinystr.cpp   tinyxmlparser.cpp ROM.cpp ScreenImage.cpp KSoundManager.cpp Defaults.cpp EnemyController.cpp\
-StupidPlaceholderShip.cpp KenXML.cpp GameObject.cpp GameController.cpp ComputerScreen.cpp Falcon.cpp\
+StupidPlaceholderShip.cpp KenXML.cpp GameObject.cpp GameController.cpp ComputerScreen.cpp Falcon.cpp Hyperspace.cpp\
 		mainJuggler.cpp JugglerInterface.cpp	\
 
 
@@ -30,7 +30,7 @@ EXTRA_LIBS+=            -L${OSG_LIB_DIR} -losg -losgDB -losgGA -losgUtil -lOpenT
 EXTRA_LIBS+=            -L${OPENTHREADS_LIB_DIR} -lfmodex64 -L/home/users/kennyk/Graphics_Programming/lib/Linux/fmodex
 
 #EXTRA_LIBS := -L. -L/home/vr/apps/watch-libs/rhel5/boost-1.45.0/lib/ $(EXTRA_LIBS)
-EXTRA_LIBS+= -L. -lcorona
+EXTRA_LIBS+= -L. 
 EXTRA_LIBS+= -lpng
 EXTRA_LIBS+= -ljpeg
 

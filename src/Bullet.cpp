@@ -44,10 +44,10 @@ void Bullet::addGeometry()
 {
 	Cylinder* cyl = new Cylinder(Vec3(), 0.25, mLength);
 //	cyl->setRotation(Quat(3.14159/2.0, Vec3(1, 0, 0)));
-	ShapeDrawable* sd = new ShapeDrawable(cyl);
-	sd->setColor(Vec4(.4, .9, .4, 1));
+	mSD = new ShapeDrawable(cyl);
+	mSD->setColor(Vec4(.4, .9, .4, 1));
 	Geode* g = new Geode();
-	g->addDrawable(sd);
+	g->addDrawable(mSD);
 	mRoot->getOrCreateStateSet()->setMode(GL_LIGHTING, false);
 	mPat->addChild(g);
 
@@ -55,6 +55,7 @@ void Bullet::addGeometry()
 
 bool Bullet::checkHit()
 {
+	__FUNCTION_HEADER__
 	#define TimeStep 0.01
 	osgUtil::IntersectVisitor iv;
 	
@@ -74,7 +75,14 @@ bool Bullet::checkHit()
 //	printf("Seg:  %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
 	//dunno if this is the best way to do it or not, but we're gonna just check each ship individually
 	std::vector<Spacecraft*> ships = EnemyController::instance().getShips();
-
+	
+	if(mIsEnemy)		//enemy shots only hit the falcon
+	{
+		ships.clear();
+		Falcon* f = FalconApp::instance().getFalcon();
+		ships.push_back((Spacecraft*)f);
+	}
+	
 	bool hitSometing = false;		//stop after any collision
 	Vec3 hitPos;
 	for(size_t i = 0; i < ships.size() && !hitSometing; i++)
@@ -124,5 +132,10 @@ void Bullet::explode(Vec3 where)
 {
 	FalconApp::instance().getFX()->makeExplosion(where, 0.5);
 
+}
+
+void Bullet::setColor(Vec4 c)
+{
+	mSD->setColor(c);
 }
 

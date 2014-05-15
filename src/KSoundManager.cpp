@@ -206,7 +206,7 @@ SkySound* KSoundManager::playSound(std::string name, float volume, float stereo,
 	FMOD::Sound* sound;
 	result = mSystem->createSound(name.c_str(), FMOD_SOFTWARE | FMOD_2D, 0, &sound); 
 	checkErrors();
-
+	if(!sound) printf("Error playing %s\n", name.c_str());
 	if (!sound) return NULL;
 
 	FMOD::Channel* soundChannel;

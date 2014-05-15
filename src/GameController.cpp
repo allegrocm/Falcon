@@ -29,6 +29,7 @@ GameController::GameController()
 	mModeTime = 0;
 	mStats.reset();
 	KSoundManager::instance()->setMusicVolume(ROM::MUSIC_VOLUME);
+	mSoundTimer = 0;
 }
 
 bool GameController::modeTimeJustPassed(float t)
@@ -41,7 +42,7 @@ void GameController::update(float dt)
 {
 	mLastDT = dt;
 	mTime += dt;
-	
+	mSoundTimer -= dt;
 	mSwitchTime -= dt;
 	
 	if(mMode == PRE_GAME)
@@ -109,6 +110,7 @@ void GameController::preGame(float dt)
 	//button 1 will start the fight!
 	if(FalconApp::instance().getButton(1) == FalconApp::TOGGLE_ON && !isSwitching())
 	{
+		srand(mTime * 100);		//use the time we start to seed the RNG
 		mSwitchTime = 3.0;
 		FalconApp::instance().getScreen()->setStatusText("Incoming enemies detected!");
 		FalconApp::instance().getScreen()->setButtonChangeText(0, "");
@@ -122,11 +124,20 @@ void GameController::mainGame(float dt)
 	//the start of pregame
 	if(mModeTime == 0)
 	{
-		printf("Main Game started!\n");
+		//printf("Main Game started!\n");
 		FalconApp::instance().getScreen()->setStatusText("UNDER ATTACK");
 		mJumpTime = 3;
 		
 
+	}
+	
+	if(modeTimeJustPassed(1.5))		//play random Han sound when we start!
+	{
+		std::string hanStartPhrases[] = {"han/get_out.wav", "han/goodluck.wav", "han/welltake.wav"};
+		int numPhrases = sizeof(hanStartPhrases)/sizeof(std::string);
+		std::string phrase = hanStartPhrases[rand()%numPhrases];
+		KSoundManager::instance()->playSound(std::string("data/sounds/")+phrase, 1.0, -1);
+		justPlayedSound();
 	}
 	
 	if(EnemyController::instance().isDone())
@@ -142,5 +153,10 @@ void GameController::mainGame(float dt)
 }
 
 
+void Stats::reset()
+{
+	score = shotsFired = elapsedTime = shotsHit = 0;
+	health = maxHealth = ROM::FALCON_HITPOINTS;
+}
 
 

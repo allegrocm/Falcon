@@ -10,6 +10,8 @@
 #define __Millennium_Falcon__Falcon__
 
 #include "Spacecraft.h"
+#include "Falcon.h"
+#include "Gun.h"
 
 //the Millennium Falcon.  Will eventually include an interior, maybe can take damage, whatever
 
@@ -18,17 +20,20 @@ class Falcon : public Spacecraft
 {
 public:
 	Falcon();
-	void fire();			//pewpewpew!
+	bool shoot();			//pewpewpew!
 	bool update(float dt);
 	void aimAt(osg::Vec3 location);			//point the gun at a specific spot
 	osg::PositionAttitudeTransform* getAimedPart()	{return mAimedPart;}		//for connecting things to the turret
 	void jump();		//initiate hyperjump!
+	virtual void wasHit(Bullet* b);
 protected:
 
 	osg::Vec3 mAimTarget;		//where is the gun aiming?
 	float mFireRate;			//max fire rate
 	float mFireTimer;			//time since we last fired
 	osg::ref_ptr<osg::PositionAttitudeTransform> mAimedPart;	//this is the part that moves when we aim
+	osg::ref_ptr<osg::PositionAttitudeTransform> mUpperAimedPart;	//the turret part, basically
 	Hyperspace* mHyperspace;
+
 };
 #endif /* defined(__Millennium_Falcon__Falcon__) */
