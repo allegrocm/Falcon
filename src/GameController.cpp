@@ -15,6 +15,7 @@
 #include "Falcon.h"
 #include "ROM.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 GameController& GameController::instance()
 {
@@ -23,6 +24,11 @@ GameController& GameController::instance()
 
 GameController::GameController()
 {
+	reset();
+}
+
+void GameController::reset()
+{
 	mTime = 0;
 	mMode = PRE_GAME;
 	mSwitchTime = 0;
@@ -30,7 +36,9 @@ GameController::GameController()
 	mStats.reset();
 	KSoundManager::instance()->setMusicVolume(ROM::MUSIC_VOLUME);
 	mSoundTimer = 0;
+	
 }
+
 
 bool GameController::modeTimeJustPassed(float t)
 {
@@ -63,6 +71,12 @@ void GameController::update(float dt)
 		{
 			startGame();
 		}
+		else if(mMode == MAIN_GAME)
+		{
+			EnemyController::instance().reset();		
+			reset();
+			
+		}
 		
 	}
 	
@@ -83,6 +97,17 @@ void GameController::end()
 
 void GameController::enemyWasKilled(Spacecraft* c)
 {
+	//maybe play a sound to congratz us
+	float soundChance = 0.25;
+	if(canPlaySound() && 1.0 * rand() / RAND_MAX < soundChance)
+	{
+		std::string killPhrases[] = {"killSounds/chewy3.mp3", "han/dontgetcocky.mp3", "han/greatshotkid.mp3"};
+		int numPhrases = sizeof(killPhrases)/sizeof(std::string);
+		std::string phrase = killPhrases[rand()%numPhrases];
+		KSoundManager::instance()->playSound(std::string("data/sounds/")+phrase, 1.0, -1);
+		printf("Play kill sound %s\n", phrase.c_str());
+		justPlayedSound();
+	}
 	mStats.score += c->getScore();
 
 }
@@ -126,7 +151,7 @@ void GameController::mainGame(float dt)
 	{
 		//printf("Main Game started!\n");
 		FalconApp::instance().getScreen()->setStatusText("UNDER ATTACK");
-		mJumpTime = 3;
+		mJumpTime = 5;
 		
 
 	}
@@ -143,12 +168,23 @@ void GameController::mainGame(float dt)
 	if(EnemyController::instance().isDone())
 	{
 		mJumpTime -= dt;
+		if(mJumpTime < 2.0 && mJumpTime + dt >= 2.0)
+		{
+			//get us out of here!
+			KSoundManager::instance()->playSound(std::string("data/sounds/han/getusoutofhere.mp3"), 1.0, -1);		
+		}
+
 		if(mJumpTime < 0 && mJumpTime + dt >= 0)		//did jumptime just pass zero?
 		{
 			FalconApp::instance().getFalcon()->jump();
+			mSwitchTime = 15.0;
 		}
+
+
 		
 	}
+	
+	
 	
 }
 

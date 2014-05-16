@@ -80,7 +80,10 @@ bool Bullet::checkHit()
 	{
 		ships.clear();
 		Falcon* f = FalconApp::instance().getFalcon();
-		ships.push_back((Spacecraft*)f);
+#ifdef __APPLE__
+#warning TODO:  get falcon collision detection back in
+#endif
+		//ships.push_back((Spacecraft*)f);
 	}
 	
 	bool hitSometing = false;		//stop after any collision

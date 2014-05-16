@@ -26,9 +26,9 @@ void JugglerInterface::init()
 	mButton[5].init("VJButton5");
 	
 	mPadButtons[0].init("Button 6");
-	mPadButtons[1].init("Button 2");
+	mPadButtons[1].init("Button 1");
 	 vrj::OsgApp::init();
-
+	osg::setNotifyLevel(osg::FATAL);
 }
 
 void JugglerInterface::initScene()
@@ -51,7 +51,7 @@ void JugglerInterface::preFrame()
 
 void JugglerInterface::latePreFrame()
 {
-	//printf("preframe begin\n");
+	//std::cout << "begin preframe" << std::endl;
 	static double tLast = mHead->getTimeStamp().secd();
 	double tNow = mHead->getTimeStamp().secd();
 	double dt = tNow - tLast;
@@ -78,9 +78,10 @@ void JugglerInterface::latePreFrame()
 	FalconApp::instance().setHeadMatrix(headMatrix);
 	
 		//KK:  on Mac, the first time this is called, the Kernel has zero users, and latePreFrame crashes. 
-
+	//std::cout << "almost end preframe" << std::endl;
 	if(mKernel->getUsers().size())
 		vrj::osg::App::latePreFrame();
+	//printf("end preframe\n");
 	fflush(stdout);
 
 }
@@ -121,8 +122,8 @@ void JugglerInterface::configSceneView(osgUtil::SceneView* newSceneViewer)
 
 void JugglerInterface::draw()
 {
-	//printf("Begin draw\n");
+	//std::cout << "begin draw" << std::endl;
 	vrj::OsgApp::draw();
-	//printf("end draw\n");
+	//std::cout << "end draw" << std::endl;
 
 }

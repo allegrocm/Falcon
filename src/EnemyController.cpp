@@ -25,7 +25,13 @@ EnemyController& EnemyController::instance()
 
 EnemyController::EnemyController()
 {
-	//just add a few generic spaceships for now
+	reset();
+
+}
+
+void EnemyController::reset()
+{
+//just add a few generic spaceships for now
 	int numToMake = 3;
 
 	mLeftToSpawn = 10;
@@ -42,9 +48,7 @@ EnemyController::EnemyController()
 		sps->setCircleOrigin(Vec3(-85 + 20 * i, 15, -100));
 		addShip(sps);
 	}
-
 }
-
 
 void EnemyController::update(float dt)
 {

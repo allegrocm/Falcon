@@ -196,8 +196,8 @@ void FalconApp::setWandMatrix(osg::Matrixf mat)
 	mWandXForm->setMatrix(osg::Matrixf::scale(0.25, 0.125, 1.0)*mWandMatrix);
 	Matrix screenMat;
 	Quat q;
-	q.makeRotate(-0.8, Vec3(1, 0, 0));
-	screenMat.setTrans(Vec3(0, 0.5, 0.5));
+	q.makeRotate(-0.5, Vec3(1, 0, 0));
+	screenMat.setTrans(Vec3(0, 0.9, 0.5));
 	screenMat.setRotate(q);
 	
 

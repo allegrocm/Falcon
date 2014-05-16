@@ -54,9 +54,11 @@ public:
 	bool modeTimeJustPassed(float val);	//did we cross this time value at this timestep?  for triggering events
 	bool canPlaySound()	{return (mSoundTimer < 0);}
 	void justPlayedSound()	{mSoundTimer = 5;}	//did we play a sound elsewhere that we don't want Han talking over?
+	void reset();
 protected:
 	float mTime;
 	float mJumpTime;			//we've initialized hyperjump.  how long till it happens?
+	
 	GameMode mMode;
 	Stats mStats;					//holds score, etc
 	float mSwitchTime;				//if this is >0, we're getting ready to switch to a new game mode

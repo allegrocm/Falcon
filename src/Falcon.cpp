@@ -62,10 +62,10 @@ Falcon::Falcon()
 	{
 		ScreenImage* reticle1 = new ScreenImage();
 		reticle1->setImage(Util::findDataFile("data/textures/reticleSingle.png"));
-		reticle1->setPos(Vec3(0, 0, -50 * (1+i)));
+		reticle1->setPos(Vec3(0, 0, -100 * (1+i)));
 		reticle1->setHeight(2);
 		reticle1->transform->getOrCreateStateSet()->setMode(GL_LIGHTING, GL_FALSE);
-		mAimedPart->addChild(reticle1->transform);
+		mUpperAimedPart->addChild(reticle1->transform);
 	}
 	
 	mPat->addChild(mAimedPart);
@@ -74,7 +74,7 @@ Falcon::Falcon()
 
 	mPat->addChild(mUpperAimedPart);
 	mUpperAimedPart->setPivotPoint(Vec3(0, -3, 0));
-	mUpperAimedPart->setPosition(Vec3(0, 1, 0));
+	mUpperAimedPart->setPosition(Vec3(0, 3, 0));
 
 
 	
@@ -122,11 +122,11 @@ bool Falcon::shoot()
 	Matrix wand = FalconApp::instance().getWandMatrix();
 	Matrix wandRotate = Matrix::rotate(wand.getRotate());
 	mAimTarget = Vec3(wand.ptr()[12], wand.ptr()[13], wand.ptr()[14]) +
-		Vec3(wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]) * -100;
+		Vec3(wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]) * -500;
 
 	//each of the four barrels has a different position
 	Vec3 barrelPos = Vec3(1.0 * (-1 + 2*(whichBarrel%2)), 1.0 * (whichBarrel/2), 0) * wandRotate;
-	Vec3 shootFrom = getTransform() * Vec3(0, 4.5, -2) * wandRotate;
+	Vec3 shootFrom = getTransform() * Vec3(0, 6, -2) * wandRotate;
 	Vec3 fireDir = mAimTarget - shootFrom;			//actual direction our shot will travel
 	fireDir.normalize();
 	b->setTransform(wand);
@@ -136,7 +136,8 @@ bool Falcon::shoot()
 
 	float speed = ROM::FALCON_LASER_SPEED;
 	//printf("soundvolume: %f\n", ROM::FALCON_FIRE_VOLUME);
-	KSoundManager::instance()->playSound(std::string("data/sounds/") + mGun.mFireSound, mGun.mFireVolume, 0);
+	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + mGun.mFireSound, 
+		mGun.mFireVolume, b->getPos().x(), FalconApp::instance().getHeadMatrix().ptr()[13], b->getPos().z(),false, 50);
 //	printf("new bullet at %.2f, %.2f, %.2f\n", wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]);
 	b->mVel = b->getForward() * speed;
 	b->setColor(Vec4(1.0, .5, .3, 1.0));

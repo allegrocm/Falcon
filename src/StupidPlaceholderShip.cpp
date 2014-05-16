@@ -80,7 +80,7 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	std::string engineSound;
 	if(Defaults::instance().getValue("placeholderShipSound", engineSound))
 	{
-		mEngineSound = KSoundManager::instance()->play3DSound(std::string("data/sounds/") + engineSound, 0.5, 1000, 1000, 1000, true, 30);
+		mEngineSound = KSoundManager::instance()->play3DSound(std::string("data/sounds/") + engineSound, 0.75, 1000, 1000, 1000, true, 80);
 	}
 	
 	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
@@ -172,9 +172,9 @@ bool StupidPlaceholderShip::update(float dt)
 //			std::cout << "Turning around to retreat!\n";
 			mMovingAway = true;
 			mTurning = true;
-			float theta = Util::random(0.0, 3.14159265);
-			float phi = Util::random(0.0, 6.28318531);
-			Vec3 target = Vec3(500*cosf(theta), 500*sinf(theta), 500*cosf(phi));
+			float theta = Util::random(-0.0, 6.28);
+			float phi = Util::random(-1, 2.5);
+			Vec3 target = Vec3(500*cosf(theta) * cosf(phi), 500*sinf(phi), -500*sinf(theta) * cosf(phi));
 			this->targetPosition = target;
 			this->mCurrentTurnTime = 0;
 			this->mTimeToTurn = 3;
