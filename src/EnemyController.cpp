@@ -13,7 +13,7 @@
 #include "Defaults.h"
 #include "Util.h"
 #include "GameController.h"
-
+#include "EventAudio.h"
 
 #include <stdlib.h>
 
@@ -84,6 +84,7 @@ void EnemyController::update(float dt)
 			sps->update(0);		//send a zero update so this ship positions itself immediately
 			addShip(sps);
 			printf("Spawn ship!\n");
+			EventAudio::instance().eventHappened("spawnEnemy");
 		}
 		
 	}

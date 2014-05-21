@@ -82,7 +82,12 @@ bool Bullet::checkHit()
 #ifdef __APPLE__
 #warning TODO:  get falcon collision detection back in
 #endif
+<<<<<<< HEAD
 		ships.push_back((Spacecraft*)f);
+=======
+		if(ROM::FALCON_HIT_DETECTION)
+			ships.push_back((Spacecraft*)f);
+>>>>>>> 3e507d10a1b2bb3e90db97db08d2a803cc06a77f
 	}
 	
 	bool hitSometing = false;		//stop after any collision

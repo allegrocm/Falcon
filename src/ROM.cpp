@@ -28,6 +28,8 @@ Gun ROM::TIE_FIGHTER_GUN;
 
 float ROM::TIE_HITBOX_SIZE;
 
+bool ROM::FALCON_HIT_DETECTION;
+
 void ROM::load()
 {
 
@@ -41,14 +43,14 @@ void ROM::load()
 	FALCON_LASER_SPEED = 800;
 	FALCON_LASER_LENGTH = 16;
 	MUSIC_VOLUME = 0.2;
-
+	FALCON_HIT_DETECTION = false;
 	getDefault("musicVolume", MUSIC_VOLUME);
 	getDefault("falconShootSound", FALCON_FIRE_SOUND);
 	getDefault("falconShootVolume", FALCON_FIRE_VOLUME);
 	getDefault("placeholderExplosionSound", PLACEHOLDER_EXPLOSION_SOUND);
 	getDefault("mainMusic", MAIN_MUSIC);
 	getDefault("combatMusic", COMBAT_MUSIC);
-
+	getDefault("falconHitDetection", FALCON_HIT_DETECTION);
 
 	TIE_HITBOX_SIZE = 10;
 	getDefault("tieHitboxSize", TIE_HITBOX_SIZE);

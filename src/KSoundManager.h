@@ -103,6 +103,7 @@ public:
 	void setMusicVolume(float v);
 	void setMusicEcho(float on);				//makes our music echo...or not echo.  in this case music is an engine noise
 	float getEchoAmount()		{return mEchoAmount;}
+	float getSoundTimeRemaining(SkySound* channel);
 	void setSound3DInfo(SkySound* soundChannel, float px, float py, float pz, float vx, float vy, float vz);
 	void setSoundVolume(SkySound* soundChannel, float volume);
 	void setSoundFrequency(SkySound* soundChannel, float frequency);
