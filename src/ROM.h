@@ -39,6 +39,8 @@ public:
 	static int FALCON_HITPOINTS;
 	static float TIE_HITBOX_SIZE;		//hitbox size of a TIE fighter
 
+	//performace/difficulty
+	static bool FALCON_HIT_DETECTION;
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

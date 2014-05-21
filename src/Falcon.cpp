@@ -10,6 +10,8 @@
 #include <gl/glut.h>
 #endif
 
+#include <stdarg.h>
+
 #include "Falcon.h"
 #include "Util.h"
 #include "Bullet.h"
@@ -20,7 +22,8 @@
 #include "Hyperspace.h"
 #include "ParticleFX.h"
 #include "GameController.h"
-#include <stdarg.h>
+#include "EventAudio.h"
+
 
 using namespace osg;
 
@@ -157,14 +160,7 @@ void Falcon::jump()
 {
 
 	//play a voice clip before we jump
-	if(GameController::instance().canPlaySound())
-	{
-		std::string hanJumpPhrases[] = {"han/crops.mp3", "han/burnout.wav"};
-		int numPhrases = sizeof(hanJumpPhrases)/sizeof(std::string);
-		std::string phrase = hanJumpPhrases[rand()%numPhrases];
-		KSoundManager::instance()->playSound(std::string("data/sounds/")+phrase, 1.0, -1);
-		GameController::instance().justPlayedSound();
-	}
+	EventAudio::instance().eventHappened("preJump");
 	mHyperspace->go();
 }
 
@@ -172,7 +168,23 @@ void Falcon::jump()
 void Falcon::wasHit(Bullet* b)
 {
 	//reduce hitpoints
-	GameController::instance().getStats().health--;
+	::Stats& stats = GameController::instance().getStats();
+	EventAudio::instance().eventHappened("falconHit");
+	float oldPercent = 1.0 * (stats.health) / stats.maxHealth;
+	stats.health--;
+
+	float newPercent = 1.0 * stats.health / stats.maxHealth;
+	
+	if(oldPercent > 0.5 && newPercent <= 0.5)
+	{
+		EventAudio::instance().eventHappened("halfHealth");		//maybe play a sound when health gets low
+	}
+
+	if(oldPercent > 0.25 && newPercent <= 0.25)
+	{
+		EventAudio::instance().eventHappened("quarterHealth");		//maybe play a sound when health gets low
+	}
+
 //	printf("Health:  %i\n", 	GameController::instance().getStats().health);
 //	FalconApp::instance().getFX()->makeExplosion(b->getPos(), 1.5);
 }

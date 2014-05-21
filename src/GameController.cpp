@@ -6,6 +6,10 @@
 //
 //
 
+#include <stdio.h>
+#include <stdlib.h>
+
+
 #include "GameController.h"
 #include "FalconApp.h"
 #include "EnemyController.h"
@@ -14,8 +18,7 @@
 #include "KSoundManager.h"
 #include "Falcon.h"
 #include "ROM.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "EventAudio.h"
 
 GameController& GameController::instance()
 {
@@ -98,16 +101,9 @@ void GameController::end()
 void GameController::enemyWasKilled(Spacecraft* c)
 {
 	//maybe play a sound to congratz us
-	float soundChance = 0.25;
-	if(canPlaySound() && 1.0 * rand() / RAND_MAX < soundChance)
-	{
-		std::string killPhrases[] = {"killSounds/chewy3.mp3", "han/dontgetcocky.mp3", "han/greatshotkid.mp3"};
-		int numPhrases = sizeof(killPhrases)/sizeof(std::string);
-		std::string phrase = killPhrases[rand()%numPhrases];
-		KSoundManager::instance()->playSound(std::string("data/sounds/")+phrase, 1.0, -1);
-		printf("Play kill sound %s\n", phrase.c_str());
-		justPlayedSound();
-	}
+	if(EnemyController::instance().isDone())
+		EventAudio::instance().eventHappened("lastEnemyKilled");
+	EventAudio::instance().eventHappened("EnemyKilled");
 	mStats.score += c->getScore();
 
 }
@@ -158,11 +154,7 @@ void GameController::mainGame(float dt)
 	
 	if(modeTimeJustPassed(1.5))		//play random Han sound when we start!
 	{
-		std::string hanStartPhrases[] = {"han/get_out.wav", "han/goodluck.wav", "han/welltake.wav"};
-		int numPhrases = sizeof(hanStartPhrases)/sizeof(std::string);
-		std::string phrase = hanStartPhrases[rand()%numPhrases];
-		KSoundManager::instance()->playSound(std::string("data/sounds/")+phrase, 1.0, -1);
-		justPlayedSound();
+		EventAudio::instance().eventHappened("beginGame");
 	}
 	
 	if(EnemyController::instance().isDone())
@@ -171,7 +163,8 @@ void GameController::mainGame(float dt)
 		if(mJumpTime < 2.0 && mJumpTime + dt >= 2.0)
 		{
 			//get us out of here!
-			KSoundManager::instance()->playSound(std::string("data/sounds/han/getusoutofhere.mp3"), 1.0, -1);		
+			EventAudio::instance().eventHappened("timeToGo");
+
 		}
 
 		if(mJumpTime < 0 && mJumpTime + dt >= 0)		//did jumptime just pass zero?
@@ -183,6 +176,10 @@ void GameController::mainGame(float dt)
 
 		
 	}
+	else
+	{
+		EventAudio::instance().eventHappened("randomFighting");	//triggered every frame
+	}
 	
 	
 	
@@ -193,6 +190,7 @@ void Stats::reset()
 {
 	score = shotsFired = elapsedTime = shotsHit = 0;
 	health = maxHealth = ROM::FALCON_HITPOINTS;
+	EventAudio::instance().reset();
 }
 
 

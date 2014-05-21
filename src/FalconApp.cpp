@@ -36,6 +36,7 @@
 #include "ComputerScreen.h"
 #include "EnemyController.h"
 #include "GameController.h"
+#include "EventAudio.h"
 
 using namespace osg;
 
@@ -46,6 +47,7 @@ void FalconApp::init()
 	PROFILER.init();		//init profiling
 	__FUNCTION_HEADER__
 	ROM::load();			//load our "ROM" right off the bat so we have access to its data
+	mEventAudioManager = new EventAudio();
 	mTimeStep = 0.01;
 	mGameController = new GameController();
 	
@@ -127,7 +129,10 @@ void FalconApp::update(float fulldt)
 	mTargetTime += fulldt;
 	while(mTotalTime < mTargetTime)
 	{
-		KSoundManager::instance()->updateListener(mTimeStep, mHeadMatrix.ptr(), 0, 0, 0);
+//		KSoundManager::instance()->updateListener(mTimeStep, mHeadMatrix.ptr(), 0, 0, 0);
+		mEventAudioManager->update(mTimeStep);
+		//in the C6, the listener moves relative to the speakers already
+		KSoundManager::instance()->update(mTimeStep);
 		mTotalTime += mTimeStep;
 		//process navigation, etc
 		if(mButtons[0] == TOGGLE_ON)
