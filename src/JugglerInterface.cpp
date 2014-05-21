@@ -124,6 +124,7 @@ void JugglerInterface::draw()
 {
 	//std::cout << "begin draw" << std::endl;
 	vrj::OsgApp::draw();
+	FalconApp::instance().drawStatus();
 	//std::cout << "end draw" << std::endl;
 
 }

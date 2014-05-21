@@ -123,7 +123,7 @@ void FalconApp::buttonInput(unsigned int button, bool pressed)
 void FalconApp::update(float fulldt)
 {
 	__FUNCTION_HEADER__
-
+	updateFrameRate(fulldt);
 	mTargetTime += fulldt;
 	while(mTotalTime < mTargetTime)
 	{
@@ -302,6 +302,7 @@ void FalconApp::handleArguments(int* argc, char **argv)
 		else if(KenXML::CICompare(arg, "--vrjmaster"))
 		{
 			mIsMaster = true;
+			printf("We are the master node!\n");
 //			handled = true;
 		}
 
