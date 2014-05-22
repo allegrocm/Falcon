@@ -90,7 +90,7 @@ protected:
 	osg::ref_ptr<osg::LightSource> mLightSource;
 
 	void deToggleButtons();									//remove toggle status from our buttons after each frame to prevent events from happening repeatedly
-	static const int NUMBUTTONS = 6;
+	static const int NUMBUTTONS = 8;
 	
 	int mButtons[NUMBUTTONS];
 

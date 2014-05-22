@@ -22,6 +22,9 @@ using namespace osg;
 float gScreenAspect = 1.75;
 ComputerScreen::ComputerScreen()
 {
+	getDefault("screenAspect", gScreenAspect);
+	float mainTextSize = 0.1;
+	getDefault("textSize", mainTextSize);
 	mCamera = new PrerenderCamera(1024, 1, GL_RGBA);
 	mCamera->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 	mPat->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
@@ -37,19 +40,22 @@ ComputerScreen::ComputerScreen()
 	
 	//add some text
 	mStatusText = new osgText::Text();
-	mStatusText->setCharacterSize(0.05);
+	mStatusText->setCharacterSize(mainTextSize);
 	mStatusText->setColor(Vec4(0.7, .7, 1, 1.0));
 
-	
+	float textY = 0.35;
+	float textX = -0.6;
+	getDefault("textPosX", textX);
+	getDefault("textPosY", textY);
 	mStatusText->setMaximumWidth(5.0);
 	mStatusText->setAlignment(osgText::TextBase::LEFT_TOP);
 	mStatusText->setText("Hi Ken");
-	mStatusText->setPosition(Vec3(-.6, .3, 0));
+	mStatusText->setPosition(Vec3(textX, textY, 0));
 	std::string where = osgDB::findDataFile("../Models/tarzeau_ocr_a.ttf");
 //	std::string where = "../Models/arial.ttf";
 	mStatusText->setFont(where.c_str());
 	mScoreText = (osgText::Text*)mStatusText->clone(CopyOp::SHALLOW_COPY);		//copy the parameters for the status text
-	mScoreText->setPosition(Vec3(-.6, .15, 0));
+	mScoreText->setPosition(Vec3(textX, textY - 1.25 * mainTextSize, 0));
 	
 	Geode* textGeode = new Geode();
 
@@ -57,34 +63,50 @@ ComputerScreen::ComputerScreen()
 	textGeode->addDrawable(mStatusText);
 	textGeode->addDrawable(mScoreText);
 	mCamera->addChild(textGeode);
+	
+	//add a little ornament
 	ScreenImage* image = new ScreenImage();
 	mCamera->addChild(image->transform);
 	image->setImage("data/textures/curve.png");
-	image->setHeight(.95);
+	image->setHeight(1);
 	image->setAspect(gScreenAspect);
 	image->setColor(Vec4(0.7, 0.7, 1.0, 1));
-	image->setTopLeft(Vec3(-.5 * gScreenAspect + 0.05, 0.45, 0));
+	image->setTopLeft(Vec3(-.5 * gScreenAspect + 0.01, 0.49, 0));
 
 	//add the Falcon diagram
+	float healthImageSize = 0.7;
+	float healthImageX = 0.3 * gScreenAspect;
+	float healthImageY = -0.1;
+	getDefault("damageIndicatorSize", healthImageSize);
+	getDefault("damageIndicatorX", healthImageX);
+	getDefault("damageIndicatorY", healthImageY);
 	mHealthImage = new ScreenImage();
 	mCamera->addChild(mHealthImage->transform);
 	mHealthImage->setImage("data/textures/falconOutlineInverted.png");
-	mHealthImage->setHeight(.7);
+	mHealthImage->setHeight(healthImageSize);
 	mHealthImage->transform->getOrCreateStateSet()->setAttribute(new BlendFunc(GL_SRC_ALPHA, GL_ONE));
 	mHealthImage->setColor(Vec4(0.7, 0.7, 1.0, 0.75));
-	mHealthImage->setPos(Vec3(.3 * gScreenAspect, -0.1, 0));
+	mHealthImage->setPos(Vec3(healthImageX, healthImageY, 0));
 
 
 	
 	mRadar = new RadarScreen();
 	mCamera->addChild(mRadar->transform);
-	mRadar->setHeight(0.5);
-	mRadar->setPos(Vec3(0, -.2, 0));
-	
+	float radarHeight = 0.5;
+	float radarX = 0;
+	float radarY = -0.2;
+	getDefault("radarSize", radarHeight);
+	getDefault("radarX", radarX);
+	getDefault("radarY", radarY);
+	mRadar->setHeight(radarHeight);
+	mRadar->setPos(Vec3(radarX, radarY, 0));
+
+	float buttonTextSize = 0.04;
+	getDefault("buttonTextSize", buttonTextSize);
 	for(int i = 0; i < 4; i++)		//set up button indicators
 	{
 		mButtonText[i] = new osgText::Text();
-		mButtonText[i]->setCharacterSize(0.04);
+		mButtonText[i]->setCharacterSize(buttonTextSize);
 		mButtonText[i]->setColor(Vec4(.7, .7, 1, 1));
 		mButtonText[i]->setAlignment(osgText::TextBase::CENTER_CENTER);
 		mButtonText[i]->setText(Util::stringWithFormat("Button%i", i+1));
@@ -98,10 +120,16 @@ ComputerScreen::ComputerScreen()
 
 	
 	//position the button texts in a plus layout
-	float buttonX = -0.5;
+	float buttonX = -0.55;
 	float buttonY = -0.3;
-	float buttonDX = 0.15;
+	float buttonDX = 0.1;
 	float buttonDY = 0.075;
+	getDefault("buttonsX", buttonX);
+	getDefault("buttonsY", buttonY);
+	getDefault("buttonsDX", buttonDX);
+	getDefault("buttonsDY", buttonDY);
+	float buttonCircleSize = 0.1;
+	getDefault("buttonCircleSize", buttonCircleSize);
 	mButtonText[0]->setPosition(Vec3(buttonX-buttonDX, buttonY, 0));
 	mButtonText[1]->setPosition(Vec3(buttonX, buttonY-buttonDY, 0));
 	mButtonText[2]->setPosition(Vec3(buttonX+buttonDX, buttonY, 0));
@@ -109,11 +137,11 @@ ComputerScreen::ComputerScreen()
 
 	for(int i = 0; i < 4; i++)
 	{
-			//add circles behind the buttons
+		//add circles behind the buttons
 		ScreenImage* image = new ScreenImage();
 		mCamera->addChild(image->transform);
 		image->setImage("data/textures/Circle.png");
-		image->setHeight(.2);
+		image->setHeight(buttonCircleSize);
 		image->setColor(Vec4(0.7, 0.7, .7, 1));
 		image->setPos(mButtonText[i]->getPosition());
 
@@ -149,6 +177,7 @@ void ComputerScreen::makeScreenGeometry()
 	geom->setColorArray(colors);
 	geom->setColorBinding(osg::Geometry::BIND_OVERALL);
 
+	//attach a texture so the screen displays what the camera sees
 	osg::Vec2Array* texes = new osg::Vec2Array;
 	texes->push_back(osg::Vec2(0, 0));
 	texes->push_back(osg::Vec2(1, 0));

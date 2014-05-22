@@ -131,7 +131,9 @@ void GameController::preGame(float dt)
 	//button 1 will start the fight!
 	if(FalconApp::instance().getButton(1) == FalconApp::TOGGLE_ON && !isSwitching())
 	{
-		srand(mTime * 100);		//use the time we start to seed the RNG
+		int seed = mTime * 100;
+		srand(seed);		//use the time we start to seed the RNG
+		printf("Seed RNG to %i\n", seed);
 		mSwitchTime = 3.0;
 		FalconApp::instance().getScreen()->setStatusText("Incoming enemies detected!");
 		FalconApp::instance().getScreen()->setButtonChangeText(0, "");
@@ -147,7 +149,7 @@ void GameController::mainGame(float dt)
 	{
 		//printf("Main Game started!\n");
 		FalconApp::instance().getScreen()->setStatusText("UNDER ATTACK");
-		mJumpTime = 5;
+		mJumpTime = 6;
 		
 
 	}
@@ -160,7 +162,7 @@ void GameController::mainGame(float dt)
 	if(EnemyController::instance().isDone())
 	{
 		mJumpTime -= dt;
-		if(mJumpTime < 2.0 && mJumpTime + dt >= 2.0)
+		if(mJumpTime < 3.0 && mJumpTime + dt >= 3.0)
 		{
 			//get us out of here!
 			EventAudio::instance().eventHappened("timeToGo");

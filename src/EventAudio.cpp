@@ -119,6 +119,9 @@ void EventAudio::reset()
 
 void EventAudio::eventHappened(std::string name)
 {
+	//grab the random numbers now before we exit out due to sounds already playing
+	int r1 = rand();
+	int r2 = rand();
 	//do we have sounds for this event?
 	Event* e = NULL;
 	for(size_t i = 0; i < mEvents.size(); i++)
@@ -145,7 +148,7 @@ void EventAudio::eventHappened(std::string name)
 	if(mSoundTimer > 0) return;
 	if(e->playAgainTimer > 0) return;	//too soon for this event to trigger again
 	//only play a sound a certain percent of the time
-	if(1.0 * rand() / RAND_MAX > e->probability) return;
+	if(1.0 * r1 / RAND_MAX > e->probability) return;
 	
 
 	EventSound* sound = NULL;		//find a sound that can play
@@ -157,11 +160,12 @@ void EventAudio::eventHappened(std::string name)
 	//if we didn't find any possible candid8s, give up
 	if(!possibles.size()) return;
 	
-	int which = rand() % possibles.size();
+	int which = r2 % possibles.size();
 	sound = possibles[which];
 	if(sound->playAgainTimer > 0) return;			//is it too soon to play this sound?  don't play anything
 	
 	sound->playAgainTimer = sound->howOften;
+	printf("Playing %s for event %s\n", sound->name.c_str(), name.c_str());
 	SkySound* s = KSoundManager::instance()->playSound(std::string("data/sounds/") + sound->name, sound->volume, sound->pan);
 	if(!s)
 	{

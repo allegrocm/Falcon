@@ -134,8 +134,10 @@ void FalconApp::update(float fulldt)
 		//in the C6, the listener moves relative to the speakers already
 		KSoundManager::instance()->update(mTimeStep);
 		mTotalTime += mTimeStep;
-		//process navigation, etc
-		if(mButtons[0] == TOGGLE_ON)
+		
+		
+		//buttons 0, 5, 6, and 7 all shoot
+		if(mButtons[0] == TOGGLE_ON || mButtons[5] == TOGGLE_ON || mButtons[6] == TOGGLE_ON || mButtons[7] == TOGGLE_ON)
 		{
 			//fire!
 			mFalcon->shoot();
@@ -199,14 +201,30 @@ void FalconApp::setWandMatrix(osg::Matrixf mat)
 {
 	mWandMatrix = mat*mNavigation->getInverseMatrix();
 	mWandXForm->setMatrix(osg::Matrixf::scale(0.25, 0.125, 1.0)*mWandMatrix);
-	Matrix screenMat;
-	Quat q;
-	q.makeRotate(-0.5, Vec3(1, 0, 0));
-	screenMat.setTrans(Vec3(0, 0.9, 0.5));
-	screenMat.setRotate(q);
+	Vec3 wandX(mat.ptr()[0], mat.ptr()[1], mat.ptr()[2]);
+	Vec3 wandY(mat.ptr()[4], mat.ptr()[5], mat.ptr()[6]);
+	Vec3 wandZ(mat.ptr()[8], mat.ptr()[9], mat.ptr()[10]);
+	wandX.y() = 0;
+	wandX.normalize();
+	wandZ.y() = 0;
+	wandZ.normalize();
 	
-
-	mScreen->setTransform(screenMat * mat);
+	wandY = Vec3(0, 1, 0);
+	//create an un-pitched version of the wand matrix
+	Matrix flatWand = mat;
+	
+	//don't take wand pitch into account UNLESS we're pointing downward
+	if(mat.ptr()[9] < 0)
+		for(int i = 0; i < 3; i++)
+		{
+			flatWand.ptr()[i] = wandX.ptr()[i];
+			flatWand.ptr()[i+4] = wandY.ptr()[i];
+			flatWand.ptr()[i+8] = wandZ.ptr()[i];
+		}
+	Matrix newScreen = ROM::SCREEN_OFFSET * flatWand;
+	
+	
+	mScreen->setTransform(newScreen); 
 
 }
 

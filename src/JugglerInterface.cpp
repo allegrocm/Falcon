@@ -24,9 +24,12 @@ void JugglerInterface::init()
 	mButton[3].init("VJButton3");
 	mButton[4].init("VJButton4");
 	mButton[5].init("VJButton5");
-	
+	//triggers map to buttons 0, 5, 6, 7
 	mPadButtons[0].init("Button 6");
-	mPadButtons[1].init("Button 1");
+	mPadButtons[5].init("Button 7");
+	mPadButtons[6].init("Button 8");
+	mPadButtons[7].init("Button 5");
+	mPadButtons[1].init("Button 3");		//gamepad is backwards for this one
 	 vrj::OsgApp::init();
 	osg::setNotifyLevel(osg::FATAL);
 }
@@ -58,7 +61,7 @@ void JugglerInterface::latePreFrame()
 	tLast = tNow;
 	
 	//pass changes in button state on to the app
-	for(int i = 0; i < 6; i++)
+	for(int i = 0; i < 8; i++)
 	{
 		//use gamepad buttons if they're available
 		gadget::DigitalInterface* button = &mButton[i];

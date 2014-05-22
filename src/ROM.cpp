@@ -30,6 +30,9 @@ float ROM::TIE_HITBOX_SIZE;
 
 bool ROM::FALCON_HIT_DETECTION;
 
+osg::Matrixf ROM::SCREEN_OFFSET;
+
+
 void ROM::load()
 {
 
@@ -68,4 +71,17 @@ void ROM::load()
 	TIE_FIGHTER_LASER_LENGTH = 4;
 	
 	getDefault("FalconHitPoints", FALCON_HITPOINTS);
+	
+	float screenX = 0, screenY = .9, screenZ = 0.5;
+	float screenAngle = -28;
+	
+	getDefault("screenOffsetX", screenX);
+	getDefault("screenOffsetY", screenY);
+	getDefault("screenOffsetZ", screenZ);
+	getDefault("screenOffsetAngle", screenAngle);
+	
+	osg::Quat q;
+	q.makeRotate(screenAngle / 57.3, osg::Vec3(1, 0, 0));
+	SCREEN_OFFSET.setTrans(osg::Vec3(screenX, screenY, screenZ));
+	SCREEN_OFFSET.setRotate(q);
 }

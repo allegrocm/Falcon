@@ -17,7 +17,6 @@ placeholderExplosionSound = explosion_3.mp3
 
 
 tieHitboxSize = 12
-screenSize = 0.4
 
 
 #for the demo...how many ships?
@@ -31,3 +30,32 @@ demoBattleMaxShipCount = 4
 
 #perform collision checking with Millennium Falcon?  need to improve our 3d model...
 falconHitDetection = true
+
+#for configuring the HUD
+textSize = 0.05
+textPosY = 0.4
+textPosX = -0.5
+screenSize = 0.4
+screenAspect = 1.75
+screenOffsetX = 0
+screenOffsetY = .9
+screenOffsetZ = 0.5
+screenOffsetAngle = -10
+
+
+radarSize = 0.75
+
+radarX = 0
+radarY = -0.1
+
+damageIndicatorSize = 0.5
+damageIndicatorX = 0.6
+damageIndicatorY = -0.2
+
+#the buttons on the left side of the HUD
+buttonsX = -0.575
+buttonsY = -0.3
+buttonsDX = 0.1
+buttonsDY = 0.075
+buttonCircleSize = 0.1
+buttonTextSize = 0.04

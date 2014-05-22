@@ -16,6 +16,7 @@
 //it's useful in C++, but we'll find out.
 
 #include "Gun.h"
+#include <osg/MatrixTransform>
 
 class ROM
 {
@@ -41,6 +42,9 @@ public:
 
 	//performace/difficulty
 	static bool FALCON_HIT_DETECTION;
+	
+	//setting up the HUD/targetting computer
+	static osg::Matrixf SCREEN_OFFSET;		//from the wand
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */
