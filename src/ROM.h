@@ -16,6 +16,7 @@
 //it's useful in C++, but we'll find out.
 
 #include "Gun.h"
+#include <osg/MatrixTransform>
 
 class ROM
 {
@@ -33,10 +34,17 @@ public:
 	static std::string PLACEHOLDER_EXPLOSION_SOUND;
 	static std::string MAIN_MUSIC;
 	static std::string COMBAT_MUSIC;
-	static Gun TIE_FIGHTER_GUN;					//the basic gun used by TIE fighters
-	
+
 	//difficulty
+	static Gun TIE_FIGHTER_GUN;					//the basic gun used by TIE fighters
+	static int FALCON_HITPOINTS;
 	static float TIE_HITBOX_SIZE;		//hitbox size of a TIE fighter
+
+	//performace/difficulty
+	static bool FALCON_HIT_DETECTION;
+	
+	//setting up the HUD/targetting computer
+	static osg::Matrixf SCREEN_OFFSET;		//from the wand
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

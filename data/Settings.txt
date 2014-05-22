@@ -2,19 +2,60 @@
 #use it to tweak parameters and assign things like sound file names
 #the parameter names are NOT case sensitive, but if you provide a filename for a sound or texture or model, that IS.
 
+#how many shots to kill the Falcon?
+FalconHitPoints = 70
 
-hyperspaceSound = LAZER.WAV
+hyperspaceSound = hyperspace.mp3
 mainMusic =	imperialProbe.mp3
 combatMusic = asteroidField.mp3
 musicVolume = 0.25
 falconShootSound = torret_2.mp3
 falconShootVolume = 0.25
-initialShipCount = 1
-placeholderShipSound = elephant.wav
+placeholderShipSound = TIEEngine1.wav
 placeholderExplosionSound = explosion_3.mp3
 
 
-tieHitboxSize = 15
-screenSize = 0.7
+
+tieHitboxSize = 12
 
 
+#for the demo...how many ships?
+initialShipCount = 0
+
+#how many ships do we have to kill to win the demo battle?
+demoBattleTotalShipCount = 10
+
+#how many simultaneous ships can there be during the demo battle?
+demoBattleMaxShipCount = 4
+
+#perform collision checking with Millennium Falcon?  need to improve our 3d model...
+falconHitDetection = true
+
+#for configuring the HUD
+textSize = 0.05
+textPosY = 0.4
+textPosX = -0.5
+screenSize = 0.4
+screenAspect = 1.75
+screenOffsetX = 0
+screenOffsetY = .9
+screenOffsetZ = 0.5
+screenOffsetAngle = -10
+
+
+radarSize = 0.75
+
+radarX = 0
+radarY = -0.1
+
+damageIndicatorSize = 0.5
+damageIndicatorX = 0.6
+damageIndicatorY = -0.2
+
+#the buttons on the left side of the HUD
+buttonsX = -0.575
+buttonsY = -0.3
+buttonsDX = 0.1
+buttonsDY = 0.075
+buttonCircleSize = 0.1
+buttonTextSize = 0.04

@@ -10,6 +10,7 @@
 // Local
 #include "JugglerInterface.h"
 #include "FalconApp.h"
+#include "KSoundManager.h"
 
 using namespace vrj;
 int main(int argc, char* argv[])
@@ -40,7 +41,7 @@ int main(int argc, char* argv[])
 	
 	//the app needs to know if it's the master node or a slave node
 	FalconApp::instance().setIsMaster(!slave);
-
+	//KSoundManager::instance()->setSilent(!slave);
 	// Initialize the kernel object
 	kernel->init(argc, argv);
 

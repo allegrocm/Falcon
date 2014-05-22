@@ -6,6 +6,10 @@
 //
 //
 
+#include <stdio.h>
+#include <stdlib.h>
+
+
 #include "GameController.h"
 #include "FalconApp.h"
 #include "EnemyController.h"
@@ -14,7 +18,7 @@
 #include "KSoundManager.h"
 #include "Falcon.h"
 #include "ROM.h"
-#include <stdio.h>
+#include "EventAudio.h"
 
 GameController& GameController::instance()
 {
@@ -23,13 +27,21 @@ GameController& GameController::instance()
 
 GameController::GameController()
 {
+	reset();
+}
+
+void GameController::reset()
+{
 	mTime = 0;
 	mMode = PRE_GAME;
 	mSwitchTime = 0;
 	mModeTime = 0;
 	mStats.reset();
 	KSoundManager::instance()->setMusicVolume(ROM::MUSIC_VOLUME);
+	mSoundTimer = 0;
+	
 }
+
 
 bool GameController::modeTimeJustPassed(float t)
 {
@@ -41,7 +53,7 @@ void GameController::update(float dt)
 {
 	mLastDT = dt;
 	mTime += dt;
-	
+	mSoundTimer -= dt;
 	mSwitchTime -= dt;
 	
 	if(mMode == PRE_GAME)
@@ -61,6 +73,12 @@ void GameController::update(float dt)
 		if(mMode == PRE_GAME)
 		{
 			startGame();
+		}
+		else if(mMode == MAIN_GAME)
+		{
+			EnemyController::instance().reset();		
+			reset();
+			
 		}
 		
 	}
@@ -82,6 +100,10 @@ void GameController::end()
 
 void GameController::enemyWasKilled(Spacecraft* c)
 {
+	//maybe play a sound to congratz us
+	if(EnemyController::instance().isDone())
+		EventAudio::instance().eventHappened("lastEnemyKilled");
+	EventAudio::instance().eventHappened("EnemyKilled");
 	mStats.score += c->getScore();
 
 }
@@ -109,6 +131,9 @@ void GameController::preGame(float dt)
 	//button 1 will start the fight!
 	if(FalconApp::instance().getButton(1) == FalconApp::TOGGLE_ON && !isSwitching())
 	{
+		int seed = mTime * 100;
+		srand(seed);		//use the time we start to seed the RNG
+		printf("Seed RNG to %i\n", seed);
 		mSwitchTime = 3.0;
 		FalconApp::instance().getScreen()->setStatusText("Incoming enemies detected!");
 		FalconApp::instance().getScreen()->setButtonChangeText(0, "");
@@ -122,25 +147,52 @@ void GameController::mainGame(float dt)
 	//the start of pregame
 	if(mModeTime == 0)
 	{
-		printf("Main Game started!\n");
+		//printf("Main Game started!\n");
 		FalconApp::instance().getScreen()->setStatusText("UNDER ATTACK");
-		mJumpTime = 3;
+		mJumpTime = 6;
 		
 
+	}
+	
+	if(modeTimeJustPassed(1.5))		//play random Han sound when we start!
+	{
+		EventAudio::instance().eventHappened("beginGame");
 	}
 	
 	if(EnemyController::instance().isDone())
 	{
 		mJumpTime -= dt;
+		if(mJumpTime < 3.0 && mJumpTime + dt >= 3.0)
+		{
+			//get us out of here!
+			EventAudio::instance().eventHappened("timeToGo");
+
+		}
+
 		if(mJumpTime < 0 && mJumpTime + dt >= 0)		//did jumptime just pass zero?
 		{
 			FalconApp::instance().getFalcon()->jump();
+			mSwitchTime = 15.0;
 		}
+
+
 		
 	}
+	else
+	{
+		EventAudio::instance().eventHappened("randomFighting");	//triggered every frame
+	}
+	
+	
 	
 }
 
 
+void Stats::reset()
+{
+	score = shotsFired = elapsedTime = shotsHit = 0;
+	health = maxHealth = ROM::FALCON_HITPOINTS;
+	EventAudio::instance().reset();
+}
 
 

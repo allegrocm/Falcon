@@ -26,6 +26,7 @@ public:
 	void addShip(Spacecraft* s);
 	bool isDone();			//everything dead and no more spawning?
 	void drawDebug();
+	void reset();
 protected:
 	std::vector<Spacecraft*> mEnemies;
 	int mMaxEnemies;			//max in play

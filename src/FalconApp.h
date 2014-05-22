@@ -24,7 +24,7 @@ class ParticleFX;
 class ComputerScreen;
 class EnemyController;
 class GameController;
-
+class EventAudio;
 class FalconApp
 {
 public:
@@ -59,6 +59,7 @@ public:
 	ParticleFX*			getFX()						{return mParticleFX;}
 	
 	ButtonState getButton(int which)				{return (ButtonState)mButtons[which];}
+	EventAudio* getEventAudio()						{return mEventAudioManager;}
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call
@@ -89,7 +90,7 @@ protected:
 	osg::ref_ptr<osg::LightSource> mLightSource;
 
 	void deToggleButtons();									//remove toggle status from our buttons after each frame to prevent events from happening repeatedly
-	static const int NUMBUTTONS = 6;
+	static const int NUMBUTTONS = 8;
 	
 	int mButtons[NUMBUTTONS];
 
@@ -106,6 +107,7 @@ protected:
 	
 	
 	ParticleFX*						mParticleFX;
+	EventAudio*						mEventAudioManager;
 };
 
 

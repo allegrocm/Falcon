@@ -19,15 +19,11 @@ struct Stats
 	int score;
 	int shotsFired;
 	int health;
+	int maxHealth;
 	float elapsedTime;
 	int shotsHit;			//how many times the we've hit the enemy.  For calculating accuracy
 	
-	void reset()
-	{
-		score = shotsFired = elapsedTime = shotsHit = 0;
-		health = 15;
-	}
-	
+	void reset();
 
 };
 //manages the state of the game, score, enemy spawning, etc
@@ -56,13 +52,18 @@ public:
 	void preGame(float dt);				//do pregame mode stuff
 	void mainGame(float dt);
 	bool modeTimeJustPassed(float val);	//did we cross this time value at this timestep?  for triggering events
+	bool canPlaySound()	{return (mSoundTimer < 0);}
+	void justPlayedSound()	{mSoundTimer = 5;}	//did we play a sound elsewhere that we don't want Han talking over?
+	void reset();
 protected:
 	float mTime;
 	float mJumpTime;			//we've initialized hyperjump.  how long till it happens?
+	
 	GameMode mMode;
 	Stats mStats;					//holds score, etc
 	float mSwitchTime;				//if this is >0, we're getting ready to switch to a new game mode
 	float mModeTime;				//how long have we been in this mode?
 	float mLastDT;					//supports the modeTimeJustPassed() function
+	float mSoundTimer;	//don't play other random sounds till this is < 0
 };
 #endif /* defined(__Millennium_Falcon__GameController__) */

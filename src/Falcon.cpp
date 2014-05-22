@@ -10,6 +10,8 @@
 #include <gl/glut.h>
 #endif
 
+#include <stdarg.h>
+
 #include "Falcon.h"
 #include "Util.h"
 #include "Bullet.h"
@@ -19,14 +21,15 @@
 #include "ScreenImage.h"
 #include "Hyperspace.h"
 #include "ParticleFX.h"
+#include "GameController.h"
+#include "EventAudio.h"
 
-#include <stdarg.h>
 
 using namespace osg;
 
 Falcon::Falcon()
 {
-	
+	setName("Millennium Falcon");
 	//load a ship model.  we can also pre-transform the model into our coordinate system
 	float scaleFactor = 0.56 * 8.4;			//found through trial, error, and online MF specs
 	MatrixTransform* n = Util::loadModel("data/models/falcon3DS/milfalcon.3ds", scaleFactor, -90, 180, 0, Vec3(0, -10, 0));
@@ -37,6 +40,7 @@ Falcon::Falcon()
 	mFireTimer = 0;
 	mFireRate = 6;
 	mAimedPart = new PositionAttitudeTransform();
+	mUpperAimedPart = new PositionAttitudeTransform();
 //	osg::Node* turretNode = Util::findNodeWithName(n, "mf GunBod");
 	osg::Node* turretNode = Util::loadModel("data/models/falcon3DS/laserbeamerthing.3ds", scaleFactor, -90, 180, 0, Vec3(0, -10, 0));
 
@@ -54,22 +58,27 @@ Falcon::Falcon()
 	}
 	
 //	Util::printNodeHierarchy(turretNode);
-	mAimedPart->addChild(turretNode);
+	mUpperAimedPart->addChild(turretNode);
 	//make some rings with which to aim
 	int numRings = 3;
 	for(int i = 0; i < numRings; i++)
 	{
 		ScreenImage* reticle1 = new ScreenImage();
 		reticle1->setImage(Util::findDataFile("data/textures/reticleSingle.png"));
-		reticle1->setPos(Vec3(0, 0, -50 * (1+i)));
+		reticle1->setPos(Vec3(0, 0, -100 * (1+i)));
 		reticle1->setHeight(2);
 		reticle1->transform->getOrCreateStateSet()->setMode(GL_LIGHTING, GL_FALSE);
-		mAimedPart->addChild(reticle1->transform);
+		mUpperAimedPart->addChild(reticle1->transform);
 	}
 	
 	mPat->addChild(mAimedPart);
-	mAimedPart->setPivotPoint(Vec3(0, -3, 0));
-	mAimedPart->setPosition(Vec3(0, 1, 0));
+	mAimedPart->setPivotPoint(Vec3(0, 2, 0));
+	mAimedPart->setPosition(Vec3(0, 5, 0));
+
+	mPat->addChild(mUpperAimedPart);
+	mUpperAimedPart->setPivotPoint(Vec3(0, -3, 0));
+	mUpperAimedPart->setPosition(Vec3(0, 3, 0));
+
 
 	
 	mHyperspace = new Hyperspace();
@@ -87,6 +96,8 @@ bool Falcon::update(float dt)
 	mFireTimer -= dt;
 	Matrix wand = FalconApp::instance().getWandMatrix();
 	mAimedPart->setAttitude(wand.getRotate());
+	mUpperAimedPart->setAttitude(wand.getRotate());
+
 	mHyperspace->update(dt);
 	mGun.update(dt);
 	if(mGun.canAutofire()) shoot();		//if we've started a burst shot, finish it
@@ -114,11 +125,11 @@ bool Falcon::shoot()
 	Matrix wand = FalconApp::instance().getWandMatrix();
 	Matrix wandRotate = Matrix::rotate(wand.getRotate());
 	mAimTarget = Vec3(wand.ptr()[12], wand.ptr()[13], wand.ptr()[14]) +
-		Vec3(wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]) * -100;
+		Vec3(wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]) * -500;
 
 	//each of the four barrels has a different position
 	Vec3 barrelPos = Vec3(1.0 * (-1 + 2*(whichBarrel%2)), 1.0 * (whichBarrel/2), 0) * wandRotate;
-	Vec3 shootFrom = getTransform() * Vec3(0, 4.5, -2) * wandRotate;
+	Vec3 shootFrom = getTransform() * Vec3(0, 6, -2) * wandRotate;
 	Vec3 fireDir = mAimTarget - shootFrom;			//actual direction our shot will travel
 	fireDir.normalize();
 	b->setTransform(wand);
@@ -128,10 +139,11 @@ bool Falcon::shoot()
 
 	float speed = ROM::FALCON_LASER_SPEED;
 	//printf("soundvolume: %f\n", ROM::FALCON_FIRE_VOLUME);
-	KSoundManager::instance()->playSound(std::string("data/sounds/") + mGun.mFireSound, mGun.mFireVolume, 0);
+	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + mGun.mFireSound, 
+		mGun.mFireVolume, b->getPos().x(), FalconApp::instance().getHeadMatrix().ptr()[13], b->getPos().z(),false, 50);
 //	printf("new bullet at %.2f, %.2f, %.2f\n", wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]);
 	b->mVel = b->getForward() * speed;
-	b->setColor(Vec4(1.0, .7, .6, 1.0));
+	b->setColor(Vec4(1.0, .5, .3, 1.0));
 //	FalconApp::instance().getBullets().push_back(b);
 	FalconApp::instance().addThis(b);
 	
@@ -146,12 +158,34 @@ void Falcon::aimAt(Vec3 target)
 
 void Falcon::jump()
 {
+
+	//play a voice clip before we jump
+	EventAudio::instance().eventHappened("preJump");
 	mHyperspace->go();
 }
 
 
 void Falcon::wasHit(Bullet* b)
 {
+	//reduce hitpoints
+	::Stats& stats = GameController::instance().getStats();
+	EventAudio::instance().eventHappened("falconHit");
+	float oldPercent = 1.0 * (stats.health) / stats.maxHealth;
+	stats.health--;
+
+	float newPercent = 1.0 * stats.health / stats.maxHealth;
+	
+	if(oldPercent > 0.5 && newPercent <= 0.5)
+	{
+		EventAudio::instance().eventHappened("halfHealth");		//maybe play a sound when health gets low
+	}
+
+	if(oldPercent > 0.25 && newPercent <= 0.25)
+	{
+		EventAudio::instance().eventHappened("quarterHealth");		//maybe play a sound when health gets low
+	}
+
+//	printf("Health:  %i\n", 	GameController::instance().getStats().health);
 //	FalconApp::instance().getFX()->makeExplosion(b->getPos(), 1.5);
 }
 

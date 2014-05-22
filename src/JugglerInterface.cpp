@@ -24,11 +24,14 @@ void JugglerInterface::init()
 	mButton[3].init("VJButton3");
 	mButton[4].init("VJButton4");
 	mButton[5].init("VJButton5");
-	
+	//triggers map to buttons 0, 5, 6, 7
 	mPadButtons[0].init("Button 6");
-	mPadButtons[1].init("Button 2");
+	mPadButtons[5].init("Button 7");
+	mPadButtons[6].init("Button 8");
+	mPadButtons[7].init("Button 5");
+	mPadButtons[1].init("Button 3");		//gamepad is backwards for this one
 	 vrj::OsgApp::init();
-
+	osg::setNotifyLevel(osg::FATAL);
 }
 
 void JugglerInterface::initScene()
@@ -51,14 +54,14 @@ void JugglerInterface::preFrame()
 
 void JugglerInterface::latePreFrame()
 {
-	//printf("preframe begin\n");
+	//std::cout << "begin preframe" << std::endl;
 	static double tLast = mHead->getTimeStamp().secd();
 	double tNow = mHead->getTimeStamp().secd();
 	double dt = tNow - tLast;
 	tLast = tNow;
 	
 	//pass changes in button state on to the app
-	for(int i = 0; i < 6; i++)
+	for(int i = 0; i < 8; i++)
 	{
 		//use gamepad buttons if they're available
 		gadget::DigitalInterface* button = &mButton[i];
@@ -78,9 +81,10 @@ void JugglerInterface::latePreFrame()
 	FalconApp::instance().setHeadMatrix(headMatrix);
 	
 		//KK:  on Mac, the first time this is called, the Kernel has zero users, and latePreFrame crashes. 
-
+	//std::cout << "almost end preframe" << std::endl;
 	if(mKernel->getUsers().size())
 		vrj::osg::App::latePreFrame();
+	//printf("end preframe\n");
 	fflush(stdout);
 
 }
@@ -121,8 +125,9 @@ void JugglerInterface::configSceneView(osgUtil::SceneView* newSceneViewer)
 
 void JugglerInterface::draw()
 {
-	//printf("Begin draw\n");
+	//std::cout << "begin draw" << std::endl;
 	vrj::OsgApp::draw();
-	//printf("end draw\n");
+	FalconApp::instance().drawStatus();
+	//std::cout << "end draw" << std::endl;
 
 }

@@ -263,7 +263,7 @@ void display(void)
 
 	//next we'll send the app a wand matrix based on the mouse position
 
-	KMatrix wandMat = gCamera.getWandMatrix(KVec3(-1.0 + 2.0 * gMouseX / screenWidth, -1.0 + 2.0 * gMouseY / screenHeight, -2));
+	KMatrix wandMat = gCamera.getWandMatrix(KVec3(-1.0 + 2.0 * gMouseX / screenWidth, -2.0 + 2.0 * gMouseY / screenHeight, -2));
 
 	//get a directional wand by projecting our mouse position
 	double px, py, pz;

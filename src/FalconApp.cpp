@@ -36,6 +36,7 @@
 #include "ComputerScreen.h"
 #include "EnemyController.h"
 #include "GameController.h"
+#include "EventAudio.h"
 
 using namespace osg;
 
@@ -46,6 +47,7 @@ void FalconApp::init()
 	PROFILER.init();		//init profiling
 	__FUNCTION_HEADER__
 	ROM::load();			//load our "ROM" right off the bat so we have access to its data
+	mEventAudioManager = new EventAudio();
 	mTimeStep = 0.01;
 	mGameController = new GameController();
 	
@@ -65,12 +67,6 @@ void FalconApp::init()
 	mScreen = new ComputerScreen();
 
 
-	Quat q;
-	q.makeRotate(-0.8, Vec3(1, 0, 0));
-	mScreen->setPos(Vec3(0, -1.5, -2));
-	
-
-	mScreen->setQuat(q);
 	//quickly add a lil spacebox
  	mModelGroup->addChild((new SpaceBox())->getRoot());
 	
@@ -103,7 +99,9 @@ void FalconApp::init()
 
 	mFalcon = new Falcon();
 	mModelGroup->addChild(mFalcon->getRoot());
-	mFalcon->getAimedPart()->addChild(mScreen->getRoot());
+
+	mModelGroup->addChild(mScreen->getRoot());
+//	mFalcon->getAimedPart()->addChild(mScreen->getRoot());
 	mParticleFX = new ParticleFX();
 	mModelGroup->addChild(mParticleFX->getRoot());
 }
@@ -127,14 +125,19 @@ void FalconApp::buttonInput(unsigned int button, bool pressed)
 void FalconApp::update(float fulldt)
 {
 	__FUNCTION_HEADER__
-
+	updateFrameRate(fulldt);
 	mTargetTime += fulldt;
 	while(mTotalTime < mTargetTime)
 	{
-		KSoundManager::instance()->updateListener(mTimeStep, mHeadMatrix.ptr(), 0, 0, 0);
+//		KSoundManager::instance()->updateListener(mTimeStep, mHeadMatrix.ptr(), 0, 0, 0);
+		mEventAudioManager->update(mTimeStep);
+		//in the C6, the listener moves relative to the speakers already
+		KSoundManager::instance()->update(mTimeStep);
 		mTotalTime += mTimeStep;
-		//process navigation, etc
-		if(mButtons[0] == TOGGLE_ON)
+		
+		
+		//buttons 0, 5, 6, and 7 all shoot
+		if(mButtons[0] == TOGGLE_ON || mButtons[5] == TOGGLE_ON || mButtons[6] == TOGGLE_ON || mButtons[7] == TOGGLE_ON)
 		{
 			//fire!
 			mFalcon->shoot();
@@ -198,6 +201,31 @@ void FalconApp::setWandMatrix(osg::Matrixf mat)
 {
 	mWandMatrix = mat*mNavigation->getInverseMatrix();
 	mWandXForm->setMatrix(osg::Matrixf::scale(0.25, 0.125, 1.0)*mWandMatrix);
+	Vec3 wandX(mat.ptr()[0], mat.ptr()[1], mat.ptr()[2]);
+	Vec3 wandY(mat.ptr()[4], mat.ptr()[5], mat.ptr()[6]);
+	Vec3 wandZ(mat.ptr()[8], mat.ptr()[9], mat.ptr()[10]);
+	wandX.y() = 0;
+	wandX.normalize();
+	wandZ.y() = 0;
+	wandZ.normalize();
+	
+	wandY = Vec3(0, 1, 0);
+	//create an un-pitched version of the wand matrix
+	Matrix flatWand = mat;
+	
+	//don't take wand pitch into account UNLESS we're pointing downward
+	if(mat.ptr()[9] < 0)
+		for(int i = 0; i < 3; i++)
+		{
+			flatWand.ptr()[i] = wandX.ptr()[i];
+			flatWand.ptr()[i+4] = wandY.ptr()[i];
+			flatWand.ptr()[i+8] = wandZ.ptr()[i];
+		}
+	Matrix newScreen = ROM::SCREEN_OFFSET * flatWand;
+	
+	
+	mScreen->setTransform(newScreen); 
+
 }
 
 void drawStringOnScreen(int x, int y, const char* format, ...)
@@ -297,6 +325,7 @@ void FalconApp::handleArguments(int* argc, char **argv)
 		else if(KenXML::CICompare(arg, "--vrjmaster"))
 		{
 			mIsMaster = true;
+			printf("We are the master node!\n");
 //			handled = true;
 		}
 
@@ -355,7 +384,14 @@ void FalconApp::drawDebug()
 	{
 		mJunk[i]->drawDebug();
 	}
-	
+	glColor3f(0, 1, 0);
+	glPushMatrix();
+		glMultMatrixf(mWandMatrix.ptr());
+		glBegin(GL_LINES);
+			glVertex3f(0, 0, -0.25);
+			glVertex3f(0, 0, 0.25);
+		glEnd();
+	glPopMatrix();
 	mEnemyController->drawDebug();
 	
 }

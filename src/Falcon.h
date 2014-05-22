@@ -32,6 +32,7 @@ protected:
 	float mFireRate;			//max fire rate
 	float mFireTimer;			//time since we last fired
 	osg::ref_ptr<osg::PositionAttitudeTransform> mAimedPart;	//this is the part that moves when we aim
+	osg::ref_ptr<osg::PositionAttitudeTransform> mUpperAimedPart;	//the turret part, basically
 	Hyperspace* mHyperspace;
 
 };

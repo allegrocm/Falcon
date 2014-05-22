@@ -13,7 +13,7 @@
 #include "Defaults.h"
 #include "Util.h"
 #include "GameController.h"
-
+#include "EventAudio.h"
 
 #include <stdlib.h>
 
@@ -25,20 +25,30 @@ EnemyController& EnemyController::instance()
 
 EnemyController::EnemyController()
 {
-	//just add a few generic spaceships for now
+	reset();
+
+}
+
+void EnemyController::reset()
+{
+//just add a few generic spaceships for now
 	int numToMake = 3;
+
+	mLeftToSpawn = 10;
+	mMaxEnemies = 7;
+	
 	Defaults::instance().getValue("InitialShipCount", numToMake);
+	Defaults::instance().getValue("demoBattleTotalShipCount", mLeftToSpawn);
+	Defaults::instance().getValue("demoBattleMaxShipCount", mMaxEnemies);
+
+
 	for(int i = 0; i < numToMake; i++)
 	{
 		StupidPlaceholderShip* sps = new StupidPlaceholderShip();
 		sps->setCircleOrigin(Vec3(-85 + 20 * i, 15, -100));
 		addShip(sps);
 	}
-
-	mLeftToSpawn = 10;
-	mMaxEnemies = 7;
 }
-
 
 void EnemyController::update(float dt)
 {
@@ -60,8 +70,11 @@ void EnemyController::update(float dt)
 	if(mLeftToSpawn && GameController::instance().getMode() == GameController::MAIN_GAME)
 	{
 		int diff = mMaxEnemies - mEnemies.size();		//how many more enemies can we put in play?
-		float chance = 0.1 * diff;
-
+		float chance = 0.4 * diff;
+		
+		//never let us have no enemies
+		if(!mEnemies.size())
+			chance = 10000;
 		if(1.0 * rand() /  RAND_MAX < chance * dt)
 		{
 			//spawn a ship!
@@ -71,6 +84,7 @@ void EnemyController::update(float dt)
 			sps->update(0);		//send a zero update so this ship positions itself immediately
 			addShip(sps);
 			printf("Spawn ship!\n");
+			EventAudio::instance().eventHappened("spawnEnemy");
 		}
 		
 	}

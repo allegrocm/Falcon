@@ -22,10 +22,16 @@ float ROM::MUSIC_VOLUME;
 std::string ROM::MAIN_MUSIC;
 std::string ROM::COMBAT_MUSIC;
 
+int ROM::FALCON_HITPOINTS;
 
 Gun ROM::TIE_FIGHTER_GUN;
 
 float ROM::TIE_HITBOX_SIZE;
+
+bool ROM::FALCON_HIT_DETECTION;
+
+osg::Matrixf ROM::SCREEN_OFFSET;
+
 
 void ROM::load()
 {
@@ -40,13 +46,14 @@ void ROM::load()
 	FALCON_LASER_SPEED = 800;
 	FALCON_LASER_LENGTH = 16;
 	MUSIC_VOLUME = 0.2;
+	FALCON_HIT_DETECTION = false;
 	getDefault("musicVolume", MUSIC_VOLUME);
 	getDefault("falconShootSound", FALCON_FIRE_SOUND);
 	getDefault("falconShootVolume", FALCON_FIRE_VOLUME);
 	getDefault("placeholderExplosionSound", PLACEHOLDER_EXPLOSION_SOUND);
 	getDefault("mainMusic", MAIN_MUSIC);
 	getDefault("combatMusic", COMBAT_MUSIC);
-
+	getDefault("falconHitDetection", FALCON_HIT_DETECTION);
 
 	TIE_HITBOX_SIZE = 10;
 	getDefault("tieHitboxSize", TIE_HITBOX_SIZE);
@@ -62,4 +69,19 @@ void ROM::load()
 	
 	TIE_FIGHTER_LASER_SPEED = 200;
 	TIE_FIGHTER_LASER_LENGTH = 4;
+	
+	getDefault("FalconHitPoints", FALCON_HITPOINTS);
+	
+	float screenX = 0, screenY = .9, screenZ = 0.5;
+	float screenAngle = -28;
+	
+	getDefault("screenOffsetX", screenX);
+	getDefault("screenOffsetY", screenY);
+	getDefault("screenOffsetZ", screenZ);
+	getDefault("screenOffsetAngle", screenAngle);
+	
+	osg::Quat q;
+	q.makeRotate(screenAngle / 57.3, osg::Vec3(1, 0, 0));
+	SCREEN_OFFSET.setTrans(osg::Vec3(screenX, screenY, screenZ));
+	SCREEN_OFFSET.setRotate(q);
 }

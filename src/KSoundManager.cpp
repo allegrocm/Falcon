@@ -206,7 +206,7 @@ SkySound* KSoundManager::playSound(std::string name, float volume, float stereo,
 	FMOD::Sound* sound;
 	result = mSystem->createSound(name.c_str(), FMOD_SOFTWARE | FMOD_2D, 0, &sound); 
 	checkErrors();
-
+	if(!sound) printf("Error playing %s\n", name.c_str());
 	if (!sound) return NULL;
 
 	FMOD::Channel* soundChannel;
@@ -410,6 +410,21 @@ void KSoundManager::stopSound(SkySound* channel)
 	if(mInitFailed) return;
 	if(channel)
 		channel->stop();
+}
+
+float KSoundManager::getSoundTimeRemaining(SkySound* channel)
+{
+	if(mSilent) return 0;
+	if(!channel) return 0;
+	if(mInitFailed) return 0;
+	FMOD::Sound* sound;
+	channel->getCurrentSound(&sound);
+	if(!sound) return 0;
+	unsigned int pos = 0;
+	unsigned int length;
+	result = channel->getPosition(&pos, FMOD_TIMEUNIT_MS);
+	result = sound->getLength(&length, FMOD_TIMEUNIT_MS);
+	return 0.001 * (length - pos);
 }
 
 void KSoundManager::loadPlaylist(std::string filename)

@@ -59,7 +59,6 @@ bool Bullet::checkHit()
 	#define TimeStep 0.01
 	osgUtil::IntersectVisitor iv;
 	
-	//TODO:  collisions
 	Vec3 dir = getForward();
 	Vec3 pos = getPos();
 	float length = mLength;
@@ -80,7 +79,14 @@ bool Bullet::checkHit()
 	{
 		ships.clear();
 		Falcon* f = FalconApp::instance().getFalcon();
+#ifdef __APPLE__
+#warning TODO:  get falcon collision detection back in
+#endif
+
 		ships.push_back((Spacecraft*)f);
+
+		if(ROM::FALCON_HIT_DETECTION)
+			ships.push_back((Spacecraft*)f);
 	}
 	
 	bool hitSometing = false;		//stop after any collision

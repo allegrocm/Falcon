@@ -1,0 +1,99 @@
+<EventSounds>
+	<!--each event has a name, probability, and a set of sounds associated with it-->
+	<Event name="enemyKilled">
+		<soundChance>0.25</soundChance>
+<!--The minimum amount of time before ANY sound associated with this event can play-->
+		<minEventTime>5.0</minEventTime>
+		<sound>
+			<filename>killSounds/chewy3.mp3</filename>
+			<volume>1.0</volume>
+			<pan>0</pan>
+		</sound>
+		<sound>
+			<filename>killSounds/dontgetcocky.mp3</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+		</sound>
+		<sound>
+			<filename>killSounds/greatshotkid.mp3</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+		</sound>
+	</Event>
+
+<!--played a few seconds after we start the game-->
+	<Event name="beginGame">
+		<soundChance>1</soundChance>
+		<sound>
+			<filename>han/goodluck.wav</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+		</sound>
+		<sound>
+			<filename>han/get_out.wav</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+		</sound>
+		<sound>
+			<filename>han/welltake.wav</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+		</sound>
+
+	</Event>
+
+
+<!--played a few seconds before we start the hyperspace jump.  A little before the preJump event-->
+	<Event name="timeToGo">
+		<soundChance>1</soundChance>
+		<sound>
+			<filename>han/getusoutofhere.mp3</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+		</sound>
+	</Event>
+
+
+
+<!--played a moment before we start playing the hyperspace sound effect-->
+	<Event name="preJump">
+		<soundChance>1</soundChance>
+		<sound>
+			<filename>han/burnout.wav</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+		</sound>
+		<sound>
+			<filename>han/crops.mp3</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+		</sound>
+
+	</Event>
+
+
+<!--These play randomly while we're fighting TIE fighters.  
+The event occurs 100 times per second so use a very low probability-->
+	<Event name="randomFighting">
+	<!--The minimum amount of time before ANY sound associated with this event can play-->
+		<minEventTime>10.0</minEventTime>
+		<soundChance>.001</soundChance>
+		<sound>
+			<filename>han/eyesopen.wav</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+	<!--the minimum amount of time before this particular sound can play again-->
+			<minWait> 50.0</minWait>
+		</sound>
+		<sound>
+			<filename>han/optimism.mp3</filename>
+			<volume>1.0</volume>
+			<pan>-1</pan>
+			<minWait> 50.0</minWait>
+		</sound>
+
+	</Event>
+	
+
+
+</EventSounds>
