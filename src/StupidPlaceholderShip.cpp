@@ -130,7 +130,7 @@ bool StupidPlaceholderShip::update(float dt)
 	Vec3 error = desiredDirection * mSpeed - this->getVel();
 //	std::cout << "Velocity change: " << error.x() << ", " << error.y() << ", " << error.z() << "\n";
 	if(abs(error.x()) < 1 && abs(error.y()) < 1 && abs(error.z()) < 1 && Util::random(0, 100) < 50) {
-		this->shoot();
+//		this->shoot();
 	}
 	this->setVel(adjustedVelocity*mSpeed);
 
