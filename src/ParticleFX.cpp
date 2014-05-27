@@ -14,7 +14,7 @@
 #include <osgParticle/ModularProgram>
 #include <osg/BlendFunc>
 #include <osg/Depth>
-
+#include "Layers.h"
 #ifdef KENS_MIDI_CONTROLLER
 #include "magicjoystick.h"
 #endif
@@ -28,7 +28,8 @@ ParticleFX::ParticleFX()
 	mRoot->addChild(g);
 	osgParticle::ParticleSystemUpdater* psu = new osgParticle::ParticleSystemUpdater;
 	mRoot->addChild(psu);
-
+//	mRoot->setNodeMask(1 << GLOW_LAYER);
+	mRoot->setNodeMask(1 << BACKGROUND_LAYER);				//particles don't glow or occlude glow
 	for(int i = 0; i < NUM_PARTICLE_TYPES; i++)
 	{
 		mSystems[i] = new osgParticle::ParticleSystem();

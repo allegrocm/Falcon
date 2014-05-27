@@ -18,6 +18,8 @@
 #include "FalconApp.h"
 #include "quickprof.h"
 #include "Layers.h"
+#include "EnemyController.h"
+
 
 int screenWidth = 1024;
 int screenHeight = 768;
@@ -288,6 +290,10 @@ void display(void)
 		wandMat.m[4+i] = y.ptr()[i];
 		wandMat.m[8+i] = z.ptr()[i];
 	}
+	
+	//the wand rotates about a point a foot ahead of and a foot below the head position
+	//...
+	
 //	wandMat.print();
 //	printf("Unproject to %.2f, %.2f, %.2f\n", px, py, pz);
 	FalconApp::instance().setWandMatrix(osg::Matrixf(wandMat.m));
@@ -399,7 +405,7 @@ void keyboard(unsigned char key, int x, int y)
 		case 'd': gCamera.setRight(true);	break;
 		case 'z': gCamera.setLower(true);		break;
 		case 'x': gCamera.setRaise(true);		break;
-	
+		case 'K': EnemyController::instance().killAll(); break;
 		case 'c': gShowC6 = !gShowC6; break;
 		case ' ':	FalconApp::instance().buttonInput(0, true);	break;		//space bar controls the main wand button
 	

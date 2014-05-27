@@ -12,7 +12,7 @@
 #include "Debris.h"
 #include "Util.h"
 #include "FalconApp.h"
-
+#include "Layers.h"
 #include <stdlib.h>
 
 using namespace osg;
@@ -26,7 +26,7 @@ GameObject::GameObject()
 	mPat->setName("GameObject Pat");
 	mRoot->addChild(mPat);
 	setName("GameObject");
-
+	setGlows(false);			//things don't glow by default
 }
 
 GameObject::~GameObject()
@@ -36,6 +36,13 @@ GameObject::~GameObject()
 		while(mRoot->getNumParents())
 			mRoot->getParent(0)->removeChild(mRoot);
 
+}
+
+void GameObject::setGlows(bool b)
+{
+	setLayer(mRoot, GLOW_LAYER, b);
+	setLayer(mRoot, NON_GLOW_LAYER, !b);
+	setLayer(mRoot, GLOW_ONLY_LAYER, false);		//by default, nothing goes on the glow only layer
 }
 
 Matrixf GameObject::getTransform()

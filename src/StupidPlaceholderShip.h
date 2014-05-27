@@ -28,13 +28,13 @@ protected:
 
 	bool mMovingAway;
 	bool mTurning;
-	osg::Vec3 targetPosition;
+	osg::Vec3 mTargetPosition;
 	float mCurrentTurnTime;
 	float mTimeToTurn;
 	float mTimeTillShoot;		//how long till we open fire once we're facing the falcon?
 	float mSpeed;
 	osg::Vec3 mCenter;			//center of our ship
-	
+	osg::ref_ptr<osg::Sphere> mEngineGlow;		
 
 };
 

@@ -112,3 +112,13 @@ void EnemyController::drawDebug()
 		mEnemies[i]->drawDebug();
 }
 
+void EnemyController::killAll()
+{
+	for(size_t i = 0; i < mEnemies.size(); i++)
+	{
+		mEnemies[i]->explode();
+	}
+	mLeftToSpawn = 0;
+	
+}
+

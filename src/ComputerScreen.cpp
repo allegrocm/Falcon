@@ -22,6 +22,7 @@ using namespace osg;
 float gScreenAspect = 1.75;
 ComputerScreen::ComputerScreen()
 {
+	setGlows(false);
 	getDefault("screenAspect", gScreenAspect);
 	float mainTextSize = 0.1;
 	getDefault("textSize", mainTextSize);

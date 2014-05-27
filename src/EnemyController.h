@@ -27,6 +27,7 @@ public:
 	bool isDone();			//everything dead and no more spawning?
 	void drawDebug();
 	void reset();
+	void killAll();			//kill all the current enemy ships
 protected:
 	std::vector<Spacecraft*> mEnemies;
 	int mMaxEnemies;			//max in play

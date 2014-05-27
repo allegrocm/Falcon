@@ -52,4 +52,8 @@ bool Spacecraft::shoot()
 	return false;
 }
 
+void Spacecraft::kill()
+{
+	explode();
+}
 

@@ -15,10 +15,11 @@
 #define StarWars_Layers_h
 #include <osg/Node>
 
-#define NON_GLOW_LAYER 0				//objects that draw for the non-glow camera.  is used to depth-mask glowing stuff
-#define GLOW_LAYER 1					//objects that draw for the glow camera
+#define NON_GLOW_LAYER 0				//objects that draw for the non-glow camera and main camera.  is used to depth-mask glowing stuff
+#define GLOW_LAYER 1					//objects that draw for the glow camera and main camera
 #define COLLISION_LAYER 2				//objects that don't have this in their node mask won't hit detect against laser beams
 #define BACKGROUND_LAYER 3				//draws, but isn't used for depth masking of glow (the non-glow layer)
+#define GLOW_ONLY_LAYER 4				//only draws on the glow camera
 
 //use this to easily enable and disable
 static void setLayer(osg::Node* n, int layer, bool enabled)

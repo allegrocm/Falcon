@@ -30,6 +30,7 @@ Bullet::Bullet()
 	mIsEnemy = false;
 	mLength = ROM::FALCON_LASER_LENGTH;
 	addGeometry();
+	setGlows(true);
 }
 
 bool Bullet::update(float dt)

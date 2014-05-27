@@ -15,6 +15,7 @@
 #include <osg/Geode>
 #include <osg/LightSource>
 #include <osg/MatrixTransform>
+#include "Bloom.h"
 
 class Spacecraft;
 class Bullet;
@@ -38,6 +39,7 @@ public:
 	osg::Matrixf getWandMatrix()		{return mWandMatrix;}
 	void update(float dt);										//timestep update
 	osg::Group* getRoot() {return mRoot.get();}			//get our root scene node
+	
 	osg::Group* getModelGroup()	{return mModelGroup.get();}
 	void buttonInput(unsigned int button, bool pressed);
 
@@ -108,6 +110,8 @@ protected:
 	
 	ParticleFX*						mParticleFX;
 	EventAudio*						mEventAudioManager;
+	
+	BloomController* mBloom;					//for bloom!
 };
 
 

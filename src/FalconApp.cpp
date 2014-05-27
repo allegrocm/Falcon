@@ -104,6 +104,10 @@ void FalconApp::init()
 //	mFalcon->getAimedPart()->addChild(mScreen->getRoot());
 	mParticleFX = new ParticleFX();
 	mModelGroup->addChild(mParticleFX->getRoot());
+	
+	mBloom = new BloomController();
+	mRoot->addChild(mBloom->getRoot());
+	mBloom->getScene()->addChild(mModelGroup);
 }
 
 

@@ -26,6 +26,7 @@ using namespace osg;
 
 StupidPlaceholderShip::StupidPlaceholderShip()
 {
+	setGlows(false);
 	mCenter = Vec3(-50, 15, -100);		//feet!
 	mRadius = 50 + rand()%50;
 	mOffset = 6.28 * rand() / RAND_MAX;
@@ -35,7 +36,7 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	MatrixTransform* n = Util::loadModel("data/models/tief3DS/TIEF_50.3ds", 1.0, -90);
 	MatrixTransform* lod = Util::loadModel("data/models/tief3DS/TIEF_10.3ds", 1.0, -90);
 	
-
+	
 	//use an LOD to reduce render time
 	osg::LOD* l = new LOD();
 //	l->addChild(g, 0, 100000);
@@ -64,6 +65,15 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	g->setNodeMask(1 << COLLISION_LAYER);			//don't draw the sphere
 
 
+	//...maybe not.  we'll leave the engine glow out for now
+	//now add the engine glow as another sphere
+	mEngineGlow = new Sphere(Vec3(0, 0, -15), 3.0);
+	sd = new ShapeDrawable(mEngineGlow);
+	sd->setColor(Vec4(.6, .7, 1.0, 1.0) * 0.25);
+	g = new Geode;
+	g->addDrawable(sd);
+	g->setNodeMask(1 << GLOW_ONLY_LAYER);			//only glow.  not used for anything else
+//	mPat->addChild(g);
 	//n->addChild(g);
 	mPat->addChild(l);
 //	n = Util::loadModel("data/models/TieWing.3ds", 10.0, -90,0,0, Vec3(8, 0, 0));
@@ -84,15 +94,15 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	}
 	
 	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
-	this->setPos(pos);
+	setPos(pos);
 	mSpeed = 100;
-	this->setVel(Vec3(0, 0, -mSpeed));
-	this->mMovingAway = true;
-	this->mTurning = false;
+	setVel(Vec3(0, 0, -mSpeed));
+	mMovingAway = true;
+	mTurning = false;
 
-	this->targetPosition = Vec3();
-	this->mCurrentTurnTime = 0;
-	this->mTimeToTurn = 0;
+	mTargetPosition = Vec3();
+	mCurrentTurnTime = 0;
+	mTimeToTurn = 0;
 	mTimeTillShoot = Util::random(0.0, 2.0);
 	mGun = ROM::TIE_FIGHTER_GUN;
 }
@@ -121,22 +131,22 @@ bool StupidPlaceholderShip::update(float dt)
 	}
 */
 	
-	this->setPos(this->getVel() * dt + this->getPos());
-	Vec3 desiredDirection = this->targetPosition - this->getPos();
+	setPos(getVel() * dt + getPos());
+	Vec3 desiredDirection = mTargetPosition - getPos();
 	desiredDirection.normalize();
-	Vec3 adjustedVelocity = this->getVel() + (desiredDirection * mSpeed - this->getVel()) * dt; //dt when coded was .01
+	Vec3 adjustedVelocity = getVel() + (desiredDirection * mSpeed - getVel()) * dt; //dt when coded was .01
 	adjustedVelocity.normalize();
 
-	Vec3 error = desiredDirection * mSpeed - this->getVel();
+	Vec3 error = desiredDirection * mSpeed - getVel();
 //	std::cout << "Velocity change: " << error.x() << ", " << error.y() << ", " << error.z() << "\n";
 	if(abs(error.x()) < 1 && abs(error.y()) < 1 && abs(error.z()) < 1 && Util::random(0, 100) < 50) {
-//		this->shoot();
+//		shoot();
 	}
-	this->setVel(adjustedVelocity*mSpeed);
+	setVel(adjustedVelocity*mSpeed);
 
 	FalconApp& app = FalconApp::instance();
 	Falcon* falcon = app.getFalcon();
-	Vec3 distanceToFalcon = falcon->getPos() - this->getPos();
+	Vec3 distanceToFalcon = falcon->getPos() - getPos();
 	
 	if(mMovingAway) {
 		if(distanceToFalcon.length() < 600) {
@@ -146,9 +156,9 @@ bool StupidPlaceholderShip::update(float dt)
 			mMovingAway = false;
 			mTurning = true;
 			mTimeTillShoot = Util::random(0.0, 2.0);		//attack after a random amount of time
-			this->targetPosition = falcon->getPos();
-			this->mCurrentTurnTime = 0;
-			this->mTimeToTurn = 3;
+			mTargetPosition = falcon->getPos();
+			mCurrentTurnTime = 0;
+			mTimeToTurn = 3;
 		}
 	} else {
 		if(distanceToFalcon.length() > 200)		//flying toward the Falcon
@@ -175,9 +185,9 @@ bool StupidPlaceholderShip::update(float dt)
 			float theta = Util::random(-0.0, 6.28);
 			float phi = Util::random(-1, 2.5);
 			Vec3 target = Vec3(500*cosf(theta) * cosf(phi), 500*sinf(phi), -500*sinf(theta) * cosf(phi));
-			this->targetPosition = target;
-			this->mCurrentTurnTime = 0;
-			this->mTimeToTurn = 3;
+			mTargetPosition = target;
+			mCurrentTurnTime = 0;
+			mTimeToTurn = 3;
 			
 		}
 	}
@@ -198,6 +208,7 @@ void StupidPlaceholderShip::wasHit(Bullet* b)
 void StupidPlaceholderShip::explode()
 {
 	//make scattered little explosions
+	mHP = 0;
 	int count = rand()%2+3;
 	for(int i = 0; i < count; i++)
 	{

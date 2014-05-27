@@ -29,6 +29,7 @@ using namespace osg;
 
 Falcon::Falcon()
 {
+	setGlows(false);
 	setName("Millennium Falcon");
 	//load a ship model.  we can also pre-transform the model into our coordinate system
 	float scaleFactor = 0.56 * 8.4;			//found through trial, error, and online MF specs
@@ -82,7 +83,7 @@ Falcon::Falcon()
 
 	
 	mHyperspace = new Hyperspace();
-	mPat->addChild(mHyperspace->getRoot());
+	FalconApp::instance().getModelGroup()->addChild(mHyperspace->getRoot());
 	
 	mGun.mAutoburst = true;
 	

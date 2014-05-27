@@ -47,4 +47,5 @@ SpaceBox::SpaceBox()
 	mRoot->addChild(c);
 	c->addChild(g);
 	c->setRenderOrder(Camera::NESTED_RENDER, -1);
+	mRoot->setNodeMask(1 << NON_GLOW_LAYER);
 }

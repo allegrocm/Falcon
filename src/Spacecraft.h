@@ -29,6 +29,8 @@ public:
 	virtual void setVel(osg::Vec3 v)	{mVel = v;}
 	virtual int getHP()					{return mHP;}
 	virtual int getScore()				{return mScore;}
+	virtual void kill();				//blow it up
+	virtual void explode()				{}
 protected:
 	//basic things might go here, like ammo count, firing rate, speed/acceleration/turning stats, allegiance, etc
 	bool			mIsEnemy;
