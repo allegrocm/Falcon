@@ -102,7 +102,10 @@ void GameController::enemyWasKilled(Spacecraft* c)
 {
 	//maybe play a sound to congratz us
 	if(EnemyController::instance().isDone())
+	{
 		EventAudio::instance().eventHappened("lastEnemyKilled");
+
+	}
 	EventAudio::instance().eventHappened("EnemyKilled");
 	mStats.score += c->getScore();
 
@@ -119,13 +122,14 @@ void GameController::preGame(float dt)
 	if(mModeTime == 0)
 	{
 //		printf("Pregame started!\n");
-		FalconApp::instance().getScreen()->setStatusText("All systems normal");
+		FalconApp::instance().getScreen()->setStatusText("Press the left gamepad button to begin");
 		KSoundManager::instance()->fadeIntoSong(1.0, std::string("data/sounds/") + ROM::MAIN_MUSIC);
 		//set up text for the computer screen
 		FalconApp::instance().getScreen()->setButtonText(0, "Begin");
 		FalconApp::instance().getScreen()->setButtonText(1, "");
 		FalconApp::instance().getScreen()->setButtonText(2, "");
 		FalconApp::instance().getScreen()->setButtonText(3, "");
+		FalconApp::instance().getScreen()->setIsUp(true);		//put the screen so we know to interact with it
 	}
 	
 	//button 1 will start the fight!
@@ -157,6 +161,7 @@ void GameController::mainGame(float dt)
 	if(modeTimeJustPassed(1.5))		//play random Han sound when we start!
 	{
 		EventAudio::instance().eventHappened("beginGame");
+		FalconApp::instance().getScreen()->setIsUp(false);		//put the screen down
 	}
 	
 	if(EnemyController::instance().isDone())
@@ -165,14 +170,16 @@ void GameController::mainGame(float dt)
 		if(mJumpTime < 3.0 && mJumpTime + dt >= 3.0)
 		{
 			//get us out of here!
+
 			EventAudio::instance().eventHappened("timeToGo");
+			FalconApp::instance().getScreen()->setStatusText("Initiating hyperspace jump...");
 
 		}
 
 		if(mJumpTime < 0 && mJumpTime + dt >= 0)		//did jumptime just pass zero?
 		{
 			FalconApp::instance().getFalcon()->jump();
-			mSwitchTime = 15.0;
+			mSwitchTime = 10.0;
 		}
 
 

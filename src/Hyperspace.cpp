@@ -19,7 +19,7 @@ using namespace osg;
 
 Hyperspace::Hyperspace()
 {
-	setGlows(true);
+	setGlows(false);
 	//start by creating a bunch of "stars"
 	int stars = 2500;
 	osg::Geode* geode = new Geode();

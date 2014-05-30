@@ -45,6 +45,7 @@ public:
 	
 	//setting up the HUD/targetting computer
 	static osg::Matrixf SCREEN_OFFSET;		//from the wand
+	static float HUD_MOVEMENT_SPEED;		//when it moves up and down for combat/interaction
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

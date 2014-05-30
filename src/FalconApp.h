@@ -62,6 +62,8 @@ public:
 	
 	ButtonState getButton(int which)				{return (ButtonState)mButtons[which];}
 	EventAudio* getEventAudio()						{return mEventAudioManager;}
+	
+	BloomController* getBloom()						{return mBloom;}	//for setting glow aspect ratio for proper rendering
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call

@@ -229,13 +229,15 @@ void display(void)
 {
     // update and render the scene graph
 	osg::Camera* currentCam = viewer->getCamera();
+
+
 //	printf("camera name:  %s\n", currentCam->getName().c_str());
 	currentCam->setCullMask((1 << NON_GLOW_LAYER) | (1 << GLOW_LAYER) | (1 << BACKGROUND_LAYER));
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 8500.0);
-	
+	FalconApp::instance().getBloom()->setAspectRatio(aspect);
 
 	currentCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 	gluPerspective(60, aspect, 0.2, 200.0);

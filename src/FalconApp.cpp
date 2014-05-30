@@ -130,6 +130,7 @@ void FalconApp::update(float fulldt)
 {
 	__FUNCTION_HEADER__
 	updateFrameRate(fulldt);
+
 	mTargetTime += fulldt;
 	while(mTotalTime < mTargetTime)
 	{
@@ -205,31 +206,8 @@ void FalconApp::setWandMatrix(osg::Matrixf mat)
 {
 	mWandMatrix = mat*mNavigation->getInverseMatrix();
 	mWandXForm->setMatrix(osg::Matrixf::scale(0.25, 0.125, 1.0)*mWandMatrix);
-	Vec3 wandX(mat.ptr()[0], mat.ptr()[1], mat.ptr()[2]);
-	Vec3 wandY(mat.ptr()[4], mat.ptr()[5], mat.ptr()[6]);
-	Vec3 wandZ(mat.ptr()[8], mat.ptr()[9], mat.ptr()[10]);
-	wandX.y() = 0;
-	wandX.normalize();
-	wandZ.y() = 0;
-	wandZ.normalize();
 	
-	wandY = Vec3(0, 1, 0);
-	//create an un-pitched version of the wand matrix
-	Matrix flatWand = mat;
-	
-	//don't take wand pitch into account UNLESS we're pointing downward
-	if(mat.ptr()[9] < 0)
-		for(int i = 0; i < 3; i++)
-		{
-			flatWand.ptr()[i] = wandX.ptr()[i];
-			flatWand.ptr()[i+4] = wandY.ptr()[i];
-			flatWand.ptr()[i+8] = wandZ.ptr()[i];
-		}
-	Matrix newScreen = ROM::SCREEN_OFFSET * flatWand;
-	
-	
-	mScreen->setTransform(newScreen); 
-
+	//the computer screen will update on its own
 }
 
 void drawStringOnScreen(int x, int y, const char* format, ...)

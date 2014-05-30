@@ -31,7 +31,7 @@ float ROM::TIE_HITBOX_SIZE;
 bool ROM::FALCON_HIT_DETECTION;
 
 osg::Matrixf ROM::SCREEN_OFFSET;
-
+float ROM::HUD_MOVEMENT_SPEED;
 
 void ROM::load()
 {
@@ -84,4 +84,7 @@ void ROM::load()
 	q.makeRotate(screenAngle / 57.3, osg::Vec3(1, 0, 0));
 	SCREEN_OFFSET.setTrans(osg::Vec3(screenX, screenY, screenZ));
 	SCREEN_OFFSET.setRotate(q);
+	
+	HUD_MOVEMENT_SPEED = 1.0;
+	getDefault("hudMovementSpeed", HUD_MOVEMENT_SPEED);
 }

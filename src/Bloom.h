@@ -29,11 +29,13 @@ public:
 	//parameters
 	void setGlowAmount(float f);							//pixels :-/
 	void setGlowGain(float f);
-
+	void setAspectRatio(float f);							//pass in the aspect ratio of the main camera when you can kthx
+//	void update(float dt);									//call this every frame to optimize blooming stuff
 protected:
 	osg::ref_ptr<osg::Group>			mScene;				//holds things that glow or occlude glow
 	osg::ref_ptr<osg::Group>			mRoot;				//holds our cameras.  add this to the scenegraph root
 	osg::ref_ptr<osg::Uniform>			mGlowAmount;		//pixels
+	osg::ref_ptr<osg::Uniform>			mGlowAmountV;		//pixels.  should ideally be adjusted by the aspect ratio of main camera
 	osg::ref_ptr<osg::Uniform>			mGlowGain;			//multiply the light!
 	osg::ref_ptr<osg::Uniform>			mGlowRadius;		//used for sampling the glow.  not adjustable
 	
