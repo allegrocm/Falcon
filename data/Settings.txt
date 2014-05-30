@@ -32,16 +32,19 @@ demoBattleMaxShipCount = 4
 falconHitDetection = true
 
 #for configuring the HUD
-textSize = 0.05
-textPosY = 0.4
-textPosX = -0.5
 screenSize = 0.4
 screenAspect = 1.75
 screenOffsetX = 0
-screenOffsetY = .9
+screenOffsetY = .5
 screenOffsetZ = 0.5
 screenOffsetAngle = -10
 
+
+
+#layout-related
+textSize = 0.05
+textPosY = 0.4
+textPosX = -0.5
 
 radarSize = 0.75
 
@@ -59,3 +62,31 @@ buttonsDX = 0.1
 buttonsDY = 0.075
 buttonCircleSize = 0.1
 buttonTextSize = 0.04
+
+
+#bloom parameters
+glowAmount = 5.5
+glowGain = 2.0
+
+
+
+#interaction (non-battle layout) for the computer/HUD
+radarSizeUp = 0.3
+radarYUp = -0.3
+radarXUp = 0.4
+
+damageIndicatorSizeUp = 0.25
+damageIndicatorXUp = 0.7
+damageIndicatorYUp = -0.3
+
+#make the text more front and center
+textSizeUp = 0.1
+textPosXUp = -0.7
+textPosYUp = 0.4
+
+#how much bigger does the button layout thing get?
+buttonsUpScale = 1.2
+buttonsXUp = -0.575
+buttonsYUp = -0.1
+
+
