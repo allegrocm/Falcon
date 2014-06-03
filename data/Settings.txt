@@ -20,7 +20,7 @@ tieHitboxSize = 12
 
 
 #for the demo...how many ships?
-initialShipCount = 0
+initialShipCount = 1
 
 #how many ships do we have to kill to win the demo battle?
 demoBattleTotalShipCount = 10

@@ -107,7 +107,7 @@ void FalconApp::init()
 	
 	mBloom = new BloomController();
 	mRoot->addChild(mBloom->getRoot());
-	mBloom->getScene()->addChild(mModelGroup);
+	mBloom->getScene()->addChild(mNavigation);
 }
 
 
@@ -154,6 +154,18 @@ void FalconApp::update(float fulldt)
 		mFalcon->update(mTimeStep);
 		mEnemyController->update(mTimeStep);
 		mGameController->update(mTimeStep);
+		EnemyPlayer* player = mEnemyController->getPlayer();
+		if(player && player->getShip())
+		{
+			Spacecraft* enemy = player->getShip();
+			Matrix nav = enemy->getTransform();
+			float ahead = 5;
+			for(int i = 0; i < 3; i++)
+				nav.ptr()[12+i] += nav.ptr()[8+i] * ahead;
+			nav.invert(nav);
+			mNavigation->setMatrix(nav);
+		}
+		
 		//update bullets. when one is "finished", delete it
 		for(size_t i = 0; i < mBullets.size(); i++)
 		{
@@ -199,12 +211,14 @@ void FalconApp::deToggleButtons()
 void FalconApp::setHeadMatrix(osg::Matrixf mat)
 {
 	mHeadMatrix = mat*mNavigation->getInverseMatrix();
+	mHeadMatrix = mat;
 
 }
 
 void FalconApp::setWandMatrix(osg::Matrixf mat)
 {
-	mWandMatrix = mat*mNavigation->getInverseMatrix();
+//	mWandMatrix = mat*mNavigation->getInverseMatrix();
+	mWandMatrix = mat;
 	mWandXForm->setMatrix(osg::Matrixf::scale(0.25, 0.125, 1.0)*mWandMatrix);
 	
 	//the computer screen will update on its own

@@ -36,7 +36,9 @@ Bullet::Bullet()
 bool Bullet::update(float dt)
 {
 	GameObject::update(dt);
+	 
 	setPos(getPos() + mVel * dt);
+//	printf("pos:  %.2f, %.2f, %.2f\n", getPos().x(), getPos().y(), getPos().z());
 	if(checkHit()) return false;
 	return (mAge < mLife);
 }
@@ -80,9 +82,6 @@ bool Bullet::checkHit()
 	{
 		ships.clear();
 		Falcon* f = FalconApp::instance().getFalcon();
-#ifdef __APPLE__
-#warning TODO:  get falcon collision detection back in
-#endif
 
 		ships.push_back((Spacecraft*)f);
 

@@ -16,6 +16,7 @@
 #include <osg/LightSource>
 #include <osg/MatrixTransform>
 #include "Bloom.h"
+#include "EnemyPlayer.h"
 
 class Spacecraft;
 class Bullet;
@@ -114,6 +115,9 @@ protected:
 	EventAudio*						mEventAudioManager;
 	
 	BloomController* mBloom;					//for bloom!
+	
+	
+	
 };
 
 

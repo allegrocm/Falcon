@@ -500,8 +500,15 @@ void timer(int bl)
 	{
 		//send gamepad button presses to the app
 		MagicJoystick& gamepad = MagicJoystick::stick(0);
-		for(int i = 0; i < 4; i++)
-			FalconApp::instance().buttonInput(1+i, gamepad.button[i]);
+		EnemyControlInput imp;
+		imp.xAxis = gamepad.axis[0];
+		imp.yAxis = gamepad.axis[1];
+		imp.thrustAxis = gamepad.axis[2];
+		imp.trigger = gamepad.button[0];
+		
+		EnemyController::instance().setEnemyInput(0, imp);
+//		for(int i = 0; i < 4; i++)
+//			FalconApp::instance().buttonInput(1+i, gamepad.button[i]);
 	}
 #endif
 

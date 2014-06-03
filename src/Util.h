@@ -106,6 +106,19 @@ namespace Util
 	
 	osg::Matrixf getTransform(osg::Node* n);				//gets matrix from a matrixtransform, or turns a PAT into a matrix
 	void deCull(osg::Node* n);					//recursively turn off culling.  experimenting with using no culling
+	
+	
+	//for working with matrices more easily
+	osg::Vec3 xAxis(osg::Matrix& m);
+	osg::Vec3 yAxis(osg::Matrix& m);
+	osg::Vec3 zAxis(osg::Matrix& m);
+	osg::Vec3 pos(osg::Matrix& m);
+	
+	//directly set one of the axes or position of a matrix.  doesn't affect other axes
+	void setXAxis(osg::Matrix& m, osg::Vec3 v);
+	void setYAxis(osg::Matrix& m, osg::Vec3 v);
+	void setZAxis(osg::Matrix& m, osg::Vec3 v);
+	void setPos(osg::Matrix& m, osg::Vec3 v);
 };
 #endif /* defined(__OSGSample__Util__) */
 

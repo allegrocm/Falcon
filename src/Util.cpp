@@ -329,6 +329,7 @@ osg::Vec3 randomVector()
 
 void printMatrix(Matrixf m)
 {
+	printf("Matrix:\n");
 	for(int i = 0; i < 4; i++)
 		printf("%.3f	%.3f	%.3f	%.3f\n", m.ptr()[i], m.ptr()[i+4], m.ptr()[i+8], m.ptr()[i+12]);
 }
@@ -676,6 +677,40 @@ void deCull(osg::Node* n)
 	}
 	
 }
+
+osg::Vec3 xAxis(osg::Matrix& m)	{return Vec3(m.ptr()[0], m.ptr()[1], m.ptr()[2]);}
+osg::Vec3 yAxis(osg::Matrix& m)	{return Vec3(m.ptr()[4], m.ptr()[5], m.ptr()[6]);}
+osg::Vec3 zAxis(osg::Matrix& m)	{return Vec3(m.ptr()[8], m.ptr()[9], m.ptr()[10]);}
+osg::Vec3 pos(osg::Matrix& m)	{return Vec3(m.ptr()[12], m.ptr()[13], m.ptr()[14]);}
+
+void setXAxis(osg::Matrix& m, osg::Vec3 v)
+{
+	m.ptr()[0] = v.x();
+	m.ptr()[1] = v.y();
+	m.ptr()[2] = v.x();
+}
+
+void setYAxis(osg::Matrix& m, osg::Vec3 v)
+{
+	m.ptr()[4] = v.x();
+	m.ptr()[5] = v.y();
+	m.ptr()[6] = v.x();
+}
+
+void setZAxis(osg::Matrix& m, osg::Vec3 v)
+{
+	m.ptr()[8] = v.x();
+	m.ptr()[9] = v.y();
+	m.ptr()[10] = v.x();
+}
+
+void setPos(osg::Matrix& m, osg::Vec3 v)
+{
+	m.ptr()[12] = v.x();
+	m.ptr()[13] = v.y();
+	m.ptr()[14] = v.x();
+}
+
 
 
 		

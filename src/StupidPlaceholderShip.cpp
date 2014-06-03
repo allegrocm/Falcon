@@ -107,31 +107,32 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	mGun = ROM::TIE_FIGHTER_GUN;
 }
 
-
-bool StupidPlaceholderShip::update(float dt)
+void StupidPlaceholderShip::playerControl(float dt)
 {
+	EnemyControlInput input = mPlayer->getInput();
+//	printf("player control!  %.2f, %.2f, %.2f, (%i)\n", input.xAxis, input.yAxis, input.thrustAxis, input.trigger);
+	float yawSpeed = 90.0 * input.xAxis * dt;
+	float pitchSpeed = 60.0 * input.yAxis * dt;
+	Vec3 vel = getVel();
+	Matrix current = getTransform();
+	Matrix pitchRot;
+	pitchRot.setRotate(osg::Quat(pitchSpeed / 57.3, Util::xAxis(current)));
+	Matrix yawRot;
+	yawRot.setRotate(osg::Quat(-yawSpeed / 57.3, Util::yAxis(current)));
+
+//	setTransform(pitchRot * yawRot * current);
+//	vel = pitchRot * yawRot * vel;
+	vel = vel * pitchRot * yawRot;
+//	Util::printMatrix(yawRot);
+//	printf("Forward:  %f, %f, %f\n", vel.x(), vel.y(), vel.z());
+	setVel(vel);
+	if(input.trigger)
+		shoot();
+}
 
 
-/*	
-	//Fly in circle
-	float radius = mRadius;
-	float dTheta = -1.0;
-//	dTheta = 0;		//hack for explosion testing
-	float theta = mAge * dTheta + mOffset;
-	Vec3 pos = mCenter + Vec3(cosf(theta)*radius, 0, sinf(theta)*radius);
-	Vec3 forward = Vec3(-sinf(theta), 0, cosf(theta)) * dTheta * radius;
-	mVel = forward;
-	
-	setPos(pos);
-	
-	if(forward.length())
-	{
-		forward.normalize();
-		setForward(forward);
-	}
-*/
-	
-	setPos(getVel() * dt + getPos());
+void StupidPlaceholderShip::AIControl(float dt)
+{
 	Vec3 desiredDirection = mTargetPosition - getPos();
 	desiredDirection.normalize();
 	Vec3 adjustedVelocity = getVel() + (desiredDirection * mSpeed - getVel()) * dt; //dt when coded was .01
@@ -191,7 +192,38 @@ bool StupidPlaceholderShip::update(float dt)
 			
 		}
 	}
+
+}
+
+
+bool StupidPlaceholderShip::update(float dt)
+{
+
+
+/*	
+	//Fly in circle
+	float radius = mRadius;
+	float dTheta = -1.0;
+//	dTheta = 0;		//hack for explosion testing
+	float theta = mAge * dTheta + mOffset;
+	Vec3 pos = mCenter + Vec3(cosf(theta)*radius, 0, sinf(theta)*radius);
+	Vec3 forward = Vec3(-sinf(theta), 0, cosf(theta)) * dTheta * radius;
+	mVel = forward;
 	
+	setPos(pos);
+	
+	if(forward.length())
+	{
+		forward.normalize();
+		setForward(forward);
+	}
+*/
+	if(mPlayer)
+		playerControl(dt);
+	else
+		AIControl(dt);
+	setPos(getVel() * dt + getPos());
+
 	setForward(mVel);
 	bool up = Spacecraft::update(dt);
 	return up;

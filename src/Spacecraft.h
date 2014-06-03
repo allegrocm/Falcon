@@ -15,7 +15,7 @@
 #include "Gun.h"
 
 class Bullet;
-
+class EnemyPlayer;		//enemy ships can be controlled by players
 class Spacecraft: public GameObject
 {
 public:
@@ -31,6 +31,8 @@ public:
 	virtual int getScore()				{return mScore;}
 	virtual void kill();				//blow it up
 	virtual void explode()				{}
+	virtual void setPlayer(EnemyPlayer* p)		{mPlayer = p;}
+	virtual EnemyPlayer* getPlayer()			{return mPlayer;}
 protected:
 	//basic things might go here, like ammo count, firing rate, speed/acceleration/turning stats, allegiance, etc
 	bool			mIsEnemy;
@@ -40,6 +42,7 @@ protected:
 	int mScore;				//score for blowing this up
 	int mHP;				//hitpoints
 	Gun mGun;
+	EnemyPlayer*			mPlayer;
 };
 
 

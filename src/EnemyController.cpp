@@ -25,6 +25,8 @@ EnemyController& EnemyController::instance()
 
 EnemyController::EnemyController()
 {
+	mEnemyPlayers.push_back(new EnemyPlayer);
+	mPlayer = mEnemyPlayers.back();
 	reset();
 
 }
@@ -65,7 +67,33 @@ void EnemyController::update(float dt)
 		}
 
 	}
+	
+	//do we have any enemy players that have no one to control?  get them someone!
+	for(size_t i = 0; i < mEnemyPlayers.size(); i++)
+	{
+		if(mEnemyPlayers[i]->getShip() == NULL)
+		{
+			//find a ship for this player
+			Spacecraft* enemy = NULL;
+			for(size_t i = 0; i < mEnemies.size(); i++)
+			{
+				if(mEnemies[i]->getPlayer() == NULL)
+				{
+					enemy = mEnemies[i];
+				}
+				
+			}
+				
+			//link them up!
+			if(enemy)
+			{
+				mEnemyPlayers[i]->setShip(enemy);
+				enemy->setPlayer(mEnemyPlayers[i]);
+			}
+		}
 		
+	}
+	
 	//should we spawn new enemies?  Don't spawn unless we're actually playing
 	if(mLeftToSpawn && GameController::instance().getMode() == GameController::MAIN_GAME)
 	{
@@ -122,3 +150,8 @@ void EnemyController::killAll()
 	
 }
 
+void EnemyController::setEnemyInput(int which, EnemyControlInput i)
+{
+	if(which < mEnemyPlayers.size())
+		mEnemyPlayers[which]->setInput(i);
+}

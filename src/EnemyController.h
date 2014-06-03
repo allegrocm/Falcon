@@ -12,6 +12,8 @@
 #include <iostream>
 #include <vector>
 
+#include "EnemyPlayer.h"
+
 //manages spawning of enemies
 
 class Spacecraft;
@@ -28,13 +30,18 @@ public:
 	void drawDebug();
 	void reset();
 	void killAll();			//kill all the current enemy ships
+	void setEnemyInput(int which, EnemyControlInput i);		//for controlling enemy players
+	EnemyPlayer* getPlayer()					{return mPlayer;}
+	
 protected:
 	std::vector<Spacecraft*> mEnemies;
 	int mMaxEnemies;			//max in play
 	int mLeftToSpawn;			//how many more enemies will we be spawning
 	
 	
-
+	//for...MULTIPLAYER!
+	std::vector<EnemyPlayer*>				mEnemyPlayers;
+	EnemyPlayer*							mPlayer;				//if this node is used for an enemy POV, which enemy is it?
 };
 
 #endif /* defined(__Millennium_Falcon__EnemyController__) */

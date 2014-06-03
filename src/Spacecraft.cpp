@@ -18,6 +18,7 @@ Spacecraft::Spacecraft()
 	mEngineSound = NULL;
 	mHP = 2;
 	mScore = 10;
+	mPlayer =  NULL;
 }
 
 
