@@ -3,7 +3,7 @@
 
 #include <vrj/Draw/OGL/GlApp.h>
 #include <vrj/Draw/OSG/OsgApp.h>
-
+#include <gadget/Type/AnalogInterface.h>
 
 // OSG
 #include <osg/Matrix>
@@ -35,6 +35,9 @@ class JugglerInterface : public vrj::OsgApp
 	gadget::PositionInterface  mHead;    /**< Positional interface for Head position */
 	gadget::DigitalInterface   mButton[8]; /**< Digital interface for button 0 */
 	gadget::DigitalInterface   mPadButtons[8];
+	
+	gadget::DigitalInterface   mEnemyButtons[8];
+	gadget::AnalogInterface  	mEnemyAxes[3];		//from a flight stick
 	osg::ref_ptr<osg::FrameStamp> _frameStamp;
 };
 

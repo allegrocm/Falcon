@@ -86,7 +86,7 @@ BloomController::BloomController()
 
 	mGlowAmount->set(glowAmount);
 	mGlowGain->set(glowGain);
-	mGlowAmountV->set(glowAmount * 16.0 / 9.0);		//default to HDTV aspecct
+	mGlowAmountV->set((float)(1.0f*glowAmount * 16.0 / 9.0));		//default to HDTV aspecct
 	glowBlendCam1->getOrCreateStateSet()->addUniform(new Uniform("blurDirection", Vec2(1, 0)));		//horizontal blur
 	glowBlendCam2->getOrCreateStateSet()->addUniform(new Uniform("blurDirection", Vec2(0, 1)));		//vertical blur
 	glowBlendCam1->getOrCreateStateSet()->addUniform(mGlowRadius);

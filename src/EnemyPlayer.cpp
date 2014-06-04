@@ -14,13 +14,13 @@
 EnemyPlayer::EnemyPlayer()
 {
 	mShip = NULL;
-	
+	mDeadTimer = 0;
 }
 
 
 void EnemyPlayer::update(float dt)
 {
-
+	mDeadTimer -= dt;
 }
 
 void EnemyPlayer::setInput(EnemyControlInput i)
@@ -30,6 +30,7 @@ void EnemyPlayer::setInput(EnemyControlInput i)
 
 void EnemyPlayer::shipDied()
 {
+	mDeadTimer = 5.0;
 	mShip = NULL;
 }
 

@@ -26,6 +26,7 @@ public:
 	virtual bool shoot();
 	virtual void AIControl(float dt);		//Shawn's control scheme
 	virtual void playerControl(float dt);	//if a player is controlling this ship
+	bool isHittingFalcon();
 protected:
 
 	bool mMovingAway;

@@ -1,7 +1,7 @@
 #include "JugglerInterface.h"
 #include "FalconApp.h"
 #include "Util.h"
-
+#include "EnemyController.h"
 
 JugglerInterface::JugglerInterface(vrj::Kernel* kern, int& argc, char** argv) : vrj::OsgApp(kern)
 {
@@ -30,6 +30,20 @@ void JugglerInterface::init()
 	mPadButtons[6].init("Button 8");
 	mPadButtons[7].init("Button 5");
 	mPadButtons[1].init("Button 3");		//gamepad is backwards for this one
+	
+	
+	//init enemy controls
+	for(int i = 0; i < 8; i++)
+	{
+		char name[1024];
+		sprintf(name, "FlightStick1Button%i", i+1);
+		mEnemyButtons[i].init(name);
+	}
+	
+	mEnemyAxes[0].init("FlightStick1Axis1");
+	mEnemyAxes[1].init("FlightStick1Axis2");
+	mEnemyAxes[2].init("FlightStick1Axis3");
+	
 	 vrj::OsgApp::init();
 	osg::setNotifyLevel(osg::FATAL);
 }
@@ -71,8 +85,23 @@ void JugglerInterface::latePreFrame()
 			FalconApp::instance().buttonInput(i, true);
 		else if((*button)->getData() == gadget::Digital::TOGGLE_OFF)
 			FalconApp::instance().buttonInput(i, false);
+			
 	}
-
+	
+	//send enemy controls if possible
+	EnemyControlInput ec;
+	if(mEnemyAxes[0]->isStupefied() == false)
+	{
+		ec.xAxis = mEnemyAxes[0]->getData() * 2.0 - 1.0;
+		ec.yAxis = mEnemyAxes[1]->getData() * 2.0 - 1.0;
+		ec.thrustAxis = mEnemyAxes[2]->getData() * 2.0 - 1.0;
+		ec.trigger = mEnemyButtons[0]->getData();
+		ec.button1 = mEnemyButtons[1]->getData();
+		ec.button2 = mEnemyButtons[2]->getData();
+		printf("Enemy input:  %.2f, %.2f, %.2f, %i\n", ec.xAxis, ec.yAxis, ec.thrustAxis, ec.trigger);
+		EnemyController::instance().setEnemyInput(0, ec);
+	}
+	
 	FalconApp::instance().update(dt);
 	//attach the wand's matrix to the paint sprayer
 	osg::Matrixf wandMatrix(mWand->getData().mData);

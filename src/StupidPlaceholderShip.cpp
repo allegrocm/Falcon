@@ -20,7 +20,7 @@
 #include <osgUtil/Optimizer>
 #include "Layers.h"
 #include "Bullet.h"
-
+#include <osgUtil/IntersectVisitor>
 using namespace osg;
 
 
@@ -110,19 +110,29 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 void StupidPlaceholderShip::playerControl(float dt)
 {
 	EnemyControlInput input = mPlayer->getInput();
-//	printf("player control!  %.2f, %.2f, %.2f, (%i)\n", input.xAxis, input.yAxis, input.thrustAxis, input.trigger);
+	if(input.button1)		//autopilot
+	{
+		AIControl(dt);
+		return;
+	}
+	printf("player control!  %.2f, %.2f, %.2f, (%i)\n", input.xAxis, input.yAxis, input.thrustAxis, input.trigger);
 	float yawSpeed = 90.0 * input.xAxis * dt;
 	float pitchSpeed = 60.0 * input.yAxis * dt;
 	Vec3 vel = getVel();
 	Matrix current = getTransform();
 	Matrix pitchRot;
-	pitchRot.setRotate(osg::Quat(pitchSpeed / 57.3, Util::xAxis(current)));
+	pitchRot.setRotate(osg::Quat(pitchSpeed / -57.3, Util::xAxis(current)));
 	Matrix yawRot;
-	yawRot.setRotate(osg::Quat(-yawSpeed / 57.3, Util::yAxis(current)));
-
+	yawRot.setRotate(osg::Quat(-yawSpeed / 57.3, Util::zAxis(current)));
+//	Vec3 up = getUp();
 //	setTransform(pitchRot * yawRot * current);
 //	vel = pitchRot * yawRot * vel;
-	vel = vel * pitchRot * yawRot;
+	Vec3 pos = getPos();
+	setTransform(current * yawRot);
+	setPos(pos);
+	vel = getForward() * pitchRot;
+	vel.normalize();
+	vel *= (input.thrustAxis + 1.0) * 0.5 * mSpeed;
 //	Util::printMatrix(yawRot);
 //	printf("Forward:  %f, %f, %f\n", vel.x(), vel.y(), vel.z());
 	setVel(vel);
@@ -226,6 +236,9 @@ bool StupidPlaceholderShip::update(float dt)
 
 	setForward(mVel);
 	bool up = Spacecraft::update(dt);
+	
+	if(isHittingFalcon())
+		explode();
 	return up;
 }
 
@@ -303,6 +316,8 @@ void StupidPlaceholderShip::explode()
 */
 
 	mDead = true;
+	if(mPlayer)
+		mPlayer->shipDied();
 	GameController::instance().enemyWasKilled(this);
 
 }
@@ -342,5 +357,48 @@ bool StupidPlaceholderShip::shoot()
 	return true;
 	
 }
+
+bool StupidPlaceholderShip::isHittingFalcon()
+{
+	osgUtil::IntersectVisitor iv;
+	
+	Vec3 dir = getForward();
+	Vec3 pos = getPos();
+	float length = 3;
+	float travelLength = 0;
+	
+	//if our length is shorter than our velocity * dt, lengthen it so we don't pass through something
+	if(travelLength > length)
+		length = travelLength;
+	//make a line segment representing the laser beam
+	ref_ptr<LineSegment> seg = new LineSegment(pos - dir * length * 0.5, pos + dir * length * 0.5);
+	iv.setTraversalMask(1 << COLLISION_LAYER);		//DON'T check collisions with other lazer beams
+	iv.addLineSegment(seg.get());
+//	printf("Seg:  %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
+	//dunno if this is the best way to do it or not, but we're gonna just check each ship individually
+	std::vector<Spacecraft*> ships;
+	Falcon* f = FalconApp::instance().getFalcon();
+
+	ships.push_back((Spacecraft*)f);
+
+
+	
+	bool hitSometing = false;		//stop after any collision
+	Vec3 hitPos;
+	for(size_t i = 0; i < ships.size() && !hitSometing; i++)
+	{
+//		iv.reset();
+		ships[i]->getRoot()->accept(iv);
+		osgUtil::IntersectVisitor::HitList& hitList = iv.getHitList(seg.get());
+		if(hitList.size())		//if there's any size in the hitlist, we HIT something!
+		{
+		
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 
 

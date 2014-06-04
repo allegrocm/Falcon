@@ -17,8 +17,10 @@ class EnemyControlInput
 {
 	public:
 	//enemy controls are simple!
-	EnemyControlInput()	{trigger = false;  xAxis = 0; yAxis = 0; thrustAxis = 0;}
-	bool trigger;
+	EnemyControlInput()	{trigger = false;  xAxis = 0; yAxis = 0; thrustAxis = 0; button1 = 0; button2 = 0;}
+	int trigger;
+	int button1;
+	int button2;
 	float xAxis;
 	float yAxis;
 	float thrustAxis;
@@ -37,9 +39,11 @@ public:
 	void setShip(Spacecraft* ship);
 	EnemyControlInput getInput()	{return mInput;}
 	void shipDied();				//called by the spaceship we control
+	bool isReadyForShip() {return (!mShip && mDeadTimer <= 0);}			//ready to get into a new ship?
 protected:
 	Spacecraft* mShip;
 	EnemyControlInput mInput;
+	float mDeadTimer;				//how long we been dead?
 
 };
 #endif /* defined(__Millennium_Falcon__EnemyPlayer__) */

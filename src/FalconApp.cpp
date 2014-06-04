@@ -155,7 +155,7 @@ void FalconApp::update(float fulldt)
 		mEnemyController->update(mTimeStep);
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
-		if(player && player->getShip())
+		if(player && player->getShip() && mIsMaster)		//for now, only the master node shows the view of the enemy TIE fighter
 		{
 			Spacecraft* enemy = player->getShip();
 			Matrix nav = enemy->getTransform();
@@ -165,6 +165,8 @@ void FalconApp::update(float fulldt)
 			nav.invert(nav);
 			mNavigation->setMatrix(nav);
 		}
+		else if (!player)
+			mNavigation->setMatrix(osg::Matrix());
 		
 		//update bullets. when one is "finished", delete it
 		for(size_t i = 0; i < mBullets.size(); i++)
@@ -284,7 +286,15 @@ void FalconApp::drawStatus()
 	drawStringOnScreen(20, rowHeight * row++, "Buttons:  %i, %i, %i, %i, %i, %i", mButtons[0], mButtons[1], mButtons[2], mButtons[3], mButtons[4], mButtons[5]);
 	drawStringOnScreen(20, rowHeight * row++, "Head at:  %.2f, %.2f, %.2f", mHeadMatrix.ptr()[12], mHeadMatrix.ptr()[13], mHeadMatrix.ptr()[14]);
 	drawStringOnScreen(20, rowHeight * row++, "Wand at:  %.2f, %.2f, %.2f", mWandMatrix.ptr()[12], mWandMatrix.ptr()[13], mWandMatrix.ptr()[14]);
-
+	
+	EnemyPlayer* player = mEnemyController->getPlayer();
+	if(player)
+	{
+		EnemyControlInput input = player->getInput();
+		drawStringOnScreen(20, rowHeight * row++, "Enemy Input:  %.2f, %.2f, %.2f (%i, %i, %i)", 
+			input.xAxis, input.yAxis, input.thrustAxis, input.trigger, input.button1, input.button2);
+	
+	}
 }
 
 void FalconApp::updateFrameRate(float dt)

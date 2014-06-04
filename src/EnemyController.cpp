@@ -71,7 +71,8 @@ void EnemyController::update(float dt)
 	//do we have any enemy players that have no one to control?  get them someone!
 	for(size_t i = 0; i < mEnemyPlayers.size(); i++)
 	{
-		if(mEnemyPlayers[i]->getShip() == NULL)
+		mEnemyPlayers[i]->update(dt);
+		if(mEnemyPlayers[i]->getShip() == NULL && mEnemyPlayers[i]->isReadyForShip())
 		{
 			//find a ship for this player
 			Spacecraft* enemy = NULL;
