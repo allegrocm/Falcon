@@ -22,7 +22,7 @@ class EnemyController
 {
 public:
 	static EnemyController& instance();		//return the primary enemycontroller in the FalconApp
-	EnemyController();
+	EnemyController(bool isTIENode);
 	void update(float dt);
 	std::vector<Spacecraft*> getShips()	{return mEnemies;}
 	void addShip(Spacecraft* s);

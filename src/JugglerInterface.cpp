@@ -2,6 +2,15 @@
 #include "FalconApp.h"
 #include "Util.h"
 #include "EnemyController.h"
+#include "CameraThatRendersAQuad.h"
+#include "ComputerScreen.h"
+#include "RadarScreen.h"
+
+#include <vrj/Display/DisplayManager.h>
+#include <vrj/Draw/OpenGL/DrawManager.h>
+#include <vrj/Display/Display.h>
+#include <vrj/Draw/OpenGL/Window.h>
+
 
 JugglerInterface::JugglerInterface(vrj::Kernel* kern, int& argc, char** argv) : vrj::OsgApp(kern)
 {
@@ -98,7 +107,7 @@ void JugglerInterface::latePreFrame()
 		ec.trigger = mEnemyButtons[0]->getData();
 		ec.button1 = mEnemyButtons[1]->getData();
 		ec.button2 = mEnemyButtons[2]->getData();
-		printf("Enemy input:  %.2f, %.2f, %.2f, %i\n", ec.xAxis, ec.yAxis, ec.thrustAxis, ec.trigger);
+		//printf("Enemy input:  %.2f, %.2f, %.2f, %i\n", ec.xAxis, ec.yAxis, ec.thrustAxis, ec.trigger);
 		EnemyController::instance().setEnemyInput(0, ec);
 	}
 	
@@ -137,16 +146,31 @@ osg::Group* JugglerInterface::getScene()
 // This helps animations and shaders work properly in OSG.
 void JugglerInterface::configSceneView(osgUtil::SceneView* newSceneViewer)
 {
-
+	printf("----ConfigSceneView-----\n");
+	static int times = 0;
+	times++;
+	
+	//if this is the radar display, connect a different node to it
 	__FUNCTION_HEADER__
 	vrj::OsgApp::configSceneView(newSceneViewer);
-
+	std::string windowName = "none yet";
+	//if(vrj::opengl::DrawManager::instance()->currentUserData()->getViewport()->getDisplay())
+		//windowName = vrj::opengl::DrawManager::instance()->currentUserData()->getViewport()->getDisplay()->getName();
+	//printf("draw on window %s\n", windowName.c_str());
 
 //	newSceneViewer->setClearColor(osg::Vec4(0.3f, 0.2f, 0.5f, 1.0f));
 	printf("line %i\n", __LINE__);
 	if(!newSceneViewer) return;
 	osg::Camera* cam = newSceneViewer->getCamera();
-	printf("line %i\n", __LINE__);
+	if(times == 2)
+	{
+		while(cam->getNumChildren())
+		{
+			printf("Remove a child from the camera\n");
+			cam->removeChild(cam->getChild(0));
+		}
+	}
+	printf("line %i:  camera is %p\n", __LINE__, cam);
 	//set the cull mask of our camera so that we don't draw invisible hitboxes
 	newSceneViewer->setCullMask((1 << NON_GLOW_LAYER) | (1 << GLOW_LAYER) | (1 << BACKGROUND_LAYER));
 	printf("line %i\n", __LINE__);
@@ -156,6 +180,43 @@ void JugglerInterface::draw()
 {
 	//std::cout << "begin draw" << std::endl;
 	vrj::OsgApp::draw();
+	osg::ref_ptr<osgUtil::SceneView> sv = *sceneViewer;
+	 std::string windowName = "none yet";
+	if(vrj::opengl::DrawManager::instance()->currentUserData()->getViewport()->getDisplay())
+		windowName = vrj::opengl::DrawManager::instance()->currentUserData()->getViewport()->getDisplay()->getName();
+	//printf("draw on window %s\n", windowName.c_str());
+	if(windowName == "RadarView")
+	{
+		static int fixRadarOnce = 0;
+		fixRadarOnce++;
+		if(15 == fixRadarOnce)
+		{
+			printf("First draw!  Setting up radar view\n");
+			osg::Camera* cam = sv->getCamera();
+			while(cam->getNumChildren())
+			{
+				printf("Remove a child from the camera:  %s\n", cam->getChild(0)->getName().c_str());
+				cam->removeChild(cam->getChild(0));
+			}
+			
+			//now add the radar
+			PrerenderCamera* prc = FalconApp::instance().getScreen()->getCamera();
+			//for(size_t i = 0; i < prc->getNumChildren(); i++)
+				//cam->addChild(prc->getChild(i));
+			//cam->setProjectionMatrix(prc->getProjectionMatrix());
+			//cam->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+			//cam->setViewMatrix(prc->getViewMatrix());
+			cam->addChild(prc);
+			CameraThatRendersAQuad* qrc = new CameraThatRendersAQuad();
+			qrc->setTexture(prc->getTargetTexture(0));
+			cam->addChild(qrc);
+			cam->addChild(FalconApp::instance().getScreen()->getRadar()->getCamera());
+	
+		}
+		
+			
+	}
+
 	FalconApp::instance().drawStatus();
 	//std::cout << "end draw" << std::endl;
 

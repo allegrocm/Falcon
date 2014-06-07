@@ -17,7 +17,7 @@ class EnemyControlInput
 {
 	public:
 	//enemy controls are simple!
-	EnemyControlInput()	{trigger = false;  xAxis = 0; yAxis = 0; thrustAxis = 0; button1 = 0; button2 = 0;}
+	EnemyControlInput()	{trigger = false;  xAxis = 0; yAxis = 0; thrustAxis = 0; button1 = 1; button2 = 0;}
 	int trigger;
 	int button1;
 	int button2;

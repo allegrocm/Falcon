@@ -20,7 +20,7 @@ EventAudio::EventAudio()
 {
 	//set up our arrays
 	mSoundTimer = 0;
-
+	mDontPlay = false;
 	load("data/eventSounds.xml");
 
 }
@@ -166,7 +166,7 @@ void EventAudio::eventHappened(std::string name)
 	
 	sound->playAgainTimer = sound->howOften;
 	printf("Playing %s for event %s\n", sound->name.c_str(), name.c_str());
-	SkySound* s = KSoundManager::instance()->playSound(std::string("data/sounds/") + sound->name, sound->volume, sound->pan);
+	SkySound* s = KSoundManager::instance()->playSound(std::string("data/sounds/") + sound->name, sound->volume * !mDontPlay, sound->pan);
 	if(!s)
 	{
 		Util::logError("Error playing sound file %s\n", sound->name.c_str());

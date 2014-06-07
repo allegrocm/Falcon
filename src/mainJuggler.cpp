@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 	//also handle command line arguments
 	for( int i = 1; i < argc; ++i )
 	{
-		system("env");
+		//system("env");
 		
 		//skip slave/master args.  they confuse the kernel
 		if(std::string("--vrjmaster") == argv[i] || std::string("--vrjslave") == argv[i]) continue;

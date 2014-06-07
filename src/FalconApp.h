@@ -65,12 +65,14 @@ public:
 	EventAudio* getEventAudio()						{return mEventAudioManager;}
 	
 	BloomController* getBloom()						{return mBloom;}	//for setting glow aspect ratio for proper rendering
+	
+	bool tieNode1()									{return mTieNode1;}		//for setting up the TIE fighter cockpit node
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call
 	FalconApp()
 	{
-		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = 0.01;
+		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = 0.01; mTieNode1 = false;
 	}
 	
 	//update our calculated frame rate
@@ -109,7 +111,7 @@ protected:
 
 	//needed for clusteredness
 	bool mIsMaster;										//is this the master node of the cluster?
-	
+	bool mTieNode1;										//are we the TIE fighter cockpit?
 	
 	ParticleFX*						mParticleFX;
 	EventAudio*						mEventAudioManager;

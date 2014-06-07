@@ -95,7 +95,7 @@ void FalconApp::init()
 	mWandXForm = new osg::MatrixTransform;
 	mModelGroup->addChild(mWandXForm);
 
-	mEnemyController = new EnemyController;
+	mEnemyController = new EnemyController(mTieNode1);
 
 	mFalcon = new Falcon();
 	mModelGroup->addChild(mFalcon->getRoot());
@@ -108,6 +108,10 @@ void FalconApp::init()
 	mBloom = new BloomController();
 	mRoot->addChild(mBloom->getRoot());
 	mBloom->getScene()->addChild(mNavigation);
+	
+	
+	//audio only plays on the master and tie fighter nodes
+	mEventAudioManager->setDontPlay(!(mIsMaster || mTieNode1));
 }
 
 
@@ -155,7 +159,7 @@ void FalconApp::update(float fulldt)
 		mEnemyController->update(mTimeStep);
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
-		if(player && player->getShip() && mIsMaster)		//for now, only the master node shows the view of the enemy TIE fighter
+		if(player && player->getShip())		//for now, only the master node shows the view of the enemy TIE fighter
 		{
 			Spacecraft* enemy = player->getShip();
 			Matrix nav = enemy->getTransform();
@@ -317,7 +321,9 @@ void FalconApp::updateFrameRate(float dt)
 
 void FalconApp::handleArguments(int* argc, char **argv)
 {
+	printf("=====================Handling %i arguments===================\n", *argc);
 	int num = 1;		//like the 'i' below, but doesn't change when an arg is handled and is used for clear output in this function
+	std::string tieNode = "";		//find which node is hosting the TIE fighter
 	for(int i = 1; i < *argc; i++)
 	{
 		std::string arg(argv[i]);
@@ -333,6 +339,34 @@ void FalconApp::handleArguments(int* argc, char **argv)
 			mIsMaster = true;
 			printf("We are the master node!\n");
 //			handled = true;
+		}
+		else if(KenXML::CICompare(arg, "--tienode"))
+		{
+			if(i < *argc-1)
+			{
+				tieNode = argv[i+1];
+				
+				//grab the argument, then pull it off the list
+				i++;
+				for(int j = i; j < *argc-1; j++)
+				{
+					argv[j] = argv[j+1];
+				}
+				i--;			//and go back an index so we'll look at the next argument
+				(*argc)--;		//and decrement the number of args
+				
+				std::string hostname = getenv("HOSTNAME");
+				printf("TIE node:  %s, we are %s\n", tieNode.c_str(), hostname.c_str());
+				if(KenXML::CICompare(hostname, tieNode))
+				{
+					printf("We are the TIE fighter node!\n");
+					mTieNode1 = true;
+				}
+			}
+			else
+				Util::logError("TIE node arg found, but not hostname supplied\n");
+			handled = true;
+		
 		}
 
 		printf("Arg %i:  %s (%s)\n", num++, arg.c_str(), handled ? "Handled" : "Not Handled");

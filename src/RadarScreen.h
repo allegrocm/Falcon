@@ -37,7 +37,8 @@ public:
 	void update(float dt);
 	osg::Texture2D* getTexture();
 	osg::Vec3 worldToRadar(osg::Vec3 worldPos);		//convert worldspace to radar screen space
-//	PrerenderCamera* getCamera()	{return mCamera;}
+	
+	PrerenderCamera* getCamera()	{return mCamera;}
 protected:
 	osg::ref_ptr<PrerenderCamera> mCamera;
 	osg::ref_ptr<RSDrawable> mDrawable;

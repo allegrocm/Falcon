@@ -21,6 +21,7 @@
 #include "Layers.h"
 #include "Bullet.h"
 #include <osgUtil/IntersectVisitor>
+
 using namespace osg;
 
 
@@ -115,7 +116,7 @@ void StupidPlaceholderShip::playerControl(float dt)
 		AIControl(dt);
 		return;
 	}
-	printf("player control!  %.2f, %.2f, %.2f, (%i)\n", input.xAxis, input.yAxis, input.thrustAxis, input.trigger);
+	//printf("player control!  %.2f, %.2f, %.2f, (%i)\n", input.xAxis, input.yAxis, input.thrustAxis, input.trigger);
 	float yawSpeed = 90.0 * input.xAxis * dt;
 	float pitchSpeed = 60.0 * input.yAxis * dt;
 	Vec3 vel = getVel();

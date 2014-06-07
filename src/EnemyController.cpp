@@ -23,10 +23,13 @@ EnemyController& EnemyController::instance()
 	return *(FalconApp::instance().getEnemyController());
 }
 
-EnemyController::EnemyController()
+EnemyController::EnemyController(bool TIENode)
 {
 	mEnemyPlayers.push_back(new EnemyPlayer);
-	mPlayer = mEnemyPlayers.back();
+	if(TIENode)
+		mPlayer = mEnemyPlayers.back();
+	else
+		mPlayer = NULL;
 	reset();
 
 }

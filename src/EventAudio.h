@@ -54,9 +54,10 @@ public:
 	void update(float dt);
 	void reset();		//reset individual sound timers
 	EventAudio();			//we don't ever need to construct this.  it's handled by the instance
+	void setDontPlay(bool b)	{mDontPlay = b;}
 protected:
 	std::vector<Event> mEvents;		//the good stuff
-
+	bool mDontPlay;					//play sounds, but silently
 	float mSoundTimer;				//how long till we can play another sound?
 };
 

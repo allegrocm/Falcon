@@ -29,6 +29,8 @@ public:
 	void setButtonText(int which, std::string text);
 	void setButtonChangeText(int which, std::string text);		//sets the next a button will change to after it's pressed
 	void setIsUp(bool b)	{mUp = b;}
+	PrerenderCamera* getCamera()		{return mCamera;}
+	RadarScreen* getRadar()				{return mRadar;}
 protected:
 	PrerenderCamera* mCamera;			//renders the display contents to a texture
 	osg::ref_ptr<osgText::Text>			mStatusText;
