@@ -82,7 +82,7 @@ void FalconApp::init()
 
 	mLightSource = new osg::LightSource;
 	mNavigation->addChild(mLightSource.get());
-
+	mNavigation->getOrCreateStateSet()->setMode(GL_LIGHT1, true);
 	light = mLightSource->getLight();
 	light->setLightNum(1);
 	light->setDiffuse(osg::Vec4(0.3f, 0.3f, 0.3f, 1.0f));
@@ -159,14 +159,16 @@ void FalconApp::update(float fulldt)
 		mEnemyController->update(mTimeStep);
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
-		if(player && player->getShip())		//for now, only the master node shows the view of the enemy TIE fighter
+		if(player && player->getShip() && mTieNode1)		//for now, only the master node shows the view of the enemy TIE fighter
 		{
 			Spacecraft* enemy = player->getShip();
 			Matrix nav = enemy->getTransform();
-			float ahead = 5;
+			float ahead = -65;
 			for(int i = 0; i < 3; i++)
 				nav.ptr()[12+i] += nav.ptr()[8+i] * ahead;
+			//Util::printMatrix(nav);
 			nav.invert(nav);
+			
 			mNavigation->setMatrix(nav);
 		}
 		else if (!player)
@@ -326,6 +328,8 @@ void FalconApp::handleArguments(int* argc, char **argv)
 	std::string tieNode = "";		//find which node is hosting the TIE fighter
 	for(int i = 1; i < *argc; i++)
 	{
+	//	printf("Arg %i:  ", i);
+		//printf("%s\n", argv[i]);
 		std::string arg(argv[i]);
 
 		bool handled = false;
@@ -344,8 +348,9 @@ void FalconApp::handleArguments(int* argc, char **argv)
 		{
 			if(i < *argc-1)
 			{
+				printf("TIE arg!\n");
 				tieNode = argv[i+1];
-				
+				printf("TIE node:  %s\n", tieNode.c_str());
 				//grab the argument, then pull it off the list
 				i++;
 				for(int j = i; j < *argc-1; j++)
@@ -354,13 +359,28 @@ void FalconApp::handleArguments(int* argc, char **argv)
 				}
 				i--;			//and go back an index so we'll look at the next argument
 				(*argc)--;		//and decrement the number of args
+				char* hn = getenv("HOSTNAME");
+				if(!hn)
+				{ 
+					printf("Couldn't get hostname!\n");
+					hn = getenv("HOST");
+				}
+				if(!hn)
+				{ 
+					printf("Couldn't get hostname again!\n");
+					hn = getenv("REMOTEHOST");
+				}
+				if(!hn) printf("Couldn't get hostname at all!\n");
 				
-				std::string hostname = getenv("HOSTNAME");
-				printf("TIE node:  %s, we are %s\n", tieNode.c_str(), hostname.c_str());
-				if(KenXML::CICompare(hostname, tieNode))
+				if(hn)
 				{
-					printf("We are the TIE fighter node!\n");
-					mTieNode1 = true;
+					std::string hostname = hn;
+					printf("TIE node:  %s, we are %s\n", tieNode.c_str(), hostname.c_str());
+					if(KenXML::CICompare(hostname, tieNode))
+					{
+						printf("We are the TIE fighter node!\n");
+						mTieNode1 = true;
+					}
 				}
 			}
 			else

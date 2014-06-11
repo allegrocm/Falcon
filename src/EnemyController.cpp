@@ -26,10 +26,10 @@ EnemyController& EnemyController::instance()
 EnemyController::EnemyController(bool TIENode)
 {
 	mEnemyPlayers.push_back(new EnemyPlayer);
-	if(TIENode)
+//	if(TIENode)
 		mPlayer = mEnemyPlayers.back();
-	else
-		mPlayer = NULL;
+	//else
+	//	mPlayer = NULL;
 	reset();
 
 }
