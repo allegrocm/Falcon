@@ -107,6 +107,7 @@ public:
 	void setSound3DInfo(SkySound* soundChannel, float px, float py, float pz, float vx, float vy, float vz);
 	void setSoundVolume(SkySound* soundChannel, float volume);
 	void setSoundFrequency(SkySound* soundChannel, float frequency);
+	void setSoundDopplerLevel(SkySound* soundChannel, float doppy);	//set whether this sound is modulated by the Doppler effect
 	void letSoundDie(SkySound* soundchannel);	//removes all priority from this sound so it can be canceled with no trouble
 	void stopSound(SkySound* sound);
 	void loadPlaylist(std::string name);

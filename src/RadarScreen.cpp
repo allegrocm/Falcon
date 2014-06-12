@@ -136,7 +136,19 @@ void RadarScreen::draw()
 //		if(i==2)
 //		printf("converted:  %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
 //		if(i == 2) printf("angles:  %.2f, %.2f\n", theta, phi);
+		bool isOtherPlayer = (ships[i]->getPlayer() != NULL);
 		float size = 0.025;
+		if(isOtherPlayer)		//is this the enemy player??
+			size = 0.035;
+
+		//flash between two colors of the enemy player
+		Vec3 colormain(1, 1, 1);
+		Vec3 colorFlash(1, .5, .5);
+
+		float flash = 0 + FalconApp::instance().getTime() * 20.0 * isOtherPlayer;
+		float t = 0.5 + 0.5 * sinf(flash);
+		Vec3 color = colormain * (1.0-t) + colorFlash * (t);
+		glColor3fv(color.ptr());
 		glBegin(GL_LINE_LOOP);
 			glVertex2f(pos.x()+size*0.5, pos.y()+size*0.5);
 			glVertex2f(pos.x()+size*0.5, pos.y()-size*0.5);

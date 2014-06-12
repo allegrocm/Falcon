@@ -43,6 +43,7 @@ public:
 		float probability;			//how likely are we to play a sound for a particular event?
 		float minTime;				//this event can play every this many seconds
 		float playAgainTimer;		//how long till this event can play a sound again?
+		std::string listener;		//who hears this sound?
 		Event()	{probability = 0.5; minTime = -1; playAgainTimer = 0.0;}
 		std::vector<EventSound> sounds;		//associated sounds
 	};
@@ -55,10 +56,12 @@ public:
 	void reset();		//reset individual sound timers
 	EventAudio();			//we don't ever need to construct this.  it's handled by the instance
 	void setDontPlay(bool b)	{mDontPlay = b;}
+	void setListener(std::string s)	{mListener = s;}
 protected:
 	std::vector<Event> mEvents;		//the good stuff
 	bool mDontPlay;					//play sounds, but silently
 	float mSoundTimer;				//how long till we can play another sound?
+	std::string mListener;			//silence sounds not intended for this listener
 };
 
 #endif /* defined(__Millennium_Falcon__EventAudio__) */

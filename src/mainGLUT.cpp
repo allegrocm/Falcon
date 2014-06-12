@@ -410,7 +410,18 @@ void keyboard(unsigned char key, int x, int y)
 		case 'K': EnemyController::instance().killAll(); break;
 		case 'c': gShowC6 = !gShowC6; break;
 		case ' ':	FalconApp::instance().buttonInput(0, true);	break;		//space bar controls the main wand button
-	
+		case 'T': FalconApp::instance().toggleTIEMode();	break;		//switch views between TIE figher and Falcon
+		case 'R':
+		{
+			//toggle radar display
+			static bool radar = false;
+			radar = !radar;
+			if(radar)
+				viewer->setSceneData(FalconApp::instance().getTIEDisplayGroup());
+			else
+				viewer->setSceneData(FalconApp::instance().getRoot());
+			break;
+		}
 		case 'p':	gPaused = !gPaused;	break;		//pause/unpause
 		//switch input modes with tab
 		case '	':	gCamera.cycleViewMode();	break;
@@ -569,7 +580,8 @@ int main( int argc, char **argv )
 	glutSpecialFunc(keySpecial);
 	glutSpecialUpFunc(keySpecialUp);
 	glutKeyboardUpFunc(keyUpBoard);
-
+//	FalconApp::instance().handleArguments(&argc, argv);
+	FalconApp::instance().toggleTIEMode();
     // create the view of the scene.
     viewer = new osgViewer::Viewer;
     window = viewer->setUpViewerAsEmbeddedInWindow(100,100,800,600);

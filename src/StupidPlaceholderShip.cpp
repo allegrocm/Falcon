@@ -282,7 +282,6 @@ void StupidPlaceholderShip::explode()
 //		h->setFireAmount(0);
 //		h->setLife(100);
 		FalconApp::instance().addThis(h);
-//		Util::printMatrix(Util::getCumulativeTransform(h->getRoot()->getChild(0)->asGroup()->getChild(0), Util::loadModel("data/models/tief3DS/TieFighterDebris.3DS", 1.0, -90)));
 	}
 	
 	if(mEngineSound)
@@ -353,8 +352,12 @@ bool StupidPlaceholderShip::shoot()
 //	FalconApp::instance().getBullets().push_back(b);
 	FalconApp::instance().addThis(b);
 //	printf("shoot from %.2f, %.2f, %.2f\n", barrelPos.x(), barrelPos.y(), barrelPos.z());
-	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + mGun.mFireSound, mGun.mFireVolume,
-		getPos().x(), getPos().y(), getPos().z(), false, 200);
+	SkySound* ss =
+		KSoundManager::instance()->play3DSound(std::string("data/sounds/") + mGun.mFireSound, mGun.mFireVolume,
+			getPos().x(), getPos().y(), getPos().z(), false, 200);
+	
+	//no doppler effect on laser sounds.  it's weird.
+	KSoundManager::instance()->setSoundDopplerLevel(ss, 0);
 	return true;
 	
 }

@@ -67,6 +67,9 @@ public:
 	BloomController* getBloom()						{return mBloom;}	//for setting glow aspect ratio for proper rendering
 	
 	bool tieNode1()									{return mTieNode1;}		//for setting up the TIE fighter cockpit node
+	void toggleTIEMode();							//for the GLUT version only I theenk
+	osg::Group*		getTIEDisplayGroup()			{return mTIEDisplayGroup;}	//this is everything we need to show the TIE fighter radar
+	float getTime()		{return mTotalTime;}
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call
@@ -90,12 +93,13 @@ protected:
 
 	osg::ref_ptr<osg::Group> mRoot;								//root of our scenegraph
 	osg::ref_ptr<osg::MatrixTransform> mNavigation;				//navigation matrix
+	osg::Vec3 mListenerVelocity;								//for audio
 	osg::ref_ptr<osg::Group> mModelGroup;						//this is where we put things into the app!
 	
 	osg::Matrixf mWandMatrix;
 	osg::Matrixf mHeadMatrix;
 	osg::ref_ptr<osg::LightSource> mLightSource;
-
+	osg::ref_ptr<osg::Group>									mTIEDisplayGroup;		//shows the TIE fighter's radar, etc
 	void deToggleButtons();									//remove toggle status from our buttons after each frame to prevent events from happening repeatedly
 	static const int NUMBUTTONS = 8;
 	

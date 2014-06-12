@@ -403,6 +403,15 @@ void KSoundManager::setSoundFrequency(SkySound* channel, float frequency)
 		channel->setFrequency(frequency);
 }
 
+void KSoundManager::setSoundDopplerLevel(SkySound* channel, float dopp)
+{
+	if(mSilent) return;
+	if(!channel) return;
+	if(mInitFailed) return;
+	if(channel)
+		channel->set3DDopplerLevel(dopp);
+}
+
 void KSoundManager::stopSound(SkySound* channel)
 {
 	if(mSilent) return;

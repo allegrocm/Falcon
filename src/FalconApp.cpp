@@ -37,6 +37,7 @@
 #include "EnemyController.h"
 #include "GameController.h"
 #include "EventAudio.h"
+#include "RadarScreen.h"
 
 using namespace osg;
 
@@ -112,6 +113,17 @@ void FalconApp::init()
 	
 	//audio only plays on the master and tie fighter nodes
 	mEventAudioManager->setDontPlay(!(mIsMaster || mTieNode1));
+	
+	//now set up the TIE fighter's radar
+	mTIEDisplayGroup = new Group();
+	mTIEDisplayGroup->addChild(mScreen->getCamera());
+
+	CameraThatRendersAQuad* qrc = new CameraThatRendersAQuad();
+	qrc->setTexture(mScreen->getCamera()->getTargetTexture(0));
+	mTIEDisplayGroup->addChild(qrc);
+	mTIEDisplayGroup->addChild(mScreen->getRadar()->getCamera());
+
+
 }
 
 
@@ -138,10 +150,7 @@ void FalconApp::update(float fulldt)
 	mTargetTime += fulldt;
 	while(mTotalTime < mTargetTime)
 	{
-//		KSoundManager::instance()->updateListener(mTimeStep, mHeadMatrix.ptr(), 0, 0, 0);
-		mEventAudioManager->update(mTimeStep);
-		//in the C6, the listener moves relative to the speakers already
-		KSoundManager::instance()->update(mTimeStep);
+	
 		mTotalTime += mTimeStep;
 		
 		
@@ -159,18 +168,24 @@ void FalconApp::update(float fulldt)
 		mEnemyController->update(mTimeStep);
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
+		if(!mTieNode1)
+			player = NULL;
 		if(player && player->getShip())		//for now, only the master node shows the view of the enemy TIE fighter
 		{
 			Spacecraft* enemy = player->getShip();
 			Matrix nav = enemy->getTransform();
 			float ahead = 5;
 			for(int i = 0; i < 3; i++)
-				nav.ptr()[12+i] += nav.ptr()[8+i] * ahead;
+				nav.ptr()[12+i] += nav.ptr()[8+i] * -ahead;
 			nav.invert(nav);
 			mNavigation->setMatrix(nav);
+			mListenerVelocity = enemy->getVel();
 		}
 		else if (!player)
+		{
 			mNavigation->setMatrix(osg::Matrix());
+			mListenerVelocity = Vec3();
+		}
 		
 		//update bullets. when one is "finished", delete it
 		for(size_t i = 0; i < mBullets.size(); i++)
@@ -198,6 +213,16 @@ void FalconApp::update(float fulldt)
 		}
 		
 	
+		//neither the TIE fighter nor the MF need to change their audio in response to head movement
+		Matrixf nav = mNavigation->getMatrix();
+		
+		KSoundManager::instance()->updateListener(mTimeStep, nav.ptr(),
+			mListenerVelocity.x(), mListenerVelocity.y(), mListenerVelocity.z());
+		mEventAudioManager->update(mTimeStep);
+		//in the C6, the listener moves relative to the speakers already
+		//KSoundManager::instance()->update(mTimeStep);
+
+
 		
 		deToggleButtons();			//it's important that this be called every frame
 	}
@@ -207,7 +232,8 @@ void FalconApp::update(float fulldt)
 
 void FalconApp::deToggleButtons()
 {
-	//remove any toggleness from the buttons.  this is important if we want to attach events to the moment a button is pressed
+	//remove any toggleness from the buttons.
+	//this is important if we want to attach events to the moment a button is pressed
 	for(int i = 0; i < NUMBUTTONS; i++)
 		if(mButtons[i] == TOGGLE_ON)	mButtons[i] = ON;
 		else if(mButtons[i] == TOGGLE_OFF) mButtons[i] = OFF;
@@ -287,9 +313,12 @@ void FalconApp::drawStatus()
 	int row = 2;
 
 	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f", mAvgFrameRate);
-	drawStringOnScreen(20, rowHeight * row++, "Buttons:  %i, %i, %i, %i, %i, %i", mButtons[0], mButtons[1], mButtons[2], mButtons[3], mButtons[4], mButtons[5]);
-	drawStringOnScreen(20, rowHeight * row++, "Head at:  %.2f, %.2f, %.2f", mHeadMatrix.ptr()[12], mHeadMatrix.ptr()[13], mHeadMatrix.ptr()[14]);
-	drawStringOnScreen(20, rowHeight * row++, "Wand at:  %.2f, %.2f, %.2f", mWandMatrix.ptr()[12], mWandMatrix.ptr()[13], mWandMatrix.ptr()[14]);
+	drawStringOnScreen(20, rowHeight * row++, "Buttons:  %i, %i, %i, %i, %i, %i",
+		mButtons[0], mButtons[1], mButtons[2], mButtons[3], mButtons[4], mButtons[5]);
+	drawStringOnScreen(20, rowHeight * row++, "Head at:  %.2f, %.2f, %.2f",
+		mHeadMatrix.ptr()[12], mHeadMatrix.ptr()[13], mHeadMatrix.ptr()[14]);
+	drawStringOnScreen(20, rowHeight * row++, "Wand at:  %.2f, %.2f, %.2f",
+		mWandMatrix.ptr()[12], mWandMatrix.ptr()[13], mWandMatrix.ptr()[14]);
 	
 	EnemyPlayer* player = mEnemyController->getPlayer();
 	if(player)
@@ -322,7 +351,8 @@ void FalconApp::updateFrameRate(float dt)
 void FalconApp::handleArguments(int* argc, char **argv)
 {
 	printf("=====================Handling %i arguments===================\n", *argc);
-	int num = 1;		//like the 'i' below, but doesn't change when an arg is handled and is used for clear output in this function
+	//like the 'i' below, but doesn't change when an arg is handled and is used for clear output in this function
+	int num = 1;
 	std::string tieNode = "";		//find which node is hosting the TIE fighter
 	for(int i = 1; i < *argc; i++)
 	{
@@ -360,7 +390,7 @@ void FalconApp::handleArguments(int* argc, char **argv)
 				if(KenXML::CICompare(hostname, tieNode))
 				{
 					printf("We are the TIE fighter node!\n");
-					mTieNode1 = true;
+					toggleTIEMode();
 				}
 			}
 			else
@@ -433,6 +463,12 @@ void FalconApp::drawDebug()
 		glEnd();
 	glPopMatrix();
 	mEnemyController->drawDebug();
+	
+}
+
+void FalconApp::toggleTIEMode()
+{
+	mTieNode1 = !mTieNode1;
 	
 }
 
