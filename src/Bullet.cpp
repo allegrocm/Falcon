@@ -101,7 +101,7 @@ bool Bullet::checkHit()
 			hitPos = hitList[0].getWorldIntersectPoint();
 			printf("Bullet just hit %s\n", ships[i]->getName().c_str());
 			explode(hitPos);
-			ships[i]->wasHit(this);
+			ships[i]->wasHit(this, hitPos);
 			hitSometing = true;
 			return true;
 		}

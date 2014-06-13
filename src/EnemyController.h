@@ -32,7 +32,7 @@ public:
 	void killAll();			//kill all the current enemy ships
 	void setEnemyInput(int which, EnemyControlInput i);		//for controlling enemy players
 	EnemyPlayer* getPlayer()					{return mPlayer;}
-	
+	virtual void spawnEnemy(bool initing = false);				//make an enemy.  maybe make it human-controlled
 protected:
 	std::vector<Spacecraft*> mEnemies;
 	int mMaxEnemies;			//max in play

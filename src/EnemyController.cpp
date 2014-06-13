@@ -14,7 +14,7 @@
 #include "Util.h"
 #include "GameController.h"
 #include "EventAudio.h"
-
+#include "VaderTIE.h"
 #include <stdlib.h>
 
 using namespace osg;
@@ -26,10 +26,10 @@ EnemyController& EnemyController::instance()
 EnemyController::EnemyController(bool TIENode)
 {
 	mEnemyPlayers.push_back(new EnemyPlayer);
-	if(TIENode)
+//	if(TIENode)
 		mPlayer = mEnemyPlayers.back();
-	else
-		mPlayer = NULL;
+	//else
+	//	mPlayer = NULL;
 	reset();
 
 }
@@ -47,11 +47,14 @@ void EnemyController::reset()
 	Defaults::instance().getValue("demoBattleMaxShipCount", mMaxEnemies);
 
 
+	
 	for(int i = 0; i < numToMake; i++)
 	{
-		StupidPlaceholderShip* sps = new StupidPlaceholderShip();
-		sps->setCircleOrigin(Vec3(-85 + 20 * i, 15, -100));
-		addShip(sps);
+		spawnEnemy(true);
+//		bool playerNeedsShip = mPlayer->getShip() == NULL;
+//		StupidPlaceholderShip* sps = new StupidPlaceholderShip(playerNeedsShip ? mPlayer : NULL);
+//
+//		addShip(sps);
 	}
 }
 
@@ -71,34 +74,12 @@ void EnemyController::update(float dt)
 
 	}
 	
-	//do we have any enemy players that have no one to control?  get them someone!
 	for(size_t i = 0; i < mEnemyPlayers.size(); i++)
 	{
 		mEnemyPlayers[i]->update(dt);
-		if(mEnemyPlayers[i]->getShip() == NULL && mEnemyPlayers[i]->isReadyForShip())
-		{
-			//find a ship for this player
-			Spacecraft* enemy = NULL;
-			for(size_t i = 0; i < mEnemies.size(); i++)
-			{
-				if(mEnemies[i]->getPlayer() == NULL)
-				{
-					enemy = mEnemies[i];
-				}
-				
-			}
-				
-			//link them up!
-			if(enemy)
-			{
-				mEnemyPlayers[i]->setShip(enemy);
-				enemy->setPlayer(mEnemyPlayers[i]);
-			}
-		}
-		
 	}
-	
-	//should we spawn new enemies?  Don't spawn unless we're actually playing
+
+		//should we spawn new enemies?  Don't spawn unless we're actually playing
 	if(mLeftToSpawn && GameController::instance().getMode() == GameController::MAIN_GAME)
 	{
 		int diff = mMaxEnemies - mEnemies.size();		//how many more enemies can we put in play?
@@ -110,17 +91,41 @@ void EnemyController::update(float dt)
 		if(1.0 * rand() /  RAND_MAX < chance * dt)
 		{
 			//spawn a ship!
-			mLeftToSpawn--;
-			StupidPlaceholderShip* sps = new StupidPlaceholderShip();
-			sps->setCircleOrigin(Vec3(Util::random(-40, 40), Util::random(-10, 40), Util::random(-50, -150)));
-			sps->update(0);		//send a zero update so this ship positions itself immediately
-			addShip(sps);
-			printf("Spawn ship!\n");
-			EventAudio::instance().eventHappened("spawnEnemy");
+			spawnEnemy();
 		}
 		
 	}
 	
+}
+
+void EnemyController::spawnEnemy(bool initing)
+{
+	EnemyPlayer* playerForShip = NULL;		//will this ship be controlled by a human?
+	for(size_t i = 0; i < mEnemyPlayers.size() && !playerForShip; i++)
+	{
+		if(mEnemyPlayers[i]->getShip() == NULL && mEnemyPlayers[i]->isReadyForShip())
+			playerForShip = mEnemyPlayers[i];
+	}
+	
+	mLeftToSpawn--;
+	StupidPlaceholderShip* sps;
+	if(playerForShip)
+	{
+		sps = new VaderTIE();
+		sps->setPlayer(playerForShip);
+		playerForShip->setShip(sps);
+	}
+	else sps = new StupidPlaceholderShip();
+	sps->loadTIEModel();
+	addShip(sps);
+	printf("Spawn ship!\n");
+
+	//events and things only happen if we're not initializing the controller
+	if(!initing)
+	{
+		sps->update(0);		//send a zero update so this ship positions itself immediately
+		EventAudio::instance().eventHappened("spawnEnemy");
+	}
 }
 
 void EnemyController::addShip(Spacecraft* s)

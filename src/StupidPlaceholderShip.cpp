@@ -27,16 +27,42 @@ using namespace osg;
 
 StupidPlaceholderShip::StupidPlaceholderShip()
 {
+//	loadTIEModel();
 	setGlows(false);
-	mCenter = Vec3(-50, 15, -100);		//feet!
-	mRadius = 50 + rand()%50;
-	mOffset = 6.28 * rand() / RAND_MAX;
+//	n = Util::loadModel("data/models/TieWing.3ds", 10.0, -90,0,0, Vec3(8, 0, 0));
+//	mPat->addChild(n);
+	setName("Placeholder Ship");
+	mHP = 4;
+//	printf("COG:  %.2f, %.2f, %.2f\n", center.x(), center.y(), center.z());
+	
+	std::string engineSound;
+	if(Defaults::instance().getValue("placeholderShipSound", engineSound))
+	{
+		mEngineSound = KSoundManager::instance()->play3DSound(std::string("data/sounds/") + engineSound, 0.75, 1000, 1000, 1000, true, 80);
+	}
+	
+	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
+	setPos(pos);
+	mSpeed = 100;
+	setVel(Vec3(0, 0, -mSpeed));
+	mMovingAway = true;
+	mTurning = false;
+
+	mTargetPosition = Vec3();
+	mCurrentTurnTime = 0;
+	mTimeToTurn = 0;
+	mTimeTillShoot = Util::random(0.0, 2.0);
+	mGun = ROM::TIE_FIGHTER_GUN;
+}
+
+void StupidPlaceholderShip::loadTIEModel()
+{
+	printf("Load thai model:  regular\n");
 	//load a ship model.  we can also pre-transform the model into our coordinate system
 //	MatrixTransform* red = Util::loadModel("data/models/tief3DS/TIEFReduced.3DS", 1.0, -90);
 	MatrixTransform* nbest = Util::loadModel("data/models/tief3DS/TIEF.3DS", 1.0, -90);
 	MatrixTransform* n = Util::loadModel("data/models/tief3DS/TIEF_50.3ds", 1.0, -90);
 	MatrixTransform* lod = Util::loadModel("data/models/tief3DS/TIEF_10.3ds", 1.0, -90);
-	
 	
 	//use an LOD to reduce render time
 	osg::LOD* l = new LOD();
@@ -77,35 +103,7 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 //	mPat->addChild(g);
 	//n->addChild(g);
 	mPat->addChild(l);
-//	n = Util::loadModel("data/models/TieWing.3ds", 10.0, -90,0,0, Vec3(8, 0, 0));
-//	mPat->addChild(n);
-	setName("Placeholder Ship");
-//	for(int i = 0; i < 50; i++)
-	{
-		Vec4 center = Util::getNodeCG(n, n);
-		center /= center.w();
-	}
-	mHP = 4;
-//	printf("COG:  %.2f, %.2f, %.2f\n", center.x(), center.y(), center.z());
-	
-	std::string engineSound;
-	if(Defaults::instance().getValue("placeholderShipSound", engineSound))
-	{
-		mEngineSound = KSoundManager::instance()->play3DSound(std::string("data/sounds/") + engineSound, 0.75, 1000, 1000, 1000, true, 80);
-	}
-	
-	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
-	setPos(pos);
-	mSpeed = 100;
-	setVel(Vec3(0, 0, -mSpeed));
-	mMovingAway = true;
-	mTurning = false;
 
-	mTargetPosition = Vec3();
-	mCurrentTurnTime = 0;
-	mTimeToTurn = 0;
-	mTimeTillShoot = Util::random(0.0, 2.0);
-	mGun = ROM::TIE_FIGHTER_GUN;
 }
 
 void StupidPlaceholderShip::playerControl(float dt)
@@ -117,25 +115,37 @@ void StupidPlaceholderShip::playerControl(float dt)
 		return;
 	}
 	//printf("player control!  %.2f, %.2f, %.2f, (%i)\n", input.xAxis, input.yAxis, input.thrustAxis, input.trigger);
-	float yawSpeed = 90.0 * input.xAxis * dt;
+	float yawness = ROM::ENEMY_CONTROL_YAW_MIX;		//temporarily slide between x-to-roll and x-to-yaw
+	float rollSpeed = 90 * input.xAxis * (1.0-yawness) * dt;;
+	float yawSpeed = 90.0 * input.xAxis * yawness *  dt;
 	float pitchSpeed = 60.0 * input.yAxis * dt;
+	
+	//we want to reduce roll slowly so that overall we stay with the y-axis uppish
+	//coming in on the falcon at a weird roll is kind of disconcerting
+	
+
 	Vec3 vel = getVel();
 	Matrix current = getTransform();
+	float currentRoll = current.ptr()[1];		//y-value of the x-axis indicates if we're rolled
+	float unrollSpeed = 0.5 * currentRoll * dt;
+
 	Matrix pitchRot;
 	pitchRot.setRotate(osg::Quat(pitchSpeed / -57.3, Util::xAxis(current)));
+	Matrix rollRot;
+	rollRot.setRotate(osg::Quat(-rollSpeed / 57.3, Util::zAxis(current)));
+	rollRot.setRotate(osg::Quat(-unrollSpeed, Util::zAxis(current)));
 	Matrix yawRot;
-	yawRot.setRotate(osg::Quat(-yawSpeed / 57.3, Util::zAxis(current)));
-//	Vec3 up = getUp();
-//	setTransform(pitchRot * yawRot * current);
-//	vel = pitchRot * yawRot * vel;
+	yawRot.setRotate(osg::Quat(-yawSpeed / 57.3, Util::yAxis(current)));
+
+	
 	Vec3 pos = getPos();
-	setTransform(current * yawRot);
+	setTransform(current * rollRot);
 	setPos(pos);
-	vel = getForward() * pitchRot;
+	vel = getForward() * pitchRot * yawRot;
 	vel.normalize();
-	vel *= (input.thrustAxis + 1.0) * 0.5 * mSpeed;
-//	Util::printMatrix(yawRot);
-//	printf("Forward:  %f, %f, %f\n", vel.x(), vel.y(), vel.z());
+	float thrust = (input.thrustAxis + 1.0) * 0.5 + 0.025;		//minimum speed
+	vel *= thrust * mSpeed;
+	
 	setVel(vel);
 	if(input.trigger)
 		shoot();
@@ -144,6 +154,7 @@ void StupidPlaceholderShip::playerControl(float dt)
 
 void StupidPlaceholderShip::AIControl(float dt)
 {
+
 	Vec3 desiredDirection = mTargetPosition - getPos();
 	desiredDirection.normalize();
 	Vec3 adjustedVelocity = getVel() + (desiredDirection * mSpeed - getVel()) * dt; //dt when coded was .01
@@ -243,7 +254,7 @@ bool StupidPlaceholderShip::update(float dt)
 	return up;
 }
 
-void StupidPlaceholderShip::wasHit(Bullet* b)
+void StupidPlaceholderShip::wasHit(Bullet* b, osg::Vec3 hitPos)
 {
 	GameController::instance().enemyWasHit(this);
 	mHP--;
@@ -317,7 +328,10 @@ void StupidPlaceholderShip::explode()
 
 	mDead = true;
 	if(mPlayer)
+	{
+		printf("Player's ship died!\n");
 		mPlayer->shipDied();
+	}
 	GameController::instance().enemyWasKilled(this);
 
 }
@@ -338,7 +352,7 @@ bool StupidPlaceholderShip::shoot()
 	//align the new bullet more or less with the wand, since that's our turret
 	//each of the four barrels has a different position
 	int whichBarrel = mGun.mBurstCounter%2;
-	Vec3 barrelPos = Vec3(2.5 * (-1 + 2*(whichBarrel%2)), 0, -4) * getTransform();
+	Vec3 barrelPos = Vec3(1.0 * (-1 + 2*(whichBarrel%2)), -2, -4) * getTransform();
 	Vec3 fireDir = getForward();
 	fireDir.normalize();
 //	b->setTransform(wand);

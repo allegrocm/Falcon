@@ -25,7 +25,7 @@ public:
 	void aimAt(osg::Vec3 location);			//point the gun at a specific spot
 	osg::PositionAttitudeTransform* getAimedPart()	{return mAimedPart;}		//for connecting things to the turret
 	void jump();		//initiate hyperjump!
-	virtual void wasHit(Bullet* b);
+	virtual void wasHit(Bullet* b, osg::Vec3 hitPos);
 protected:
 
 	osg::Vec3 mAimTarget;		//where is the gun aiming?

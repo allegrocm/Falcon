@@ -166,7 +166,7 @@ void Falcon::jump()
 }
 
 
-void Falcon::wasHit(Bullet* b)
+void Falcon::wasHit(Bullet* b, osg::Vec3 hitPos)
 {
 	//reduce hitpoints
 	::Stats& stats = GameController::instance().getStats();

@@ -38,6 +38,7 @@
 #include "GameController.h"
 #include "EventAudio.h"
 #include "RadarScreen.h"
+#include "TIEComputer.h"
 
 using namespace osg;
 
@@ -66,6 +67,7 @@ void FalconApp::init()
 	mModelGroup = new osg::Group;
 	mNavigation->addChild(mModelGroup.get());
 	mScreen = new ComputerScreen();
+	mTIEScreen = new TIEComputer();
 
 
 	//quickly add a lil spacebox
@@ -83,7 +85,7 @@ void FalconApp::init()
 
 	mLightSource = new osg::LightSource;
 	mNavigation->addChild(mLightSource.get());
-
+	mNavigation->getOrCreateStateSet()->setMode(GL_LIGHT1, true);
 	light = mLightSource->getLight();
 	light->setLightNum(1);
 	light->setDiffuse(osg::Vec4(0.3f, 0.3f, 0.3f, 1.0f));
@@ -116,12 +118,20 @@ void FalconApp::init()
 	
 	//now set up the TIE fighter's radar
 	mTIEDisplayGroup = new Group();
-	mTIEDisplayGroup->addChild(mScreen->getCamera());
+	mTIEDisplayGroup->addChild(mTIEScreen->getCamera());
 
 	CameraThatRendersAQuad* qrc = new CameraThatRendersAQuad();
-	qrc->setTexture(mScreen->getCamera()->getTargetTexture(0));
+	qrc->setTexture(mTIEScreen->getCamera()->getTargetTexture(0));
 	mTIEDisplayGroup->addChild(qrc);
-	mTIEDisplayGroup->addChild(mScreen->getRadar()->getCamera());
+	
+	//HACK:  for temps, put the TIE radar on the main screen
+#ifndef USE_VRJ
+	qrc = new CameraThatRendersAQuad();
+	qrc->setTexture(mTIEScreen->getCamera()->getTargetTexture(0));
+	qrc->setViewport(10, 10, 480 * 1.6, 480);
+	mRoot->addChild(qrc);
+	mRoot->addChild(mTIEScreen->getCamera());
+#endif
 
 
 }
@@ -163,25 +173,34 @@ void FalconApp::update(float fulldt)
 		}
 
 		mScreen->update(mTimeStep);
+		mTIEScreen->update(mTimeStep);
 		mParticleFX->update(mTimeStep);
 		mFalcon->update(mTimeStep);
 		mEnemyController->update(mTimeStep);
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
-		if(!mTieNode1)
-			player = NULL;
-		if(player && player->getShip())		//for now, only the master node shows the view of the enemy TIE fighter
+		if(player && player->getShip() && mTieNode1)		//for now, only the master node shows the view of the enemy TIE fighter
 		{
 			Spacecraft* enemy = player->getShip();
 			Matrix nav = enemy->getTransform();
-			float ahead = 5;
+			float ahead = -65;
+			float lower = -3;
+#ifndef USE_VRJ
+			ahead = -3;
+#else
+#warning look into TIE camera position
+#endif
 			for(int i = 0; i < 3; i++)
-				nav.ptr()[12+i] += nav.ptr()[8+i] * -ahead;
+			{
+				nav.ptr()[12+i] += nav.ptr()[8+i] * ahead + nav.ptr()[4+i] * lower;
+			}
+			//Util::printMatrix(nav);
 			nav.invert(nav);
+			
 			mNavigation->setMatrix(nav);
 			mListenerVelocity = enemy->getVel();
 		}
-		else if (!player)
+		else if (!mTieNode1)
 		{
 			mNavigation->setMatrix(osg::Matrix());
 			mListenerVelocity = Vec3();
@@ -356,6 +375,8 @@ void FalconApp::handleArguments(int* argc, char **argv)
 	std::string tieNode = "";		//find which node is hosting the TIE fighter
 	for(int i = 1; i < *argc; i++)
 	{
+	//	printf("Arg %i:  ", i);
+		//printf("%s\n", argv[i]);
 		std::string arg(argv[i]);
 
 		bool handled = false;
@@ -374,8 +395,9 @@ void FalconApp::handleArguments(int* argc, char **argv)
 		{
 			if(i < *argc-1)
 			{
+				printf("TIE arg!\n");
 				tieNode = argv[i+1];
-				
+				printf("TIE node:  %s\n", tieNode.c_str());
 				//grab the argument, then pull it off the list
 				i++;
 				for(int j = i; j < *argc-1; j++)
@@ -384,13 +406,28 @@ void FalconApp::handleArguments(int* argc, char **argv)
 				}
 				i--;			//and go back an index so we'll look at the next argument
 				(*argc)--;		//and decrement the number of args
+				char* hn = getenv("HOSTNAME");
+				if(!hn)
+				{ 
+					printf("Couldn't get hostname!\n");
+					hn = getenv("HOST");
+				}
+				if(!hn)
+				{ 
+					printf("Couldn't get hostname again!\n");
+					hn = getenv("REMOTEHOST");
+				}
+				if(!hn) printf("Couldn't get hostname at all!\n");
 				
-				std::string hostname = getenv("HOSTNAME");
-				printf("TIE node:  %s, we are %s\n", tieNode.c_str(), hostname.c_str());
-				if(KenXML::CICompare(hostname, tieNode))
+				if(hn)
 				{
-					printf("We are the TIE fighter node!\n");
-					toggleTIEMode();
+					std::string hostname = hn;
+					printf("TIE node:  %s, we are %s\n", tieNode.c_str(), hostname.c_str());
+					if(KenXML::CICompare(hostname, tieNode))
+					{
+						printf("We are the TIE fighter node!\n");
+						mTieNode1 = true;
+					}
 				}
 			}
 			else

@@ -24,7 +24,7 @@ public:
 	virtual bool update(float dt);		//return false if this should be destroyed
 	virtual bool shoot();				//return false if we couldn't shoot for some reason (e.g., out of ammo)
 	virtual bool isEnemy()			{return mIsEnemy;}		//friend or foe?
-	virtual void wasHit(Bullet* b)		{}
+	virtual void wasHit(Bullet* b, osg::Vec3 hitPos)		{}
 	virtual osg::Vec3 getVel()	{return mVel;}
 	virtual void setVel(osg::Vec3 v)	{mVel = v;}
 	virtual int getHP()					{return mHP;}
@@ -33,6 +33,7 @@ public:
 	virtual void explode()				{}
 	virtual void setPlayer(EnemyPlayer* p)		{mPlayer = p;}
 	virtual EnemyPlayer* getPlayer()			{return mPlayer;}
+	virtual void loadTIEModel()	{printf("SPS load thai\n");}
 protected:
 	//basic things might go here, like ammo count, firing rate, speed/acceleration/turning stats, allegiance, etc
 	bool			mIsEnemy;

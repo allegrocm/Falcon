@@ -18,6 +18,7 @@
 #include "Bloom.h"
 #include "EnemyPlayer.h"
 
+class TIEComputer;
 class Spacecraft;
 class Bullet;
 class Falcon;
@@ -89,6 +90,7 @@ protected:
 	std::vector<GameObject*>				mJunk;			//other stuff that will take care of itself
 	Falcon*									mFalcon;			//the Millennium Falcon!
 	ComputerScreen*							mScreen;			//in-game data display
+	TIEComputer*							mTIEScreen;			//for the TIE figher cockpit
 	GameController*							mGameController;
 
 	osg::ref_ptr<osg::Group> mRoot;								//root of our scenegraph

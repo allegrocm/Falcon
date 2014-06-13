@@ -33,6 +33,10 @@ bool ROM::FALCON_HIT_DETECTION;
 osg::Matrixf ROM::SCREEN_OFFSET;
 float ROM::HUD_MOVEMENT_SPEED;
 
+float ROM::ENEMY_CONTROL_YAW_MIX;
+int ROM::VADER_TIE_HP;
+float ROM::VADER_HITBOX_SIZE;
+
 void ROM::load()
 {
 
@@ -47,6 +51,7 @@ void ROM::load()
 	FALCON_LASER_LENGTH = 16;
 	MUSIC_VOLUME = 0.2;
 	FALCON_HIT_DETECTION = false;
+
 	getDefault("musicVolume", MUSIC_VOLUME);
 	getDefault("falconShootSound", FALCON_FIRE_SOUND);
 	getDefault("falconShootVolume", FALCON_FIRE_VOLUME);
@@ -87,4 +92,13 @@ void ROM::load()
 	
 	HUD_MOVEMENT_SPEED = 1.0;
 	getDefault("hudMovementSpeed", HUD_MOVEMENT_SPEED);
+	
+	ENEMY_CONTROL_YAW_MIX = 0.1;
+	getDefault("enemyControlYawMix", ENEMY_CONTROL_YAW_MIX);
+	
+	VADER_TIE_HP = 12;
+	getDefault("vaderTieHP", VADER_TIE_HP);
+	
+	VADER_HITBOX_SIZE = 10;
+	getDefault("vaderHitboxSize", VADER_HITBOX_SIZE);
 }

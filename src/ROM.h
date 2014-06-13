@@ -46,6 +46,10 @@ public:
 	//setting up the HUD/targetting computer
 	static osg::Matrixf SCREEN_OFFSET;		//from the wand
 	static float HUD_MOVEMENT_SPEED;		//when it moves up and down for combat/interaction
+	
+	static float ENEMY_CONTROL_YAW_MIX;		//how much does the enemy yaw instead of roll in response to x-axis input?
+	static int VADER_TIE_HP;				//hitpoints of human-controlled enemies
+	static float VADER_HITBOX_SIZE;
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

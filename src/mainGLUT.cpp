@@ -325,7 +325,7 @@ void display(void)
 	FalconApp::instance().drawDebug();
 	if(gShowC6)
 		drawC6(false);
-	drawStatus();
+	FalconApp::instance().drawStatus();
     // Swap Buffers
     glutSwapBuffers();
 }
@@ -509,14 +509,15 @@ void timer(int bl)
 	MagicJoystick::update();
 	if(MagicJoystick::sticks())
 	{
+//		printf("got gamepad\n");
 		//send gamepad button presses to the app
 		MagicJoystick& gamepad = MagicJoystick::stick(0);
 		EnemyControlInput imp;
 		imp.xAxis = gamepad.axis[0];
-		imp.yAxis = gamepad.axis[1];
+		imp.yAxis = gamepad.axis[1] * -1;
 		imp.thrustAxis = gamepad.axis[2];
 		imp.trigger = gamepad.button[0];
-		
+		imp.button1 = gamepad.button[1];
 		EnemyController::instance().setEnemyInput(0, imp);
 //		for(int i = 0; i < 4; i++)
 //			FalconApp::instance().buttonInput(1+i, gamepad.button[i]);

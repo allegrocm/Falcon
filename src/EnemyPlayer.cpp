@@ -39,7 +39,7 @@ void EnemyPlayer::setShip(Spacecraft* ship)
 
 	if(ship == mShip) return;
 	mShip = ship;
-	ship->setPlayer(this);
+//	ship->setPlayer(this);
 	
 }
 

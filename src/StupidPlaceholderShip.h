@@ -10,23 +10,24 @@
 #define __Millennium_Falcon__StupidPlaceholderShip__
 
 #include "Spacecraft.h"
+#include <osg/ShapeDrawable>
+
 
 //this spaceship flies around in a circle and sometimes maybe shoots.
 class StupidPlaceholderShip : public Spacecraft
 {
 public:
 	StupidPlaceholderShip();
-	void setCircleOrigin(osg::Vec3 p)	{mCenter = p;}
-	bool update(float dt);			//flies around in a circle....
-	void explode();
-	void wasHit(Bullet* b);
-	float mRadius;
-	float mOffset;
+	virtual bool update(float dt);			//flies around in a circle....
+	virtual void explode();
+	virtual void wasHit(Bullet* b, osg::Vec3 hitPos);
 	virtual void drawDebug();
 	virtual bool shoot();
 	virtual void AIControl(float dt);		//Shawn's control scheme
 	virtual void playerControl(float dt);	//if a player is controlling this ship
-	bool isHittingFalcon();
+	virtual bool isHittingFalcon();
+	virtual void loadTIEModel();			//load our normal TIE fighter
+
 protected:
 
 	bool mMovingAway;
@@ -36,8 +37,7 @@ protected:
 	float mTimeToTurn;
 	float mTimeTillShoot;		//how long till we open fire once we're facing the falcon?
 	float mSpeed;
-	osg::Vec3 mCenter;			//center of our ship
-	osg::ref_ptr<osg::Sphere> mEngineGlow;		
+	osg::ref_ptr<osg::Sphere> mEngineGlow;
 
 };
 

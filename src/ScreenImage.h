@@ -27,6 +27,7 @@ public:
 	void setColor(osg::Vec4 c);
 	void setAspect(float s);		//set aspect ratio of the image (width / height)
 	void setVisible(bool b);
+	void setAngle(float degrees);			//rot8!
 protected:
 	float aspect;			//our image's aspect ratio.  used for setting our scale
 	float scale;			//our current scale

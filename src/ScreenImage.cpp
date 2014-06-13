@@ -122,3 +122,7 @@ void ScreenImage::setVisible(bool b)
 	setHeight(scale);
 }
 
+void ScreenImage::setAngle(float degrees)
+{
+	transform->setAttitude(Quat(degrees/57.3, Vec3(0, 0, 1)));
+}
