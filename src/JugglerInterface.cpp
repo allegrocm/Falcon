@@ -185,6 +185,8 @@ void JugglerInterface::draw()
 	if(vrj::opengl::DrawManager::instance()->currentUserData()->getViewport()->getDisplay())
 		windowName = vrj::opengl::DrawManager::instance()->currentUserData()->getViewport()->getDisplay()->getName();
 	//printf("draw on window %s\n", windowName.c_str());
+	
+	//if this is the radar view of the cockpit, we need to replace our scene with the radar scene
 	if(windowName == "RadarView")
 	{
 		static int fixRadarOnce = 0;
@@ -199,22 +201,10 @@ void JugglerInterface::draw()
 				cam->removeChild(cam->getChild(0));
 			}
 			
-			//now add the radar
-			PrerenderCamera* prc = FalconApp::instance().getScreen()->getCamera();
-			//for(size_t i = 0; i < prc->getNumChildren(); i++)
-				//cam->addChild(prc->getChild(i));
-			//cam->setProjectionMatrix(prc->getProjectionMatrix());
-			//cam->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-			//cam->setViewMatrix(prc->getViewMatrix());
-			cam->addChild(prc);
-			CameraThatRendersAQuad* qrc = new CameraThatRendersAQuad();
-			qrc->setTexture(prc->getTargetTexture(0));
-			cam->addChild(qrc);
-			cam->addChild(FalconApp::instance().getScreen()->getRadar()->getCamera());
-	
-		}
-		
+			//add the TIE fighter radar and things necessary to render it
+			cam->addChild(FalconApp::instance().getTIEDisplayGroup());
 			
+		}
 	}
 
 	FalconApp::instance().drawStatus();

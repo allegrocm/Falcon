@@ -7,7 +7,7 @@
 //
 
 #include "TIEComputer.h"
-#include "PreRenderCamera.h"
+#include "PrerenderCamera.h"
 #include "Util.h"
 #include "FalconApp.h"
 #include <osgDB/FileUtils>

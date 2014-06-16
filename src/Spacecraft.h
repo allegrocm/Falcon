@@ -13,6 +13,7 @@
 #include "GameObject.h"
 #include "KSoundManager.h"
 #include "Gun.h"
+#include <stdio.h>
 
 class Bullet;
 class EnemyPlayer;		//enemy ships can be controlled by players
