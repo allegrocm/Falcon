@@ -18,7 +18,8 @@ class ScreenImage;
 class Spacecraft;
 
 //display for the lower screen in the TIE fighter cockpit
-
+//the radar part is composed of two instances of everything
+//they fade in/out to give the impression of slow response
 
 class TIEComputer : public GameObject
 {
@@ -31,7 +32,7 @@ public:
 protected:
 	PrerenderCamera* mCamera;			//renders the display contents to a texture
 	void makeScreenGeometry();
-	ScreenImage* mArrowImage;			//shows where the Falcon is
+	ScreenImage* mArrowImage[2];			//shows where the Falcon is
 	
 	ScreenImage* mDamageImage[3];		//left, right, center
 	//indicates that the Falcon is in our sites.  Two for a fade effect
@@ -40,6 +41,8 @@ protected:
 	float mFlashTime;				//how long till we update our falcon image position?
 	void updateDamageDisplay();
 	Spacecraft* getShip();
+	void updateRadar(float dt);		//update the things that mvoe slowly (falcon image, arrow)
+	float mArrowFlash;
 };
 
 

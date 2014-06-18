@@ -17,6 +17,7 @@
 #include <osgUtil/IntersectVisitor>
 #include <osg/ShapeDrawable>
 #include "ROM.h"
+#include "Defaults.h"
 
 using namespace osg;
 
@@ -81,6 +82,19 @@ void VaderTIE::loadTIEModel()
 //	mPat->addChild(g);
 	//n->addChild(g);
 	mPat->addChild(l);
+	
+		std::string engineSound;
+	if(Defaults::instance().getValue("placeholderShipSound", engineSound))
+	{
+		printf("start your kengines\n");
+		if(isLocalEnemy())
+		{
+			mEngineSound = KSoundManager::instance()->playSound(std::string("data/sounds/") + engineSound, 0, 0, true);
+		}
+		else
+			mEngineSound = KSoundManager::instance()->play3DSound(std::string("data/sounds/") + engineSound, 0.75, 1000, 1000, 1000, true, 80);
+	}
+
 
 }
 

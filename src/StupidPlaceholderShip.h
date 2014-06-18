@@ -27,7 +27,7 @@ public:
 	virtual void playerControl(float dt);	//if a player is controlling this ship
 	virtual bool isHittingFalcon();
 	virtual void loadTIEModel();			//load our normal TIE fighter
-
+	virtual bool isLocalEnemy();			//is this human-controlled on this node?
 protected:
 
 	bool mMovingAway;

@@ -41,6 +41,7 @@ TIEComputer::TIEComputer()
 	mCurrentFalconImage = 0;
 	mFlashTime = 0;
 
+	
 	//add the background image
 	ScreenImage* image = new ScreenImage();
 	mCamera->addChild(image->transform);
@@ -59,11 +60,6 @@ TIEComputer::TIEComputer()
 //	image->setColor(Vec4(0.7, 0.7, 1.0, 1));
 //	image->setPos(Vec3(0, 0, 1));		//put this in front of the other images
 	
-	mArrowImage = new ScreenImage();
-//	mCamera->addChild(mArrowImage->transform);
-	mArrowImage->setImage("data/textures/TIEPuter.png");
-	mArrowImage->setHeight(1);
-	mArrowImage->setColor(Vec4(1, 1, 1.0, 1));
 
 	for(int i = 0; i < 2; i++)
 	{
@@ -76,6 +72,15 @@ TIEComputer::TIEComputer()
 		mFalconImage[i]->transform->getOrCreateStateSet()->setAttribute(new BlendFunc(GL_SRC_ALPHA, GL_ONE));
 		mFalconImage[i]->setColor(Vec4(1, .25, .25, 1));
 		mFalconImage[i]->setPos(Vec3(10, 10, 10));	//start with these off-screen
+		
+		mArrowImage[i] = new ScreenImage();
+		mCamera->addChild(mArrowImage[i]->transform);
+		mArrowImage[i]->setImage("data/textures/TIERadarArrow2.png");
+		mArrowImage[i]->setHeight(.2);
+		mArrowImage[i]->setAspect(0.5);
+		mArrowImage[i]->setColor(Vec4(1, .25, .25, 1));
+
+
 	}
 
 
@@ -106,6 +111,15 @@ bool TIEComputer::update(float dt)
 		
 		return true;
 	}
+	updateRadar(dt);
+	updateDamageDisplay();
+	return true;
+}
+
+void TIEComputer::updateRadar(float dt)
+{
+	Spacecraft* playerShip = getShip();
+
 	Matrix falconMat = Matrix();		//the falcon's always in the middle of the world
 	Matrix shipMat = playerShip->getTransform();
 	shipMat.invert(shipMat);
@@ -115,40 +129,72 @@ bool TIEComputer::update(float dt)
 	
 	float yaw = atan2f(shipMat.ptr()[12], -shipMat.ptr()[14]) * 57.3;
 	float pitch = atan2f(shipMat.ptr()[13], -shipMat.ptr()[14]) * 57.3;
-//	float dist = playerShip->getPos().length();		//how far away are we?
-//	printf("MFYaw:  %.2f, %.2f\n", yaw, pitch);
+	float dist = playerShip->getPos().length();		//how far away are we?
 	
 	float malt = 0.025;		//use the relative directions to position the Falcon icon on the radar
 	
 	
 	//move our falcon images alternately
 	mFlashTime -= dt;
-	float flashPeriod = 0.2;
+	float flashPeriod = 0.25;
 	
 	//fade the two falcons in and out alternately to give a CRT effect
 	float timeSinceSwitch = (flashPeriod - mFlashTime);
 	float fadeIn = timeSinceSwitch * 5;		//0->1 and beyond
 	float fadeOut = 1.0 - 3.0 * timeSinceSwitch;									//1->0 and less
-	
-	if(fabs(yaw * malt) > 0.5 )	yaw = 10;		//keep off-screen if not near the center
+	bool offScreen = (sqrtf(yaw * yaw + pitch * pitch) > 10);
+	if(offScreen)	yaw = 10;		//keep off-screen if not near the center
 	if(fadeIn > 1) fadeIn = 1;
 
 	if(fadeOut < 0) fadeOut = 0;
-	mFalconImage[mCurrentFalconImage%2]->setColor(Vec4(1, .25, .25, fadeOut));
-	mFalconImage[(mCurrentFalconImage+1)%2]->setColor(Vec4(1, .25, .25, fadeIn));
-//	printf("fade:  %.2f, %.2f\n", fadeIn, fadeOut);
-	if(mFlashTime < 0)
+	Vec4 colorFadeOut(1, .25, .25, fadeOut);
+	Vec4 colorFadeIn(1, .25, .25, fadeIn);
+	int currentImage = mCurrentFalconImage%2;
+	int otherImage = (mCurrentFalconImage+1)%2;
+	mFalconImage[currentImage]->setColor(colorFadeOut);
+	mFalconImage[otherImage]->setColor(colorFadeIn);
+	if(offScreen)
 	{
-//		printf("Move %i!\n", mCurrentFalconImage%2);
-		mFalconImage[mCurrentFalconImage%2]->setPos(Vec3(yaw*malt, pitch * malt, 0));
-		mFalconImage[mCurrentFalconImage%2]->setColor(Vec4());	//start the image black when it fades in
-		mCurrentFalconImage++;
+		mArrowImage[currentImage]->setColor(colorFadeOut);
+		mArrowImage[otherImage]->setColor(colorFadeIn);
+	}
+//	printf("fade:  %.2f, %.2f\n", fadeIn, fadeOut);
+
+
+	if(mFlashTime < 0)		//time to start a new fade in cycle
+	{
+//		printf("Move %i!\n", currentImage);
+		mFalconImage[currentImage]->setPos(Vec3(yaw*malt, pitch * malt, 0));
+		mFalconImage[currentImage]->setColor(Vec4());	//start the image black when it fades in
+		mArrowImage[currentImage]->setColor(Vec4());	//start the image black when it fades in
+
 		mFlashTime = flashPeriod;
+
+		//flash a locating arrow if we can't see the falcon
+		if(offScreen && dist > 50)
+		{
+			float dx = -0.023;
+			float dy = 0;
+			float arrowRadius = 0.2;		//for positioning the little arrow
+			float arrowAngle = atan2f(shipMat.ptr()[13], shipMat.ptr()[12]);
+			
+			//quantize the arrowangle
+			arrowAngle *= 18.0 / (3.14159 * 2.0);
+//			printf("aa:  %f ", arrowAngle);
+			arrowAngle = (int)arrowAngle;
+//			printf(" then %.2f ", arrowAngle);
+			arrowAngle *= 3.14159 * 2.0 / 18.0;
+//			printf("finally %.2f\n", arrowAngle);
+			mArrowImage[currentImage]->setPos(Vec3(arrowRadius * cosf(arrowAngle) + dx, arrowRadius * sinf(arrowAngle) + dy, 0));
+			mArrowImage[currentImage]->setAngle(arrowAngle * 57.3 - 90);
+		}
+		else
+			mArrowImage[currentImage]->setPos(Vec3(100, 0, 0));
+		mCurrentFalconImage++;
 	}
 	
 	
-	updateDamageDisplay();
-	return true;
+	
 }
 
 void TIEComputer::updateDamageDisplay()

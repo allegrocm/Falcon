@@ -21,7 +21,7 @@
 #include "Layers.h"
 #include "Bullet.h"
 #include <osgUtil/IntersectVisitor>
-
+#include "EnemyController.h"
 using namespace osg;
 
 
@@ -35,11 +35,6 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	mHP = 4;
 //	printf("COG:  %.2f, %.2f, %.2f\n", center.x(), center.y(), center.z());
 	
-	std::string engineSound;
-	if(Defaults::instance().getValue("placeholderShipSound", engineSound))
-	{
-		mEngineSound = KSoundManager::instance()->play3DSound(std::string("data/sounds/") + engineSound, 0.75, 1000, 1000, 1000, true, 80);
-	}
 	
 	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
 	setPos(pos);
@@ -103,6 +98,19 @@ void StupidPlaceholderShip::loadTIEModel()
 //	mPat->addChild(g);
 	//n->addChild(g);
 	mPat->addChild(l);
+	
+	std::string engineSound;
+	if(Defaults::instance().getValue("placeholderShipSound", engineSound))
+	{
+		printf("start your kengines\n");
+		if(false && isLocalEnemy())
+		{
+			mEngineSound = KSoundManager::instance()->playSound(std::string("data/sounds/") + engineSound, 0, 0, true);
+		}
+		else
+			mEngineSound = KSoundManager::instance()->play3DSound(std::string("data/sounds/") + engineSound, 0.75, 1000, 1000, 1000, true, 80);
+	}
+
 
 }
 
@@ -249,8 +257,24 @@ bool StupidPlaceholderShip::update(float dt)
 	setForward(mVel);
 	bool up = Spacecraft::update(dt);
 	
+	//send our position and velocity to the SoundManager so we can have stereo and doppler and all that good stuff
+	Vec3 pos = getPos();
+	Vec3 vel = getVel();
+	if(mEngineSound)
+	{
+		if(isLocalEnemy())
+		{
+			float speedPortion = mVel.length() / mSpeed;
+			KSoundManager::instance()->setSoundFrequency(mEngineSound, 44000 * speedPortion);
+			KSoundManager::instance()->setSoundVolume(mEngineSound, 0.5 * speedPortion);
+		}
+		else
+			KSoundManager::instance()->setSound3DInfo(mEngineSound, pos.x(), pos.y(), pos.z(), vel.x(), vel.y(), vel.z());
+	}
 	if(isHittingFalcon())
 		explode();
+		
+		
 	return up;
 }
 
@@ -366,12 +390,24 @@ bool StupidPlaceholderShip::shoot()
 //	FalconApp::instance().getBullets().push_back(b);
 	FalconApp::instance().addThis(b);
 //	printf("shoot from %.2f, %.2f, %.2f\n", barrelPos.x(), barrelPos.y(), barrelPos.z());
-	SkySound* ss =
-		KSoundManager::instance()->play3DSound(std::string("data/sounds/") + mGun.mFireSound, mGun.mFireVolume,
-			getPos().x(), getPos().y(), getPos().z(), false, 200);
+
+	//is this the darth vader tie?  its sounds are local
+	if(isLocalEnemy())
+	{
+
+		KSoundManager::instance()->playSound(std::string("data/sounds/") + mGun.mFireSound, mGun.mFireVolume,
+			(whichBarrel%2)? 0.75 : -0.75);
 	
-	//no doppler effect on laser sounds.  it's weird.
-	KSoundManager::instance()->setSoundDopplerLevel(ss, 0);
+	}
+	else
+	{
+		SkySound* ss =
+			KSoundManager::instance()->play3DSound(std::string("data/sounds/") + mGun.mFireSound, mGun.mFireVolume,
+				getPos().x(), getPos().y(), getPos().z(), false, 200);
+		
+		//no doppler effect on laser sounds.  it's weird.
+		KSoundManager::instance()->setSoundDopplerLevel(ss, 0);
+	}
 	return true;
 	
 }
@@ -418,5 +454,10 @@ bool StupidPlaceholderShip::isHittingFalcon()
 	return false;
 }
 
+bool StupidPlaceholderShip::isLocalEnemy()
+{
+	if(FalconApp::instance().tieNode1() && mPlayer) return true;
+	return false;
+}
 
 
