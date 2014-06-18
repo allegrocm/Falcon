@@ -90,3 +90,10 @@ buttonsXUp = -0.575
 buttonsYUp = -0.1
 
 
+#things related to multiplayer!
+
+#does the horizontal axis roll or yaw?  1 is yaw, 0 is roll
+enemyControlYawMix = 1
+
+#enemy player hp
+vaderTIEHP = 16
