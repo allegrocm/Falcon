@@ -15,6 +15,7 @@ EnemyPlayer::EnemyPlayer()
 {
 	mShip = NULL;
 	mDeadTimer = 0;
+	AIControl = false;
 }
 
 

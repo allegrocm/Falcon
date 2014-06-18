@@ -179,6 +179,7 @@ void FalconApp::update(float fulldt)
 		mEnemyController->update(mTimeStep);
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
+		mListenerVelocity = Vec3();			//zero by default
 		if(player && player->getShip() && mTieNode1)		//for now, only the master node shows the view of the enemy TIE fighter
 		{
 			Spacecraft* enemy = player->getShip();
@@ -203,7 +204,7 @@ void FalconApp::update(float fulldt)
 		else if (!mTieNode1)
 		{
 			mNavigation->setMatrix(osg::Matrix());
-			mListenerVelocity = Vec3();
+
 		}
 		
 		//update bullets. when one is "finished", delete it

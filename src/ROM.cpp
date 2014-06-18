@@ -36,7 +36,10 @@ float ROM::HUD_MOVEMENT_SPEED;
 float ROM::ENEMY_CONTROL_YAW_MIX;
 int ROM::VADER_TIE_HP;
 float ROM::VADER_HITBOX_SIZE;
-
+float ROM::TIE_RADAR_FOV;
+float ROM::TIE_RADAR_UPDATE_RATE;
+float ROM::VADER_UNROLL_RATE;
+osg::Vec4 ROM::VADER_DISPLAY_COLOR;
 void ROM::load()
 {
 
@@ -101,4 +104,13 @@ void ROM::load()
 	
 	VADER_HITBOX_SIZE = 10;
 	getDefault("vaderHitboxSize", VADER_HITBOX_SIZE);
+	
+	TIE_RADAR_UPDATE_RATE = 5;
+	TIE_RADAR_FOV = 45;
+	VADER_UNROLL_RATE = 0.5;
+	getDefault("vaderRadarUpdateRate", TIE_RADAR_UPDATE_RATE);
+	getDefault("vaderRadarFOV", TIE_RADAR_FOV);
+	getDefault("vaderUnrollRate", VADER_UNROLL_RATE);
+	
+	VADER_DISPLAY_COLOR = osg::Vec4(1, .25, .25, 1);
 }

@@ -40,6 +40,10 @@ public:
 	EnemyControlInput getInput()	{return mInput;}
 	void shipDied();				//called by the spaceship we control
 	bool isReadyForShip() {return (!mShip && mDeadTimer <= 0);}			//ready to get into a new ship?
+
+	//are we temporarily under AI control? due to no controller or flying in an illegal place or putting on autopilot
+	//used for display on the computer
+	bool AIControl;
 protected:
 	Spacecraft* mShip;
 	EnemyControlInput mInput;

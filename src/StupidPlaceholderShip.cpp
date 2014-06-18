@@ -38,7 +38,8 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	
 	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
 	setPos(pos);
-	mSpeed = 100;
+	mSpeed = mTopSpeed = mTargetSpeed = 100;
+	mSpeed = 10;		//start with a low speed and spool up quickly
 	setVel(Vec3(0, 0, -mSpeed));
 	mMovingAway = true;
 	mTurning = false;
@@ -119,9 +120,34 @@ void StupidPlaceholderShip::playerControl(float dt)
 	EnemyControlInput input = mPlayer->getInput();
 	if(input.button1)		//autopilot
 	{
-		AIControl(dt);
+		AIControl(dt, false);
 		return;
 	}
+
+	Matrix current = getTransform();
+
+	Vec3 pos = getPos();
+//	float towardness = (pos / pos.length()) * Util::zAxis(current);		//are we facing the ship?
+	float xzDist = sqrtf(pos.x() *pos.x() + pos.z()*pos.z());
+//	printf("XZ:  %.2f, y:  %.2f, toward:  %.2 f\n", xzDist, pos.y(), towardness);
+
+	//don't let the player fly too far away
+	if(pos.length() > 1500 || (mPlayer->AIControl && pos.length() > 1000))
+	{
+		AIControl(dt, false);
+		return;
+	}
+
+	//are we hiding under the falcon?  that's not allowed
+	//TODO:  maybe just have the falcon shoot at us.  makes more sense
+	if(false && (pos.y() < 0 && (xzDist < -pos.y() * 3 || xzDist < 50)))
+	{
+		mTargetPosition = getPos() + Vec3(0, 50, 0);		//fly upward unless we're super close
+		AIControl(dt, false);
+		return;
+	}
+	
+	mPlayer->AIControl = false;
 	//printf("player control!  %.2f, %.2f, %.2f, (%i)\n", input.xAxis, input.yAxis, input.thrustAxis, input.trigger);
 	float yawness = ROM::ENEMY_CONTROL_YAW_MIX;		//temporarily slide between x-to-roll and x-to-yaw
 	float rollSpeed = 90 * input.xAxis * (1.0-yawness) * dt;;
@@ -133,9 +159,9 @@ void StupidPlaceholderShip::playerControl(float dt)
 	
 
 	Vec3 vel = getVel();
-	Matrix current = getTransform();
+
 	float currentRoll = current.ptr()[1];		//y-value of the x-axis indicates if we're rolled
-	float unrollSpeed = 0.5 * currentRoll * dt;
+	float unrollSpeed = ROM::VADER_UNROLL_RATE * currentRoll * dt;
 
 	Matrix pitchRot;
 	pitchRot.setRotate(osg::Quat(pitchSpeed / -57.3, Util::xAxis(current)));
@@ -146,12 +172,16 @@ void StupidPlaceholderShip::playerControl(float dt)
 	yawRot.setRotate(osg::Quat(-yawSpeed / 57.3, Util::yAxis(current)));
 
 	
-	Vec3 pos = getPos();
 	setTransform(current * rollRot);
 	setPos(pos);
 	vel = getForward() * pitchRot * yawRot;
 	vel.normalize();
-	float thrust = (input.thrustAxis + 1.0) * 0.5 + 0.025;		//minimum speed
+	float thrust = (input.thrustAxis + 1.0) * 0.5 + 0.25;		//minimum speed
+	mTargetSpeed = thrust * mTopSpeed;
+	
+	//slow down slightly as we turn!
+	float turnamount = sqrtf(input.xAxis * input.xAxis + input.yAxis * input.yAxis);
+	mTargetSpeed *= 1.0 - 0.25 * turnamount;
 	vel *= thrust * mSpeed;
 	
 	setVel(vel);
@@ -160,29 +190,33 @@ void StupidPlaceholderShip::playerControl(float dt)
 }
 
 
-void StupidPlaceholderShip::AIControl(float dt)
+void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 {
 
+	if(mPlayer)
+		mPlayer->AIControl = true;
 	Vec3 desiredDirection = mTargetPosition - getPos();
 	desiredDirection.normalize();
+//	printf("Dir: %.2f, %.2f, %.2f\n", desiredDirection.x(), desiredDirection.y(), desiredDirection.z());
+
 	Vec3 adjustedVelocity = getVel() + (desiredDirection * mSpeed - getVel()) * dt; //dt when coded was .01
 	adjustedVelocity.normalize();
 
-	Vec3 error = desiredDirection * mSpeed - getVel();
-//	std::cout << "Velocity change: " << error.x() << ", " << error.y() << ", " << error.z() << "\n";
-	if(abs(error.x()) < 1 && abs(error.y()) < 1 && abs(error.z()) < 1 && Util::random(0, 100) < 50) {
-//		shoot();
-	}
+	Vec3 targetVel = desiredDirection * mSpeed;
 	setVel(adjustedVelocity*mSpeed);
 
 	FalconApp& app = FalconApp::instance();
 	Falcon* falcon = app.getFalcon();
 	Vec3 distanceToFalcon = falcon->getPos() - getPos();
 	
-	if(mMovingAway) {
-		if(distanceToFalcon.length() < 600) {
+	if(mMovingAway)
+	{
+		if(distanceToFalcon.length() < 600)
+		{
 			//nothing special
-		} else {
+		}
+		else
+		{
 //			std::cout << "Turning around to attack!\n";
 			mMovingAway = false;
 			mTurning = true;
@@ -191,13 +225,15 @@ void StupidPlaceholderShip::AIControl(float dt)
 			mCurrentTurnTime = 0;
 			mTimeToTurn = 3;
 		}
-	} else {
+	}
+	else
+	{
 		if(distanceToFalcon.length() > 200)		//flying toward the Falcon
 		{
 			Vec3 falconDir = distanceToFalcon;
 			falconDir.normalize();
 			float dot = falconDir * getForward();		//get the dot product of our direction with the millennium falcon
-			if(dot > 0.9)		//are we mostly heading towards the falcon?  OPEN FIRE
+			if(dot > 0.9 && canFire)		//are we mostly heading towards the falcon?  OPEN FIRE
 			{
 //				printf("time till shoot:  %.2f\n", mTimeTillShoot);
 				mTimeTillShoot -= dt;		//but wait for our shoot timer to run out
@@ -209,7 +245,9 @@ void StupidPlaceholderShip::AIControl(float dt)
 	
 			
 			
-		} else {
+		}
+		else
+		{
 //			std::cout << "Turning around to retreat!\n";
 			mMovingAway = true;
 			mTurning = true;
@@ -222,6 +260,28 @@ void StupidPlaceholderShip::AIControl(float dt)
 			
 		}
 	}
+	
+	//are we on the verge of hitting the falcon?  wave off!
+	if(false && willHitFalcon(150))
+	{
+//		printf("too close!\n");
+		//slow down and turn!
+		mTargetSpeed = mTopSpeed * 0.15;
+		mTargetPosition = Vec3(0, 600, 0);	//by default, go up
+		if(getPos().y() < 0)		//below the falcon.  go down
+		{
+//			printf("go down!\n");
+			mTargetPosition = Vec3(0, -600, 0);
+		}
+		else
+		{
+//			printf("go up!\n");
+		}
+		
+	}
+	else
+		mTargetSpeed = mTopSpeed;
+	
 
 }
 
@@ -230,24 +290,6 @@ bool StupidPlaceholderShip::update(float dt)
 {
 
 
-/*	
-	//Fly in circle
-	float radius = mRadius;
-	float dTheta = -1.0;
-//	dTheta = 0;		//hack for explosion testing
-	float theta = mAge * dTheta + mOffset;
-	Vec3 pos = mCenter + Vec3(cosf(theta)*radius, 0, sinf(theta)*radius);
-	Vec3 forward = Vec3(-sinf(theta), 0, cosf(theta)) * dTheta * radius;
-	mVel = forward;
-	
-	setPos(pos);
-	
-	if(forward.length())
-	{
-		forward.normalize();
-		setForward(forward);
-	}
-*/
 	if(mPlayer)
 		playerControl(dt);
 	else
@@ -255,8 +297,10 @@ bool StupidPlaceholderShip::update(float dt)
 	setPos(getVel() * dt + getPos());
 
 	setForward(mVel);
+	//now adjust speed
+	mSpeed += (mTargetSpeed - mSpeed) * dt;
 	bool up = Spacecraft::update(dt);
-	
+
 	//send our position and velocity to the SoundManager so we can have stereo and doppler and all that good stuff
 	Vec3 pos = getPos();
 	Vec3 vel = getVel();
@@ -264,14 +308,14 @@ bool StupidPlaceholderShip::update(float dt)
 	{
 		if(isLocalEnemy())
 		{
-			float speedPortion = mVel.length() / mSpeed;
+			float speedPortion = mSpeed / mTopSpeed;
 			KSoundManager::instance()->setSoundFrequency(mEngineSound, 44000 * speedPortion);
 			KSoundManager::instance()->setSoundVolume(mEngineSound, 0.5 * speedPortion);
 		}
 		else
 			KSoundManager::instance()->setSound3DInfo(mEngineSound, pos.x(), pos.y(), pos.z(), vel.x(), vel.y(), vel.z());
 	}
-	if(isHittingFalcon())
+	if(willHitFalcon(3))		//are we in contact with the falcon?  sucks for us
 		explode();
 		
 		
@@ -324,32 +368,7 @@ void StupidPlaceholderShip::explode()
 		KSoundManager::instance()->stopSound(mEngineSound);
 		KSoundManager::instance()->letSoundDie(mEngineSound);
 	}
-	/*
-	//explode with debris
-	Debris* h = new Debris("data/models/tief3DS/TieWing.3ds", Vec3(1, 0, 0), 45, 20.0 + 40.0 * rand() / RAND_MAX, 360);
-	h->setTransformAndOffset(getTransform(), Vec3(5, 0, 0));
-	h->setVel(h->getVel() + mVel);			//add in our own velocity to the debris
-	FalconApp::instance().addThis(h);
-
-	//explode with debris
-	h = new Debris("data/models/tief3DS/TieWing2.3ds", Vec3(-1, 0, 0), 45, 20.0 + 40.0 * rand() / RAND_MAX, 360);
-	h->setTransformAndOffset(getTransform(), Vec3(-4, 0, 0));
-	h->setVel(h->getVel() + mVel);			//add in our own velocity to the debris
-	FalconApp::instance().addThis(h);
 	
-	//explode with debris
-	h = new Debris("data/models/tief3DS/TieDebris3.3ds", Vec3(-1, 0, 0), 180, 20.0 + 40.0 * rand() / RAND_MAX, 360, 1);
-	h->setTransformAndOffset(getTransform(), Vec3(0, 0, 0));
-	h->setVel(h->getVel() + mVel);			//add in our own velocity to the debris
-	FalconApp::instance().addThis(h);
-
-	h = new Debris("data/models/tief3DS/TieDebris4.3ds", Vec3(-1, 0, 0), 180, 20.0 + 40.0 * rand() / RAND_MAX, 360, 1);
-	h->setTransformAndOffset(getTransform(), Vec3(1, 0, 1));
-	h->setVel(h->getVel() + mVel);			//add in our own velocity to the debris
-	h->setFireAmount(0.35);		//this little guy doesn't have as much fire behind it
-	FalconApp::instance().addThis(h);
-*/
-
 	mDead = true;
 	if(mPlayer)
 	{
@@ -362,7 +381,11 @@ void StupidPlaceholderShip::explode()
 
 void StupidPlaceholderShip::drawDebug()
 {
-
+//	glBegin(GL_LINES);
+//		glColor3f(0, 1, 0);
+//		glVertex3fv(getPos().ptr());
+//		glVertex3fv(mTargetPosition.ptr());
+//	glEnd();
 
 }
 
@@ -412,13 +435,13 @@ bool StupidPlaceholderShip::shoot()
 	
 }
 
-bool StupidPlaceholderShip::isHittingFalcon()
+bool StupidPlaceholderShip::willHitFalcon(float distance)
 {
 	osgUtil::IntersectVisitor iv;
 	
 	Vec3 dir = getForward();
 	Vec3 pos = getPos();
-	float length = 3;
+	float length = distance;
 	float travelLength = 0;
 	
 	//if our length is shorter than our velocity * dt, lengthen it so we don't pass through something
@@ -435,7 +458,7 @@ bool StupidPlaceholderShip::isHittingFalcon()
 
 	ships.push_back((Spacecraft*)f);
 
-
+//	printf("seg length:  %.2f\n", length);
 	
 	bool hitSometing = false;		//stop after any collision
 	Vec3 hitPos;
@@ -450,7 +473,7 @@ bool StupidPlaceholderShip::isHittingFalcon()
 			return true;
 		}
 	}
-	
+//	printf("no hit\n");
 	return false;
 }
 

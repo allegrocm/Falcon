@@ -50,6 +50,10 @@ public:
 	static float ENEMY_CONTROL_YAW_MIX;		//how much does the enemy yaw instead of roll in response to x-axis input?
 	static int VADER_TIE_HP;				//hitpoints of human-controlled enemies
 	static float VADER_HITBOX_SIZE;
+	static float TIE_RADAR_UPDATE_RATE;
+	static float TIE_RADAR_FOV;
+	static float VADER_UNROLL_RATE;		//how quickly does the player TIE fighter return to y-up when it rolls?
+	static osg::Vec4 VADER_DISPLAY_COLOR;
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

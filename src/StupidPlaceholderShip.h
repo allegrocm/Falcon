@@ -23,9 +23,9 @@ public:
 	virtual void wasHit(Bullet* b, osg::Vec3 hitPos);
 	virtual void drawDebug();
 	virtual bool shoot();
-	virtual void AIControl(float dt);		//Shawn's control scheme
+	virtual void AIControl(float dt, bool canFire = true);		//Shawn's control scheme.  can be activated by the player, but no shooting
 	virtual void playerControl(float dt);	//if a player is controlling this ship
-	virtual bool isHittingFalcon();
+	virtual bool willHitFalcon(float distance);
 	virtual void loadTIEModel();			//load our normal TIE fighter
 	virtual bool isLocalEnemy();			//is this human-controlled on this node?
 protected:
@@ -36,9 +36,10 @@ protected:
 	float mCurrentTurnTime;
 	float mTimeToTurn;
 	float mTimeTillShoot;		//how long till we open fire once we're facing the falcon?
-	float mSpeed;
+	float mSpeed;				//current speed
+	float mTopSpeed;			//max speed
+	float mTargetSpeed;			//desired speed
 	osg::ref_ptr<osg::Sphere> mEngineGlow;
-
 };
 
 

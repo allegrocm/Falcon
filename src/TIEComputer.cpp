@@ -40,7 +40,7 @@ TIEComputer::TIEComputer()
 //	mPat->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 	mCurrentFalconImage = 0;
 	mFlashTime = 0;
-
+	mAITextFlashTime = 0;
 	
 	//add the background image
 	ScreenImage* image = new ScreenImage();
@@ -60,7 +60,24 @@ TIEComputer::TIEComputer()
 //	image->setColor(Vec4(0.7, 0.7, 1.0, 1));
 //	image->setPos(Vec3(0, 0, 1));		//put this in front of the other images
 	
+	mAIText = new osgText::Text();
 
+	mAIText->setColor(ROM::VADER_DISPLAY_COLOR);
+
+	mAIText->setMaximumWidth(TIEScreenAspect);
+	mAIText->setAlignment(osgText::TextBase::CENTER_CENTER);
+	mAIText->setText("Hi Ken");
+	mAIText->setCharacterSize(0.05);
+	mAIText->setPosition(Vec3(0, 0.43, 0));
+	std::string where = osgDB::findDataFile("../Models/tarzeau_ocr_a.ttf");
+//	std::string where = "../Models/arial.ttf";
+	mAIText->setFont(where.c_str());
+
+	
+	Geode* textGeode = new Geode();
+	textGeode->addDrawable(mAIText);
+	mCamera->addChild(textGeode);
+	
 	for(int i = 0; i < 2; i++)
 	{
 		mFalconImage[i] = new ScreenImage();
@@ -70,7 +87,7 @@ TIEComputer::TIEComputer()
 		mFalconImage[i]->setHeight(0.125);
 
 		mFalconImage[i]->transform->getOrCreateStateSet()->setAttribute(new BlendFunc(GL_SRC_ALPHA, GL_ONE));
-		mFalconImage[i]->setColor(Vec4(1, .25, .25, 1));
+		mFalconImage[i]->setColor(ROM::VADER_DISPLAY_COLOR);
 		mFalconImage[i]->setPos(Vec3(10, 10, 10));	//start with these off-screen
 		
 		mArrowImage[i] = new ScreenImage();
@@ -78,7 +95,7 @@ TIEComputer::TIEComputer()
 		mArrowImage[i]->setImage("data/textures/TIERadarArrow2.png");
 		mArrowImage[i]->setHeight(.2);
 		mArrowImage[i]->setAspect(0.5);
-		mArrowImage[i]->setColor(Vec4(1, .25, .25, 1));
+		mArrowImage[i]->setColor(ROM::VADER_DISPLAY_COLOR);
 
 
 	}
@@ -105,6 +122,7 @@ bool TIEComputer::update(float dt)
 	mAge += dt;
 	//find out where our ship is
 	Spacecraft* playerShip = getShip();
+	updateStatusText(dt);
 	if(!playerShip)
 	{
 		//we'll respawn soon...right?
@@ -129,28 +147,33 @@ void TIEComputer::updateRadar(float dt)
 	
 	float yaw = atan2f(shipMat.ptr()[12], -shipMat.ptr()[14]) * 57.3;
 	float pitch = atan2f(shipMat.ptr()[13], -shipMat.ptr()[14]) * 57.3;
+//	printf("yaw:  %.2f   pitch:  %.2f\n", yaw, pitch);
 	float dist = playerShip->getPos().length();		//how far away are we?
-	
-	float malt = 0.025;		//use the relative directions to position the Falcon icon on the radar
-	
 	
 	//move our falcon images alternately
 	mFlashTime -= dt;
-	float flashPeriod = 0.25;
-	
+	float flashPeriod = 1.0 / ROM::TIE_RADAR_UPDATE_RATE;
+	float radarFOV = ROM::TIE_RADAR_FOV;
+	float malt = 0.3 / radarFOV;		//use the relative directions to position the Falcon icon on the radar
+
 	//fade the two falcons in and out alternately to give a CRT effect
 	float timeSinceSwitch = (flashPeriod - mFlashTime);
-	float fadeIn = timeSinceSwitch * 5;		//0->1 and beyond
-	float fadeOut = 1.0 - 3.0 * timeSinceSwitch;									//1->0 and less
-	bool offScreen = (sqrtf(yaw * yaw + pitch * pitch) > 10);
-	if(offScreen)	yaw = 10;		//keep off-screen if not near the center
+	float fadeInTime = 0.3 * flashPeriod;
+	float fadeIn = timeSinceSwitch / fadeInTime;		//0->1 and beyond
+	
+	float fadeOutTime = 0.8 * flashPeriod;
+	float fadeOut = 1.0 - timeSinceSwitch / fadeOutTime;									//1->0 and less
+	bool offScreen = (sqrtf(yaw * yaw + pitch * pitch) > radarFOV);
+	if(offScreen)	yaw = 100;		//keep off-screen if not near the center
 	if(fadeIn > 1) fadeIn = 1;
 
 	if(fadeOut < 0) fadeOut = 0;
-	Vec4 colorFadeOut(1, .25, .25, fadeOut);
-	Vec4 colorFadeIn(1, .25, .25, fadeIn);
+	Vec4 colorFadeOut(ROM::VADER_DISPLAY_COLOR.x(), ROM::VADER_DISPLAY_COLOR.y(), ROM::VADER_DISPLAY_COLOR.z(), fadeOut);
+	Vec4 colorFadeIn(ROM::VADER_DISPLAY_COLOR.x(), ROM::VADER_DISPLAY_COLOR.y(), ROM::VADER_DISPLAY_COLOR.z(), fadeIn);
+
 	int currentImage = mCurrentFalconImage%2;
 	int otherImage = (mCurrentFalconImage+1)%2;
+
 	mFalconImage[currentImage]->setColor(colorFadeOut);
 	mFalconImage[otherImage]->setColor(colorFadeIn);
 	if(offScreen)
@@ -158,13 +181,16 @@ void TIEComputer::updateRadar(float dt)
 		mArrowImage[currentImage]->setColor(colorFadeOut);
 		mArrowImage[otherImage]->setColor(colorFadeIn);
 	}
-//	printf("fade:  %.2f, %.2f\n", fadeIn, fadeOut);
 
 
 	if(mFlashTime < 0)		//time to start a new fade in cycle
 	{
-//		printf("Move %i!\n", currentImage);
-		mFalconImage[currentImage]->setPos(Vec3(yaw*malt, pitch * malt, 0));
+
+		//the radar isn't quite centered
+		float dx = -0.023;
+		float dy = 0;
+
+		mFalconImage[currentImage]->setPos(Vec3(yaw*malt + dx, pitch * malt + dy, 0));
 		mFalconImage[currentImage]->setColor(Vec4());	//start the image black when it fades in
 		mArrowImage[currentImage]->setColor(Vec4());	//start the image black when it fades in
 
@@ -173,8 +199,6 @@ void TIEComputer::updateRadar(float dt)
 		//flash a locating arrow if we can't see the falcon
 		if(offScreen && dist > 50)
 		{
-			float dx = -0.023;
-			float dy = 0;
 			float arrowRadius = 0.2;		//for positioning the little arrow
 			float arrowAngle = atan2f(shipMat.ptr()[13], shipMat.ptr()[12]);
 			
@@ -193,8 +217,40 @@ void TIEComputer::updateRadar(float dt)
 		mCurrentFalconImage++;
 	}
 	
+}
+
+
+void TIEComputer::updateStatusText(float dt)
+{
+	//pulse the AI or other warning text
+	std::string statusText = "";
+	Spacecraft* playerShip = getShip();
+	if(!playerShip)
+	{
+		statusText = "Destroyed!  Waiting to respawn...";
+	}
+	else if(playerShip->getPlayer()->AIControl)
+		statusText = "AUTOPILOT";
+	else if(playerShip->getHP() < ROM::VADER_TIE_HP / 3)
+		statusText = "WARNING:  HULL CRITICAL";
+	mAIText->setText(statusText);
+	mAITextFlashTime += dt;
+	float textFlashRate = 1.0;
+	float fadeInTime = 0.2;
+	float steadyTime = 0.3;
+	float fadeOutTime = 0.4;
+	if(mAITextFlashTime > textFlashRate) mAITextFlashTime -= textFlashRate;
+	float tFlash = mAITextFlashTime / textFlashRate;
 	
-	
+	float brite = 1.0;
+	if(tFlash < fadeInTime)
+		brite = tFlash / fadeInTime;
+	else if(tFlash > fadeInTime + steadyTime)
+		brite = 1.0 - ((tFlash-fadeInTime-steadyTime) / fadeOutTime);
+	if(brite < 0) brite = 0;
+	mAIText->setColor(Vec4(ROM::VADER_DISPLAY_COLOR.x(), ROM::VADER_DISPLAY_COLOR.y(), ROM::VADER_DISPLAY_COLOR.z(), brite));
+
+
 }
 
 void TIEComputer::updateDamageDisplay()

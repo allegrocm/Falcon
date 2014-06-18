@@ -43,6 +43,9 @@ protected:
 	Spacecraft* getShip();
 	void updateRadar(float dt);		//update the things that mvoe slowly (falcon image, arrow)
 	float mArrowFlash;
+	osg::ref_ptr<osgText::Text>			mAIText;
+	float mAITextFlashTime;				//for flashing this text.  more like pulsing
+	void updateStatusText(float dt);
 };
 
 
