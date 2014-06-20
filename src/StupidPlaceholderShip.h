@@ -28,6 +28,7 @@ public:
 	virtual bool willHitFalcon(float distance);
 	virtual void loadTIEModel();			//load our normal TIE fighter
 	virtual bool isLocalEnemy();			//is this human-controlled on this node?
+	virtual void pickNewDestination();		//fly somewhere that's not straight into the MF
 protected:
 
 	bool mMovingAway;

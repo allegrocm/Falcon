@@ -99,7 +99,7 @@ bool Bullet::checkHit()
 		if(hitList.size())		//if there's any size in the hitlist, we HIT something!
 		{
 			hitPos = hitList[0].getWorldIntersectPoint();
-			printf("Bullet just hit %s\n", ships[i]->getName().c_str());
+//			printf("Bullet just hit %s\n", ships[i]->getName().c_str());
 			explode(hitPos);
 			ships[i]->wasHit(this, hitPos);
 			hitSometing = true;

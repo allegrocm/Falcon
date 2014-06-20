@@ -39,7 +39,7 @@ public:
 	static Gun TIE_FIGHTER_GUN;					//the basic gun used by TIE fighters
 	static int FALCON_HITPOINTS;
 	static float TIE_HITBOX_SIZE;		//hitbox size of a TIE fighter
-
+	static float TIE_WAVE_OFF_DISTANCE;		//when does a TIE fighter stop its attack and pull up?
 	//performace/difficulty
 	static bool FALCON_HIT_DETECTION;
 	

@@ -103,7 +103,7 @@ void StupidPlaceholderShip::loadTIEModel()
 	std::string engineSound;
 	if(Defaults::instance().getValue("placeholderShipSound", engineSound))
 	{
-		printf("start your kengines\n");
+//		printf("start your kengines\n");
 		if(false && isLocalEnemy())
 		{
 			mEngineSound = KSoundManager::instance()->playSound(std::string("data/sounds/") + engineSound, 0, 0, true);
@@ -123,7 +123,7 @@ void StupidPlaceholderShip::playerControl(float dt)
 		AIControl(dt, false);
 		return;
 	}
-
+//	printf("PC\n");
 	Matrix current = getTransform();
 
 	Vec3 pos = getPos();
@@ -195,14 +195,15 @@ void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 
 	if(mPlayer)
 		mPlayer->AIControl = true;
+	mSpeed = 100;
 	Vec3 desiredDirection = mTargetPosition - getPos();
 	desiredDirection.normalize();
 //	printf("Dir: %.2f, %.2f, %.2f\n", desiredDirection.x(), desiredDirection.y(), desiredDirection.z());
-
+//	printf("target pos:  %.2f, %.2f, %.2f\n", mTargetPosition.x(), mTargetPosition.y(), mTargetPosition.z());
 	Vec3 adjustedVelocity = getVel() + (desiredDirection * mSpeed - getVel()) * dt; //dt when coded was .01
 	adjustedVelocity.normalize();
 
-	Vec3 targetVel = desiredDirection * mSpeed;
+//	Vec3 targetVel = desiredDirection * mSpeed;
 	setVel(adjustedVelocity*mSpeed);
 
 	FalconApp& app = FalconApp::instance();
@@ -217,7 +218,7 @@ void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 		}
 		else
 		{
-//			std::cout << "Turning around to attack!\n";
+//			std::cout << "Turning around to attack! " << rand()%1000 << "\n";
 			mMovingAway = false;
 			mTurning = true;
 			mTimeTillShoot = Util::random(0.0, 2.0);		//attack after a random amount of time
@@ -228,7 +229,7 @@ void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 	}
 	else
 	{
-		if(distanceToFalcon.length() > 200)		//flying toward the Falcon
+		if(distanceToFalcon.length() > ROM::TIE_WAVE_OFF_DISTANCE)		//flying toward the Falcon
 		{
 			Vec3 falconDir = distanceToFalcon;
 			falconDir.normalize();
@@ -248,34 +249,32 @@ void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 		}
 		else
 		{
-//			std::cout << "Turning around to retreat!\n";
+			
+			ROM::TIE_WAVE_OFF_DISTANCE--;		//HACK:  testing how close TIE fighters can come before they hit
+			std::cout << "Turning around to retreat!  NExt time at " << ROM::TIE_WAVE_OFF_DISTANCE << "\n";
 			mMovingAway = true;
 			mTurning = true;
-			float theta = Util::random(-0.0, 6.28);
-			float phi = Util::random(-1, 2.5);
-			Vec3 target = Vec3(500*cosf(theta) * cosf(phi), 500*sinf(phi), -500*sinf(theta) * cosf(phi));
-			mTargetPosition = target;
 			mCurrentTurnTime = 0;
 			mTimeToTurn = 3;
-			
+			pickNewDestination();
 		}
 	}
 	
 	//are we on the verge of hitting the falcon?  wave off!
 	if(false && willHitFalcon(150))
 	{
-//		printf("too close!\n");
+		printf("too close!\n");
 		//slow down and turn!
 		mTargetSpeed = mTopSpeed * 0.15;
 		mTargetPosition = Vec3(0, 600, 0);	//by default, go up
 		if(getPos().y() < 0)		//below the falcon.  go down
 		{
-//			printf("go down!\n");
+			printf("go down!\n");
 			mTargetPosition = Vec3(0, -600, 0);
 		}
 		else
 		{
-//			printf("go up!\n");
+			printf("go up!\n");
 		}
 		
 	}
@@ -315,8 +314,11 @@ bool StupidPlaceholderShip::update(float dt)
 		else
 			KSoundManager::instance()->setSound3DInfo(mEngineSound, pos.x(), pos.y(), pos.z(), vel.x(), vel.y(), vel.z());
 	}
-	if(willHitFalcon(3))		//are we in contact with the falcon?  sucks for us
+	if(!mDead && willHitFalcon(3))		//are we in contact with the falcon?  sucks for us
+	{
+		printf("Hit falcon at waveoff distance of %.2f\n", ROM::TIE_WAVE_OFF_DISTANCE);
 		explode();
+	}
 		
 		
 	return up;
@@ -381,11 +383,11 @@ void StupidPlaceholderShip::explode()
 
 void StupidPlaceholderShip::drawDebug()
 {
-//	glBegin(GL_LINES);
-//		glColor3f(0, 1, 0);
-//		glVertex3fv(getPos().ptr());
-//		glVertex3fv(mTargetPosition.ptr());
-//	glEnd();
+	glBegin(GL_LINES);
+		glColor3f(0, 1, 0);
+		glVertex3fv(getPos().ptr());
+		glVertex3fv(mTargetPosition.ptr());
+	glEnd();
 
 }
 
@@ -439,6 +441,7 @@ bool StupidPlaceholderShip::willHitFalcon(float distance)
 {
 	osgUtil::IntersectVisitor iv;
 	
+	
 	Vec3 dir = getForward();
 	Vec3 pos = getPos();
 	float length = distance;
@@ -469,7 +472,7 @@ bool StupidPlaceholderShip::willHitFalcon(float distance)
 		osgUtil::IntersectVisitor::HitList& hitList = iv.getHitList(seg.get());
 		if(hitList.size())		//if there's any size in the hitlist, we HIT something!
 		{
-		
+			ROM::TIE_WAVE_OFF_DISTANCE += 10;
 			return true;
 		}
 	}
@@ -483,4 +486,41 @@ bool StupidPlaceholderShip::isLocalEnemy()
 	return false;
 }
 
+void StupidPlaceholderShip::pickNewDestination()
+{
+	
+
+	//sort of hacky:  temporarily modify our transform and check if we're about to hit the falcon
+	Matrix current = getTransform();
+	int tries = 0;
+	while(tries < 10)
+	{
+		float theta = Util::random(-0.0, 6.28);
+		float phi = Util::random(-1, 2.5);
+		Vec3 target = Vec3(500*cosf(theta) * cosf(phi), 500*sinf(phi), -500*sinf(theta) * cosf(phi));
+		mTargetPosition = target;
+		
+		//check!
+//		printf("Destination:  %.2f, %.2f, %.2f\n", mTargetPosition.x(), mTargetPosition.y(), mTargetPosition.z());
+		Vec3 fwd = mTargetPosition - getPos();
+		fwd.normalize();
+//		printf("Dir:  %.2f, %.2f, %.2f\n", fwd.x(), fwd.y(), fwd.z());
+		Vec3 currentFwd = getForward();		//is this the same direction we're alrready going?  that's not good
+//		printf("Current:  %.2f, %.2f, %.2f\n", currentFwd.x(), currentFwd.y(), currentFwd.z());
+//		printf("Dot:  %.2f\n", fwd * currentFwd);
+		setForward(fwd);
+		tries++;		//if we hit enough tries, we're done, even if we're gonna fly into the poor Falcon
+		if((fwd*currentFwd) < 0.8 && willHitFalcon(500) == false)		//not gonna hit it?  we're good to go!
+		{
+
+			break;
+		}
+//		printf("Bad destination!  ahhh!\n");
+
+	}
+//	printf("Found new direction after %i tries\n", tries);
+
+	setTransform(current);		//restore our transform;
+	
+}
 
