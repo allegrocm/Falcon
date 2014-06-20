@@ -27,8 +27,24 @@ using namespace osg;
 float gScreenAspect = 1.75;
 ComputerScreen::ComputerScreen()
 {
+	//add some test events
+	MenuPrompt ex;
+	ex.buttonText[1] = "EM Escape";
+	ex.buttonEvent[1] = "runAway";
+	mMenus["Begin"] = ex;
+
+	MenuPrompt ex1;
+	ex1.text = "Hit CONFIRM to run away!";
+	ex1.buttonText[0] = "CONFIRM";
+	ex1.buttonEvent[0] = "confirmRunAway";
+	ex1.buttonText[2] = "CANCEL";
+	ex1.buttonEvent[2] = "cancelRunAway";
+
+	mMenus["runAway"] = ex1;
+
+
 	getDefault("screenAspect", gScreenAspect);
-	
+	mPendingEvent = "";
 	//init our layouts with default values
 	for(int i = 0; i < 2; i++)
 	{
@@ -252,16 +268,32 @@ bool ComputerScreen::update(float dt)
 			if(mButtonTimer[i] - dt <= flashTime)		//did we just stop flashing?  might need to change the text
 			{
 			
-				if(mNextText[i] != "")
+				if(mNextMenu.buttonText[i] != "")
 				{
-					mButtonText[i]->setText(mNextText[i]);
-					mNextText[i] = "";						//clear the "next text" so we don't switch it next time it's pressed
+					mButtonText[i]->setText(mNextMenu.buttonText[i]);
+					mCurrentMenu.buttonText[i] = mNextMenu.buttonText[i];
+					mCurrentMenu.buttonEvent[i] = mNextMenu.buttonEvent[i];
+					
+					mNextMenu.buttonText[i] = "";						//clear the "next text" so we don't switch it next time it's pressed
 				}
+				else
+				{
+//					printf("Empty event on a button!\n");
+				}
+				
+				if(mPendingEvent != "")
+				{
+					doEvent(mPendingEvent);
+					mPendingEvent = "";
+				}
+
+				
 			}
 			
 			t = 1.0;
 		}
 		
+		//slowly flash buttons that have text on them
 		mButtonText[i]->setColor(color2 * (1.0-t) + color1 * t);
 		float pulseTime = 0.5 + 0.5 * sinf(mAge * 4.0);
 		if(!mUp) pulseTime = 0;			//no flashing if the screen is down
@@ -400,21 +432,28 @@ void ComputerScreen::setStatusText(std::string t)
 
 void ComputerScreen::buttonPressed(int which)
 {
-	printf("Pressed button %i!\n", which);
+	printf("Pressed button %i (%s)!\n", which, mCurrentMenu.buttonText[which].c_str());
 	if(which >= 0 && which < 4)
 		mButtonTimer[which] = 0;
+	if(mPendingEvent == "")
+		mPendingEvent = mCurrentMenu.buttonEvent[which];
 }
 
 
-void ComputerScreen::setButtonText(int which, std::string text)
+void ComputerScreen::setButtonText(int which, std::string text, std::string event)
 {
+	if(event == "") event = text;
+	mCurrentMenu.buttonText[which] = text;
+	mCurrentMenu.buttonEvent[which] = event;
 	mButtonText[which]->setText(text);
 }
 
-void ComputerScreen::setButtonChangeText(int which, std::string text)
+void ComputerScreen::setButtonChangeText(int which, std::string text, std::string event)
 {
+	if(event == "") event = text;
 	if(text == "") text = " ";		//empty strings are ignored when the button changes, so put a space in
-	mNextText[which] = text;
+	mNextMenu.buttonText[which] = text;
+	mNextMenu.buttonEvent[which] = event;
 }
 void ComputerScreen::updateLayout(float upness)
 {
@@ -462,5 +501,23 @@ void ComputerScreen::updateLayout(float upness)
 #undef lurp
 }
 
+void ComputerScreen::doEvent(std::string event)
+{
+	printf("Computer Event:  %s\n", event.c_str());
+	
+	//does this event correspond to one of our built-in menus?
+	if(mMenus.find(event) != mMenus.end())
+	{
+		MenuPrompt p = mMenus[event];
+		if(p.text != "")
+			setStatusText(p.text);
+		for(int i = 0; i < 4; i++)
+		{
+			setButtonText(i, p.buttonText[i], p.buttonEvent[i]);
+			
+		}
+	}
+	else printf("No new menu for this event\n");
+}
 
 
