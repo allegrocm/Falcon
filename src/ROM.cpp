@@ -39,6 +39,8 @@ float ROM::VADER_HITBOX_SIZE;
 float ROM::TIE_RADAR_FOV;
 float ROM::TIE_RADAR_UPDATE_RATE;
 float ROM::VADER_UNROLL_RATE;
+float ROM::VADER_TIE_MAX_SPEED;
+
 osg::Vec4 ROM::VADER_DISPLAY_COLOR;
 void ROM::load()
 {
@@ -113,4 +115,7 @@ void ROM::load()
 	getDefault("vaderUnrollRate", VADER_UNROLL_RATE);
 	
 	VADER_DISPLAY_COLOR = osg::Vec4(1, .25, .25, 1);
+	
+	VADER_TIE_MAX_SPEED = 70;
+	
 }

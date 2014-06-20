@@ -54,6 +54,7 @@ public:
 	static float TIE_RADAR_FOV;
 	static float VADER_UNROLL_RATE;		//how quickly does the player TIE fighter return to y-up when it rolls?
 	static osg::Vec4 VADER_DISPLAY_COLOR;
+	static float VADER_TIE_MAX_SPEED;
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

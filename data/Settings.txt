@@ -96,7 +96,7 @@ buttonsYUp = -0.1
 enemyControlYawMix = 1
 
 #enemy player hp
-vaderTIEHP = 16
+vaderTIEHP = 10
 vaderRadarUpdateRate = 5
 vaderRadarFOV = 30
 

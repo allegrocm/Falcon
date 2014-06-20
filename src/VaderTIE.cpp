@@ -30,6 +30,7 @@ VaderTIE::VaderTIE()
 	//distribute our "zone HP' evenly so it shows our araes getting damaged on the computer
 	for(int i = 0; i < 3; i++)
 		mZoneHP[i] = ROM::VADER_TIE_HP/3;
+	mTopSpeed = ROM::VADER_TIE_MAX_SPEED;
 }
 
 void VaderTIE::loadTIEModel()
