@@ -86,7 +86,7 @@ void VaderTIE::loadTIEModel()
 		std::string engineSound;
 	if(Defaults::instance().getValue("placeholderShipSound", engineSound))
 	{
-		printf("start your kengines\n");
+//		printf("start your kengines\n");
 		if(isLocalEnemy())
 		{
 			mEngineSound = KSoundManager::instance()->playSound(std::string("data/sounds/") + engineSound, 0, 0, true);

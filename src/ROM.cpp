@@ -39,6 +39,7 @@ float ROM::VADER_HITBOX_SIZE;
 float ROM::TIE_RADAR_FOV;
 float ROM::TIE_RADAR_UPDATE_RATE;
 float ROM::VADER_UNROLL_RATE;
+float ROM::TIE_WAVE_OFF_DISTANCE;
 osg::Vec4 ROM::VADER_DISPLAY_COLOR;
 void ROM::load()
 {
@@ -77,7 +78,7 @@ void ROM::load()
 	
 	TIE_FIGHTER_LASER_SPEED = 200;
 	TIE_FIGHTER_LASER_LENGTH = 4;
-	
+	TIE_WAVE_OFF_DISTANCE = 150;
 	getDefault("FalconHitPoints", FALCON_HITPOINTS);
 	
 	float screenX = 0, screenY = .9, screenZ = 0.5;
