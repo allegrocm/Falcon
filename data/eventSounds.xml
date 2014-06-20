@@ -19,6 +19,13 @@
 			<volume>1.0</volume>
 			<pan>-1</pan>
 		</sound>
+		
+		<!--if a listener is supplied, the sound will only be audible to 
+			nodes where that listener is specified as EventAudio's listener.
+			If no listener is specified, everyone hears it.  This is for multiple
+			listeners in the Millennium Falcon game, so the TIE fighter pilot
+			doesn't hear Han Solo's chatter-->
+		<listener>Falcon</listener>
 	</Event>
 
 <!--played a few seconds after we start the game-->
@@ -39,7 +46,7 @@
 			<volume>1.0</volume>
 			<pan>-1</pan>
 		</sound>
-
+		<listener>Falcon</listener>
 	</Event>
 
 
@@ -51,6 +58,7 @@
 			<volume>1.0</volume>
 			<pan>-1</pan>
 		</sound>
+		<listener>Falcon</listener>
 	</Event>
 
 
@@ -68,7 +76,7 @@
 			<volume>1.0</volume>
 			<pan>-1</pan>
 		</sound>
-
+		<listener>Falcon</listener>
 	</Event>
 
 
@@ -91,7 +99,7 @@ The event occurs 100 times per second so use a very low probability-->
 			<pan>-1</pan>
 			<minWait> 50.0</minWait>
 		</sound>
-
+		<listener>Falcon</listener>
 	</Event>
 	
 
