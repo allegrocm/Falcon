@@ -77,6 +77,7 @@ protected:
 	FalconApp()
 	{
 		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = 0.01; mTieNode1 = false;
+		mEventAudioManager = NULL;
 	}
 	
 	//update our calculated frame rate

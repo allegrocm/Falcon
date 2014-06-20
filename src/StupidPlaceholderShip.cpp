@@ -41,7 +41,7 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	mSpeed = mTopSpeed = mTargetSpeed = 100;
 	mSpeed = 10;		//start with a low speed and spool up quickly
 	setVel(Vec3(0, 0, -mSpeed));
-	mMovingAway = true;
+	mMovingAway = false;
 	mTurning = false;
 
 	mTargetPosition = Vec3();
@@ -195,7 +195,7 @@ void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 
 	if(mPlayer)
 		mPlayer->AIControl = true;
-	mSpeed = 100;
+
 	Vec3 desiredDirection = mTargetPosition - getPos();
 	desiredDirection.normalize();
 //	printf("Dir: %.2f, %.2f, %.2f\n", desiredDirection.x(), desiredDirection.y(), desiredDirection.z());
@@ -218,7 +218,7 @@ void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 		}
 		else
 		{
-//			std::cout << "Turning around to attack! " << rand()%1000 << "\n";
+			std::cout << "Turning around to attack!\n";
 			mMovingAway = false;
 			mTurning = true;
 			mTimeTillShoot = Util::random(0.0, 2.0);		//attack after a random amount of time
@@ -251,7 +251,7 @@ void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 		{
 			
 			ROM::TIE_WAVE_OFF_DISTANCE--;		//HACK:  testing how close TIE fighters can come before they hit
-			std::cout << "Turning around to retreat!  NExt time at " << ROM::TIE_WAVE_OFF_DISTANCE << "\n";
+			std::cout << "Turning around to retreat!  Next time at " << ROM::TIE_WAVE_OFF_DISTANCE << "\n";
 			mMovingAway = true;
 			mTurning = true;
 			mCurrentTurnTime = 0;
@@ -316,7 +316,7 @@ bool StupidPlaceholderShip::update(float dt)
 	}
 	if(!mDead && willHitFalcon(3))		//are we in contact with the falcon?  sucks for us
 	{
-		printf("Hit falcon at waveoff distance of %.2f\n", ROM::TIE_WAVE_OFF_DISTANCE);
+		printf("Hit falcon at waveoff distance of %.2f.  Moving away:  %i\n", ROM::TIE_WAVE_OFF_DISTANCE, mMovingAway);
 		explode();
 	}
 		
@@ -384,7 +384,7 @@ void StupidPlaceholderShip::explode()
 void StupidPlaceholderShip::drawDebug()
 {
 	glBegin(GL_LINES);
-		glColor3f(0, 1, 0);
+		glColor3f(!mMovingAway, mMovingAway, 0);
 		glVertex3fv(getPos().ptr());
 		glVertex3fv(mTargetPosition.ptr());
 	glEnd();

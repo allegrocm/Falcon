@@ -125,7 +125,7 @@ void GameController::preGame(float dt)
 		FalconApp::instance().getScreen()->setStatusText("Press the left gamepad button to begin");
 		KSoundManager::instance()->fadeIntoSong(1.0, std::string("data/sounds/") + ROM::MAIN_MUSIC);
 		//set up text for the computer screen
-		FalconApp::instance().getScreen()->setButtonText(0, "Begin");
+		FalconApp::instance().getScreen()->setButtonText(0, "Begin", "Begin");
 		FalconApp::instance().getScreen()->setButtonText(1, "");
 		FalconApp::instance().getScreen()->setButtonText(2, "");
 		FalconApp::instance().getScreen()->setButtonText(3, "");

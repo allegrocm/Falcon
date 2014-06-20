@@ -132,7 +132,8 @@ void FalconApp::init()
 	mRoot->addChild(qrc);
 	mRoot->addChild(mTIEScreen->getCamera());
 #endif
-
+	
+	mEventAudioManager->setListener(mTieNode1 ? "Vader" : "Falcon");
 
 }
 
@@ -507,6 +508,7 @@ void FalconApp::drawDebug()
 void FalconApp::toggleTIEMode()
 {
 	mTieNode1 = !mTieNode1;
-	
+	if(mEventAudioManager)
+		mEventAudioManager->setListener(mTieNode1 ? "Vader" : "Falcon");
 }
 
