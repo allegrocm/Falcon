@@ -99,6 +99,8 @@ enemyControlYawMix = 1
 vaderTIEHP = 10
 vaderRadarUpdateRate = 5
 vaderRadarFOV = 30
+lowerTurretGracePeriod = 16
+
 
 #how quickly does the player's TIE fighter return to up?  Proportional to current roll, not an absolute anything
 vaderUnrollRate = 0.5

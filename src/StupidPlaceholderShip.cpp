@@ -35,9 +35,12 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	mHP = 4;
 //	printf("COG:  %.2f, %.2f, %.2f\n", center.x(), center.y(), center.z());
 	
-	
-	Vec3 pos = Vec3(Util::random(-200.0, 200), Util::random(0.0, 200.0), -500);
+	float theta = Util::random(0, 6.28);
+	float phi = Util::random(0.1, 1.0);
+	float r = 900;
+	Vec3 pos = Vec3(sinf(theta)*cosf(phi) * r, sinf(phi)*r, cosf(theta)*cosf(phi)*r);
 	setPos(pos);
+	setForward(pos * -1.0);
 	mSpeed = mTopSpeed = mTargetSpeed = 100;
 	mSpeed = 10;		//start with a low speed and spool up quickly
 	setVel(Vec3(0, 0, -mSpeed));
@@ -132,7 +135,7 @@ void StupidPlaceholderShip::playerControl(float dt)
 //	printf("XZ:  %.2f, y:  %.2f, toward:  %.2 f\n", xzDist, pos.y(), towardness);
 
 	//if the player flies too far away help them get pointed in the right direction
-	if(pos.length() > 1500 || (mPlayer->AIControl && towardness < 0.9))
+	if(pos.length() > 1500 || (mPlayer->AIControl && towardness < 0.9 && pos.length() > 1200))
 	{
 		AIControl(dt, false);
 		return;

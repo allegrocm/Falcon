@@ -144,12 +144,19 @@ void VaderTIE::wasHit(Bullet* b, osg::Vec3 hitPos)
 	if(pan < -1) pan = -1;
 	if(pan > 1) pan = 1;
 	
-	KSoundManager::instance()->playSound(std::string("data/sounds/") + ROM::VADER_HIT_SOUND, 1, pan, false);
-	mZoneHP[zone] -= b->mDamage;
 	
-	if(mHP == 0)
+	mZoneHP[zone] -= b->mDamage;
+	if(isLocalEnemy())
 	{
-		KSoundManager::instance()->playSound(std::string("data/sounds/") + ROM::VADER_DIE_SOUND, 1, 0, false);
+		//play the rumble sound!
+		KSoundManager::instance()->playSound(std::string("data/sounds/") + "BoomShort.wav", 1, 0, false);
+		
+		//and other sounds
+		KSoundManager::instance()->playSound(std::string("data/sounds/") + ROM::VADER_HIT_SOUND, 1, pan, false);
+		if(mHP == 0)
+		{
+			KSoundManager::instance()->playSound(std::string("data/sounds/") + ROM::VADER_DIE_SOUND, 1, 0, false);
+		}
 	}
 }
 
