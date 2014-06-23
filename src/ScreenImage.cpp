@@ -19,7 +19,7 @@
 
 using namespace osg;
 
-ScreenImage::ScreenImage()
+ScreenImage::ScreenImage(bool noDepth)
 {
 	transform = new PositionAttitudeTransform();
 	visible = true;
@@ -63,7 +63,8 @@ ScreenImage::ScreenImage()
 	transform->getOrCreateStateSet()->setMode(GL_BLEND, true);
 //	transform->getOrCreateStateSet()->setAttribute(new BlendFunc(GL_SRC_ALPHA, GL_ONE));
 	transform->getOrCreateStateSet()->setAttribute(new AlphaFunc(AlphaFunc::NEVER, 0.05));
-	transform->getOrCreateStateSet()->setAttribute(new Depth(Depth::LESS, 0, 1, false));		//don't write to the depth buffer
+	if(noDepth)
+		transform->getOrCreateStateSet()->setAttribute(new Depth(Depth::LESS, 0, 1, false));		//don't write to the depth buffer
 //	geom->setTexCoordArray(1, texes);			//set texcoord array 1 also, for showing high-score entry
 
 	

@@ -47,6 +47,8 @@ public:
 	static osg::Matrixf SCREEN_OFFSET;		//from the wand
 	static float HUD_MOVEMENT_SPEED;		//when it moves up and down for combat/interaction
 	
+	
+	//multiplayer stuff
 	static float ENEMY_CONTROL_YAW_MIX;		//how much does the enemy yaw instead of roll in response to x-axis input?
 	static int VADER_TIE_HP;				//hitpoints of human-controlled enemies
 	static float VADER_HITBOX_SIZE;
@@ -55,6 +57,14 @@ public:
 	static float VADER_UNROLL_RATE;		//how quickly does the player TIE fighter return to y-up when it rolls?
 	static osg::Vec4 VADER_DISPLAY_COLOR;
 	static float VADER_TIE_MAX_SPEED;
+	static std::string VADER_HIT_SOUND;
+	static std::string VADER_DIE_SOUND;
+	
+	//parameters for the turret on the belly of the Falcon
+	static float LOWER_TURRET_GRACE_PERIOD;		//how long before the lower turret starts shooting at you?
+	static float LOWER_TURRET_CATCHUP_TIME;		//how long till the lower turret shoots to kill?
+	static float LOWER_TURRET_FIRE_DELAY;		//seconds between shots
+	static float LOWER_TURRET_BURST_DELAY;		//seconds between bursts
 };
 
 #endif /* defined(__Millennium_Falcon__ROM__) */

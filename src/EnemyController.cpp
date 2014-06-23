@@ -88,6 +88,13 @@ void EnemyController::update(float dt)
 		//never let us have no enemies
 		if(!mEnemies.size())
 			chance = 10000;
+		//is there a human player waiting to respawn?
+		//if it's ready, spawn right away.  otherwise don't spawn at all
+		if(!mPlayer->getShip())
+		{
+			chance = mPlayer->isReadyForShip() * 1000;
+		}
+		
 		if(1.0 * rand() /  RAND_MAX < chance * dt)
 		{
 			//spawn a ship!

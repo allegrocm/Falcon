@@ -31,6 +31,7 @@ public:
 	void reset();
 	void killAll();			//kill all the current enemy ships
 	void setEnemyInput(int which, EnemyControlInput i);		//for controlling enemy players
+	int getShipsLeftToSpawn()		{return mLeftToSpawn;}
 	EnemyPlayer* getPlayer()					{return mPlayer;}
 	virtual void spawnEnemy(bool initing = false);				//make an enemy.  maybe make it human-controlled
 protected:

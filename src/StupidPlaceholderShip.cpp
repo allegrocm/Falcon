@@ -127,12 +127,12 @@ void StupidPlaceholderShip::playerControl(float dt)
 	Matrix current = getTransform();
 
 	Vec3 pos = getPos();
-//	float towardness = (pos / pos.length()) * Util::zAxis(current);		//are we facing the ship?
+	float towardness = (pos / pos.length()) * Util::zAxis(current);		//are we facing the ship?
 	float xzDist = sqrtf(pos.x() *pos.x() + pos.z()*pos.z());
 //	printf("XZ:  %.2f, y:  %.2f, toward:  %.2 f\n", xzDist, pos.y(), towardness);
 
-	//don't let the player fly too far away
-	if(pos.length() > 1500 || (mPlayer->AIControl && pos.length() > 1000))
+	//if the player flies too far away help them get pointed in the right direction
+	if(pos.length() > 1500 || (mPlayer->AIControl && towardness < 0.9))
 	{
 		AIControl(dt, false);
 		return;
@@ -218,7 +218,7 @@ void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 		}
 		else
 		{
-			std::cout << "Turning around to attack!\n";
+//			std::cout << "Turning around to attack!\n";
 			mMovingAway = false;
 			mTurning = true;
 			mTimeTillShoot = Util::random(0.0, 2.0);		//attack after a random amount of time
@@ -244,14 +244,12 @@ void StupidPlaceholderShip::AIControl(float dt, bool canFire)
 				}
 			}
 	
-			
-			
 		}
 		else
 		{
 			
 			ROM::TIE_WAVE_OFF_DISTANCE--;		//HACK:  testing how close TIE fighters can come before they hit
-			std::cout << "Turning around to retreat!  Next time at " << ROM::TIE_WAVE_OFF_DISTANCE << "\n";
+//			std::cout << "Turning around to retreat!  Next time at " << ROM::TIE_WAVE_OFF_DISTANCE << "\n";
 			mMovingAway = true;
 			mTurning = true;
 			mCurrentTurnTime = 0;
@@ -439,42 +437,22 @@ bool StupidPlaceholderShip::shoot()
 
 bool StupidPlaceholderShip::willHitFalcon(float distance)
 {
-	osgUtil::IntersectVisitor iv;
-	
-	
 	Vec3 dir = getForward();
 	Vec3 pos = getPos();
 	float length = distance;
-	float travelLength = 0;
+	float travelLength = 0.01 * mSpeed;
 	
 	//if our length is shorter than our velocity * dt, lengthen it so we don't pass through something
 	if(travelLength > length)
 		length = travelLength;
-	//make a line segment representing the laser beam
-	ref_ptr<LineSegment> seg = new LineSegment(pos - dir * length * 0.5, pos + dir * length * 0.5);
-	iv.setTraversalMask(1 << COLLISION_LAYER);		//DON'T check collisions with other lazer beams
-	iv.addLineSegment(seg.get());
-//	printf("Seg:  %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
-	//dunno if this is the best way to do it or not, but we're gonna just check each ship individually
+
 	std::vector<Spacecraft*> ships;
 	Falcon* f = FalconApp::instance().getFalcon();
-
-	ships.push_back((Spacecraft*)f);
-
-//	printf("seg length:  %.2f\n", length);
-	
-	bool hitSometing = false;		//stop after any collision
-	Vec3 hitPos;
-	for(size_t i = 0; i < ships.size() && !hitSometing; i++)
+	osg::Vec3 hitPos;
+	if(f->checkRaycast(pos, pos+dir*distance, hitPos))
 	{
-//		iv.reset();
-		ships[i]->getRoot()->accept(iv);
-		osgUtil::IntersectVisitor::HitList& hitList = iv.getHitList(seg.get());
-		if(hitList.size())		//if there's any size in the hitlist, we HIT something!
-		{
 			ROM::TIE_WAVE_OFF_DISTANCE += 10;
 			return true;
-		}
 	}
 //	printf("no hit\n");
 	return false;

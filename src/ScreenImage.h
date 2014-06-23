@@ -18,7 +18,7 @@
 class ScreenImage
 {
 public:
-	ScreenImage();
+	ScreenImage(bool noDepth = true);
 	osg::ref_ptr<osg::PositionAttitudeTransform> transform;
 	void setImage(std::string name);
 	void setHeight(float s);

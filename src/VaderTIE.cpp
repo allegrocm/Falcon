@@ -18,7 +18,8 @@
 #include <osg/ShapeDrawable>
 #include "ROM.h"
 #include "Defaults.h"
-
+#include "ParticleFX.h"
+#include "ScreenImage.h"
 using namespace osg;
 
 VaderTIE::VaderTIE()
@@ -97,12 +98,32 @@ void VaderTIE::loadTIEModel()
 	}
 
 
+	//add an aiming reticle
+	int numRings = 3;
+	if(FalconApp::instance().tieNode1())
+	{
+		for(int i = 0; i < numRings; i++)
+		{
+			ScreenImage* reticle1 = new ScreenImage(true);
+			
+			//don't know why this works
+			//putting anything in the transparent bin seems to make it vanish
+			//maybe something to do with the bloom effect
+			reticle1->transform->getOrCreateStateSet()->setRenderingHint(StateSet::OPAQUE_BIN);
+			reticle1->setImage(Util::findDataFile("data/textures/reticleSingle.png"));
+			reticle1->setPos(Vec3(0, -2, -100 * (1+i)));
+			reticle1->setHeight(2);
+			reticle1->transform->getOrCreateStateSet()->setMode(GL_LIGHTING, GL_FALSE);
+			mPat->addChild(reticle1->transform);
+		}
+	}
+
 }
 
 void VaderTIE::wasHit(Bullet* b, osg::Vec3 hitPos)
 {
 	StupidPlaceholderShip::wasHit(b, hitPos);
-	
+	FalconApp::instance().getFX()->makeExplosion(hitPos, 1.0);
 	//which zone did this hit?
 	Matrix inv = getTransform();
 	inv.invert(inv);
@@ -116,7 +137,19 @@ void VaderTIE::wasHit(Bullet* b, osg::Vec3 hitPos)
 		zone = 2;
 	}
 	else if(relPos.x() < -cutoff) zone = 0;		//left
-	printf("hit!  rel position:  %.2f.  zone %i\n", relPos.x(), zone);
+//	printf("hit!  rel position:  %.2f.  zone %i\n", relPos.x(), zone);
+	
+	//play a sound to commemorate this occasion
+	float pan = relPos.x();
+	if(pan < -1) pan = -1;
+	if(pan > 1) pan = 1;
+	
+	KSoundManager::instance()->playSound(std::string("data/sounds/") + ROM::VADER_HIT_SOUND, 1, pan, false);
 	mZoneHP[zone] -= b->mDamage;
+	
+	if(mHP == 0)
+	{
+		KSoundManager::instance()->playSound(std::string("data/sounds/") + ROM::VADER_DIE_SOUND, 1, 0, false);
+	}
 }
 

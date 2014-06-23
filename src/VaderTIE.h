@@ -20,6 +20,7 @@ public:
 	virtual void loadTIEModel();			//load our Vader prototype TIE fighter
 	void wasHit(Bullet* b, osg::Vec3 hitPos);
 	int getZoneHP(int which) {return mZoneHP[which];}		//hit points for a particular part of this ship
+
 protected:
 	int mZoneHP[3];		//hitpoints for our left, center, right
 };

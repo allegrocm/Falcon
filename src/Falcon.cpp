@@ -23,7 +23,7 @@
 #include "ParticleFX.h"
 #include "GameController.h"
 #include "EventAudio.h"
-
+#include "EnemyController.h"
 
 using namespace osg;
 
@@ -35,11 +35,9 @@ Falcon::Falcon()
 	float scaleFactor = 0.56 * 8.4;			//found through trial, error, and online MF specs
 	MatrixTransform* n = Util::loadModel("data/models/falcon3DS/milfalcon.3ds", scaleFactor, -90, 180, 0, Vec3(0, -10, 0));
 	Util::cullSmallGeodes(n, 1.0);
-	
+	mTurretVisibleTime = 0;
 //	Util::printNodeHierarchy(n);
 	mPat->addChild(n);
-	mFireTimer = 0;
-	mFireRate = 6;
 	mAimedPart = new PositionAttitudeTransform();
 	mUpperAimedPart = new PositionAttitudeTransform();
 //	osg::Node* turretNode = Util::findNodeWithName(n, "mf GunBod");
@@ -65,6 +63,7 @@ Falcon::Falcon()
 	for(int i = 0; i < numRings; i++)
 	{
 		ScreenImage* reticle1 = new ScreenImage();
+
 		reticle1->setImage(Util::findDataFile("data/textures/reticleSingle.png"));
 		reticle1->setPos(Vec3(0, 0, -100 * (1+i)));
 		reticle1->setHeight(2);
@@ -89,12 +88,16 @@ Falcon::Falcon()
 	
 	mGun.mFireSound = ROM::FALCON_FIRE_SOUND;
 	mGun.mFireVolume = ROM::FALCON_FIRE_VOLUME;
+	
+	mAutoTurret = mGun;		//auto turret has same properties as the main one
+	mAutoTurret.mShotDelay = ROM::LOWER_TURRET_FIRE_DELAY;
+	mAutoTurret.mBurstDelay = ROM::LOWER_TURRET_BURST_DELAY;
 
 }
 
 bool Falcon::update(float dt)
 {
-	mFireTimer -= dt;
+
 	Matrix wand = FalconApp::instance().getWandMatrix();
 	mAimedPart->setAttitude(wand.getRotate());
 	mUpperAimedPart->setAttitude(wand.getRotate());
@@ -102,24 +105,99 @@ bool Falcon::update(float dt)
 	mHyperspace->update(dt);
 	mGun.update(dt);
 	if(mGun.canAutofire()) shoot();		//if we've started a burst shot, finish it
+	
+	if(FalconApp::instance().lowerTurretAllowed())
+		updateAutoTurret(dt);
+	
 	return true;
 
 }
 
+void Falcon::updateAutoTurret(float dt)
+{
 
+	mAutoTurret.update(dt);
+
+	
+
+	Spacecraft* ship = FalconApp::getEnemyPlayerShip();
+	if(!ship)
+	{
+		mTurretVisibleTime	= 0;
+		return;
+	}
+	Vec3 turretPos(0, -25, 0);
+
+	
+	Vec3 pos = ship->getPos();
+	Vec3 vel = ship->getVel();
+	
+	Vec3 hitPos;
+	bool canSee = !checkRaycast(turretPos, pos-turretPos, hitPos);		//is the falcon between the turret and the ship?
+//	if(canSee) printf("I can see you!\n"); else printf("Can't see the guy!\n");
+	float speed = ROM::FALCON_LASER_SPEED * 0.5;
+	
+	//how long will it take the shot to arrive?
+	float travelTime = (turretPos-pos).length() / speed;
+
+
+
+	if(!canSee)
+	{
+		mTurretVisibleTime	= 0;		//reset the time if we can't see the ship
+		return;		//lower turret is only active if Vader's TIE is below the ship
+	}
+
+
+	mTurretVisibleTime += dt;
+	
+
+	//if the turret's not ready, don't do anything further
+	if(!mAutoTurret.canFire()) return;
+
+
+	//wait a little bit before firing, as a courtesy.
+	if(mTurretVisibleTime < ROM::LOWER_TURRET_GRACE_PERIOD) return;
+
+	if(!mAutoTurret.fire()) return;
+
+
+
+	//gun starts aiming in front and then catches down
+	float leadAmount = 2.0 - (mTurretVisibleTime - ROM::LOWER_TURRET_GRACE_PERIOD) / ROM::LOWER_TURRET_CATCHUP_TIME;
+	if(leadAmount < 1) leadAmount = 1;		//don't overshoot
+//	printf("fire with lead:  %.2f (viz: %.2f, grace:  %.2f)\n", leadAmount, mTurretVisibleTime, ROM::LOWER_TURRET_GRACE_PERIOD);
+	//lead by that amount
+	pos += vel * travelTime * leadAmount;
+
+
+	Bullet* b = new Bullet();
+	b->mShooter = this;
+
+	//each of the four barrels has a different position
+	Vec3 fireDir = pos - turretPos;
+	fireDir.normalize();
+//	b->setTransform(wand);
+	b->setPos(turretPos);
+	b->setForward(fireDir);
+	b->mIsEnemy = false;
+//	printf("AT:  %.2f, %i, lead:  %.2f\n", mAutoTurret.mBurstTimer, mAutoTurret.mBurstCounter, leadAmount);
+	//printf("soundvolume: %f\n", ROM::FALCON_FIRE_VOLUME);
+	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + mGun.mFireSound, 
+		mGun.mFireVolume, b->getPos().x(), FalconApp::instance().getHeadMatrix().ptr()[13], b->getPos().z(),false, 50);
+//	printf("new bullet at %.2f, %.2f, %.2f\n", wand.ptr()[8], wand.ptr()[9], wand.ptr()[10]);
+	b->mVel = b->getForward() * speed;
+	b->setColor(Vec4(1.0, .2, .1, 1.0));
+//	FalconApp::instance().getBullets().push_back(b);
+	FalconApp::instance().addThis(b);
+}
 
 bool Falcon::shoot()
 {
 	if(!mGun.fire()) return false;
+
 	static int whichBarrel = 0;
 	whichBarrel = (whichBarrel+1)%4;
-//	printf("Fire!  (timer:  %.3f\n", mFireTimer);
-	if(mFireTimer > 0)
-	{
-	//	return;		//can't shoot yet
-	}
-	
-	mFireTimer = 1.0 / mFireRate;
 	Bullet* b = new Bullet();
 	b->mShooter = this;
 	//align the new bullet more or less with the wand, since that's our turret
@@ -189,4 +267,6 @@ void Falcon::wasHit(Bullet* b, osg::Vec3 hitPos)
 //	printf("Health:  %i\n", 	GameController::instance().getStats().health);
 //	FalconApp::instance().getFX()->makeExplosion(b->getPos(), 1.5);
 }
+
+
 

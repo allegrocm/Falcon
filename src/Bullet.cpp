@@ -60,7 +60,6 @@ bool Bullet::checkHit()
 {
 	__FUNCTION_HEADER__
 	#define TimeStep 0.01
-	osgUtil::IntersectVisitor iv;
 	
 	Vec3 dir = getForward();
 	Vec3 pos = getPos();
@@ -70,11 +69,7 @@ bool Bullet::checkHit()
 	//if our length is shorter than our velocity * dt, lengthen it so we don't pass through something
 	if(travelLength > length)
 		length = travelLength;
-	//make a line segment representing the laser beam
-	ref_ptr<LineSegment> seg = new LineSegment(pos - dir * length * 0.5, pos + dir * length * 0.5);
-	iv.setTraversalMask(1 << COLLISION_LAYER);		//DON'T check collisions with other lazer beams
-	iv.addLineSegment(seg.get());
-//	printf("Seg:  %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
+
 	//dunno if this is the best way to do it or not, but we're gonna just check each ship individually
 	std::vector<Spacecraft*> ships = EnemyController::instance().getShips();
 	
@@ -94,12 +89,11 @@ bool Bullet::checkHit()
 	for(size_t i = 0; i < ships.size() && !hitSometing; i++)
 	{
 //		iv.reset();
-		ships[i]->getRoot()->accept(iv);
-		osgUtil::IntersectVisitor::HitList& hitList = iv.getHitList(seg.get());
-		if(hitList.size())		//if there's any size in the hitlist, we HIT something!
+		Vec3 hitPos;
+		if(ships[i]->checkRaycast(pos-dir*length*0.5, dir*length, hitPos))
 		{
-			hitPos = hitList[0].getWorldIntersectPoint();
-//			printf("Bullet just hit %s\n", ships[i]->getName().c_str());
+//			printf("Bullet just hit %s, cast length %.2f\n", ships[i]->getName().c_str(), length);
+//			printf("dist:  %.2f\n", (pos-hitPos).length());
 			explode(hitPos);
 			ships[i]->wasHit(this, hitPos);
 			hitSometing = true;
@@ -110,21 +104,6 @@ bool Bullet::checkHit()
 	
 	}
 	
-//	iv.setTraversalMask(0x4);		//DON'T check collisions with other lazer beams
-/*
-	//this is the segment that represents the our light saber.
-
-
-	node->accept(iv);
-	osgUtil::IntersectVisitor::HitList& hitList = iv.getHitList(seg.get());
-	if(hitList.size())		//if there's any size in the hitlist, we HIT something!
-	{
-		hitPos = hitList[0];
-	
-		return true;
-	}
-*/
-
 	return false;
 
 }

@@ -44,6 +44,7 @@ public:
 	//are we temporarily under AI control? due to no controller or flying in an illegal place or putting on autopilot
 	//used for display on the computer
 	bool AIControl;
+	float deadTimer()	{return mDeadTimer;}
 protected:
 	Spacecraft* mShip;
 	EnemyControlInput mInput;

@@ -71,7 +71,8 @@ void FalconApp::init()
 
 
 	//quickly add a lil spacebox
- 	mModelGroup->addChild((new SpaceBox())->getRoot());
+	mSpaceBox = new SpaceBox();
+ 	mModelGroup->addChild(mSpaceBox->getRoot());
 	
 	mLightSource = new osg::LightSource;
 	mNavigation->addChild(mLightSource.get());
@@ -79,7 +80,7 @@ void FalconApp::init()
 	osg::Light* light = mLightSource->getLight();
 	light->setDiffuse(osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
 	light->setSpecular(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	light->setAmbient(osg::Vec4(0.25f, 0.2f, 0.15f, 1.0f));
+	light->setAmbient(osg::Vec4(0.25f, 0.25f, .25, 1.0f));
 	light->setPosition(osg::Vec4(100.0f, 100.0f, 100.0f, 0.0f));
 
 
@@ -184,7 +185,9 @@ void FalconApp::update(float fulldt)
 		if(player && player->getShip() && mTieNode1)		//for now, only the master node shows the view of the enemy TIE fighter
 		{
 			Spacecraft* enemy = player->getShip();
+
 			Matrix nav = enemy->getTransform();
+
 			float ahead = -65;
 			float lower = -3;
 #ifndef USE_VRJ
@@ -233,11 +236,20 @@ void FalconApp::update(float fulldt)
 			}
 		}
 		
-	
-		//neither the TIE fighter nor the MF need to change their audio in response to head movement
-		Matrixf nav = mNavigation->getMatrix();
+
+		//the spacebox's position always follows the navigation
+		//so we can never approach the actual objects in it
+		Matrix sb;
+		Matrix nav = mNavigation->getMatrix();
+		nav.invert(nav);
+		Util::setPos(sb, Util::pos(nav));
+		mSpaceBox->getRoot()->setMatrix(sb);
+
 		
-		KSoundManager::instance()->updateListener(mTimeStep, nav.ptr(),
+		//neither the TIE fighter nor the MF need to change their audio in response to head movement
+		Matrixf navf = mNavigation->getMatrix();
+		
+		KSoundManager::instance()->updateListener(mTimeStep, navf.ptr(),
 			mListenerVelocity.x(), mListenerVelocity.y(), mListenerVelocity.z());
 		mEventAudioManager->update(mTimeStep);
 		//in the C6, the listener moves relative to the speakers already
@@ -512,3 +524,17 @@ void FalconApp::toggleTIEMode()
 		mEventAudioManager->setListener(mTieNode1 ? "Vader" : "Falcon");
 }
 
+Spacecraft* FalconApp::getEnemyPlayerShip()
+{
+	EnemyPlayer* player = EnemyController::instance().getPlayer();
+	if(!player) return NULL;		//no player?  we can't do anything
+	Spacecraft* playerShip = player->getShip();
+	if(!playerShip)
+	{
+		//TODO:  show something indicating if we'll respawn?
+		return NULL;
+	}
+
+	return playerShip;
+	
+}

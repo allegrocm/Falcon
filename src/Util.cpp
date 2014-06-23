@@ -687,28 +687,28 @@ void setXAxis(osg::Matrix& m, osg::Vec3 v)
 {
 	m.ptr()[0] = v.x();
 	m.ptr()[1] = v.y();
-	m.ptr()[2] = v.x();
+	m.ptr()[2] = v.z();
 }
 
 void setYAxis(osg::Matrix& m, osg::Vec3 v)
 {
 	m.ptr()[4] = v.x();
 	m.ptr()[5] = v.y();
-	m.ptr()[6] = v.x();
+	m.ptr()[6] = v.z();
 }
 
 void setZAxis(osg::Matrix& m, osg::Vec3 v)
 {
 	m.ptr()[8] = v.x();
 	m.ptr()[9] = v.y();
-	m.ptr()[10] = v.x();
+	m.ptr()[10] = v.z();
 }
 
 void setPos(osg::Matrix& m, osg::Vec3 v)
 {
 	m.ptr()[12] = v.x();
 	m.ptr()[13] = v.y();
-	m.ptr()[14] = v.x();
+	m.ptr()[14] = v.z();
 }
 
 

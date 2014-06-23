@@ -26,14 +26,17 @@ public:
 	osg::PositionAttitudeTransform* getAimedPart()	{return mAimedPart;}		//for connecting things to the turret
 	void jump();		//initiate hyperjump!
 	virtual void wasHit(Bullet* b, osg::Vec3 hitPos);
+
+	//shoot bullets at the enemy player
+	void updateAutoTurret(float dt);
+
 protected:
 
 	osg::Vec3 mAimTarget;		//where is the gun aiming?
-	float mFireRate;			//max fire rate
-	float mFireTimer;			//time since we last fired
 	osg::ref_ptr<osg::PositionAttitudeTransform> mAimedPart;	//this is the part that moves when we aim
 	osg::ref_ptr<osg::PositionAttitudeTransform> mUpperAimedPart;	//the turret part, basically
 	Hyperspace* mHyperspace;
-
+	Gun mAutoTurret;	//under-belly auto turret.  may not have any graphical rep.  fires at the enemy player
+	float mTurretVisibleTime;		//how long has the turret been able to see the enemy player?
 };
 #endif /* defined(__Millennium_Falcon__Falcon__) */

@@ -20,6 +20,8 @@
 #include "EnemyController.h"
 #include "Spacecraft.h"
 #include "VaderTIE.h"
+#include "GameController.h"
+
 
 using namespace osg;
 TIEComputer::TIEComputer()
@@ -225,9 +227,18 @@ void TIEComputer::updateStatusText(float dt)
 	//pulse the AI or other warning text
 	std::string statusText = "";
 	Spacecraft* playerShip = getShip();
+	EnemyPlayer* player = EnemyController::instance().getPlayer();
 	if(!playerShip)
 	{
-		statusText = "Destroyed!  Waiting to respawn...";
+		if(GameController::instance().getMode() != GameController::MAIN_GAME)
+		{
+			statusText = "Waiting for the game to start...";
+		}
+		else
+		if(EnemyController::instance().getShipsLeftToSpawn() && player)
+			statusText = Util::stringWithFormat("Destroyed!  Waiting to respawn in %.2f...", player->deadTimer());
+		else
+			statusText = "You have failed to kill the Millennium Falcon!";
 	}
 	else if(playerShip->getPlayer()->AIControl)
 		statusText = "AUTOPILOT";

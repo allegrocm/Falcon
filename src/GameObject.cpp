@@ -14,6 +14,7 @@
 #include "FalconApp.h"
 #include "Layers.h"
 #include <stdlib.h>
+#include <osgUtil/IntersectVisitor>
 
 using namespace osg;
 
@@ -222,4 +223,21 @@ void GameObject::drawDebug()
 
 }
 
-
+bool GameObject::checkRaycast(osg::Vec3 origin, osg::Vec3 vec, osg::Vec3& hitPos)
+{
+	osgUtil::IntersectVisitor iv;
+	//make a line segment representing the laser beam
+	ref_ptr<LineSegment> seg = new LineSegment(origin, origin+vec);
+	iv.setTraversalMask(1 << COLLISION_LAYER);		//DON'T check collisions with other lazer beams
+	iv.addLineSegment(seg.get());
+//	printf("Seg:  %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
+	getRoot()->accept(iv);
+	osgUtil::IntersectVisitor::HitList& hitList = iv.getHitList(seg.get());
+	if(hitList.size())		//if there's any size in the hitlist, we HIT something!
+	{
+		hitPos = hitList.front().getWorldIntersectPoint();
+		return true;
+	}
+		
+	return false;
+}

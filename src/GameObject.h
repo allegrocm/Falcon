@@ -63,6 +63,10 @@ public:
 	virtual std::vector<Debris*> explodeSection(osg::Group* n, int depth, int maxDepth, float splitChance, float vanishChance, osg::Matrixf currentTransform, osg::Node* root, int maxPieces = 5);
 	virtual void drawDebug();		//for...you guessed it...debugging!
 	void setGlows(bool b);			//will assign this object the correct mask for glowing/notglowing
+	
+	//perform a raycast against this object
+	virtual bool checkRaycast(osg::Vec3 origin, osg::Vec3 vec, osg::Vec3& hitPos);
+	
 protected:
 	osg::ref_ptr<osg::Group>						mRoot;
 	osg::ref_ptr<osg::PositionAttitudeTransform>	mPat;		//used for positioning/orienting

@@ -173,7 +173,7 @@ void EventAudio::eventHappened(std::string name)
 	
 	//only play the sound if we want it for this listener
 	bool audible = (KenXML::CICompare(e->listener, mListener) || e->listener == "") * !mDontPlay;
-	if(!audible) printf("Not playing.  sound listener:  %s.  ours:  %s.  (DP = %i)\n", e->listener.c_str(), mListener.c_str(), mDontPlay);
+//	if(!audible) printf("Not playing.  sound listener:  %s.  ours:  %s.  (DP = %i)\n", e->listener.c_str(), mListener.c_str(), mDontPlay);
 	SkySound* s = KSoundManager::instance()->playSound(std::string("data/sounds/") + sound->name, sound->volume * audible, sound->pan);
 	if(!s)
 	{

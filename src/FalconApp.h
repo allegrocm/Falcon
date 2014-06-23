@@ -28,6 +28,7 @@ class ComputerScreen;
 class EnemyController;
 class GameController;
 class EventAudio;
+class SpaceBox;
 class FalconApp
 {
 public:
@@ -71,13 +72,17 @@ public:
 	void toggleTIEMode();							//for the GLUT version only I theenk
 	osg::Group*		getTIEDisplayGroup()			{return mTIEDisplayGroup;}	//this is everything we need to show the TIE fighter radar
 	float getTime()		{return mTotalTime;}
+	static Spacecraft*	getEnemyPlayerShip();		//shortcut cuz we need this a lot
+	
+	bool lowerTurretAllowed()						{return mLowerTurretAllowed;}
+	SpaceBox* getSpaceBox()							{return mSpaceBox;}		//for scene loading
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call
 	FalconApp()
 	{
 		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = 0.01; mTieNode1 = false;
-		mEventAudioManager = NULL;
+		mEventAudioManager = NULL; mLowerTurretAllowed = true;
 	}
 	
 	//update our calculated frame rate
@@ -93,7 +98,7 @@ protected:
 	ComputerScreen*							mScreen;			//in-game data display
 	TIEComputer*							mTIEScreen;			//for the TIE figher cockpit
 	GameController*							mGameController;
-
+	SpaceBox*								mSpaceBox;			//holds distance scenery
 	osg::ref_ptr<osg::Group> mRoot;								//root of our scenegraph
 	osg::ref_ptr<osg::MatrixTransform> mNavigation;				//navigation matrix
 	osg::Vec3 mListenerVelocity;								//for audio
@@ -124,7 +129,7 @@ protected:
 	EventAudio*						mEventAudioManager;
 	
 	BloomController* mBloom;					//for bloom!
-	
+	bool mLowerTurretAllowed;				//on by default
 	
 	
 };

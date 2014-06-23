@@ -22,7 +22,8 @@ public:
 	osg::MatrixTransform* getRoot()	{return mRoot;}
 protected:
 	osg::ref_ptr<osg::MatrixTransform> mRoot;
-
+	void addPlanet(std::string texture, osg::Vec3 pos, float radius);
+	void addBillboard(std::string texture, osg::Vec3 pos, float height);
 };
 
 #endif /* defined(__Millennium_Falcon__SpaceBox__) */
