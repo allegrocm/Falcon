@@ -19,7 +19,7 @@
 #include "quickprof.h"
 #include "Layers.h"
 #include "EnemyController.h"
-
+#include "SpaceBox.h"
 
 int screenWidth = 1024;
 int screenHeight = 768;
@@ -411,6 +411,8 @@ void keyboard(unsigned char key, int x, int y)
 		case 'c': gShowC6 = !gShowC6; break;
 		case ' ':	FalconApp::instance().buttonInput(0, true);	break;		//space bar controls the main wand button
 		case 'T': FalconApp::instance().toggleTIEMode();	break;		//switch views between TIE figher and Falcon
+		case 'L': FalconApp::instance().getSpaceBox()->reload(); break;
+		case 'P': FalconApp::instance().getSpaceBox()->nextSystem(); break;
 		case 'R':
 		{
 			//toggle radar display
