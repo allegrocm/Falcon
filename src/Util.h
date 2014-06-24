@@ -93,6 +93,7 @@ namespace Util
 	//(rotations are in degrees!)
 	osg::MatrixTransform*		loadModel(std::string name, float scale, float rotX = 0, float rotY = 0, float rotZ = 0, osg::Vec3 translate = osg::Vec3());
 
+	osg::Image* loadImage(std::string name);
 	//print out logged errors.  This is usually called right before the program exits
 	void printErrors();
 

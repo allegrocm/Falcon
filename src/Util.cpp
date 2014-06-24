@@ -319,6 +319,24 @@ MatrixTransform* loadModel(std::string name, float scale, float rotX, float rotY
 	return m;
 }
 
+
+//store all our loaded images so we don't have to re-load them
+std::map<std::string, osg::ref_ptr<osg::Image> > gLoadedImages;
+
+osg::Image* loadImage(std::string name)
+{
+	__FUNCTION_HEADER__
+	if(gLoadedImages.find(name) != gLoadedImages.end())
+		return gLoadedImages[name];
+	gLoadedImages[name] = osgDB::readImageFile(name);
+	if(!gLoadedImages[name])
+		Util::logError("Couldn't load image %s\n", name.c_str());
+	return gLoadedImages[name];
+
+}
+
+
+
 float random(float minVal, float maxVal) 	{return minVal + (maxVal-minVal) * rand() / RAND_MAX;}
 osg::Vec3 randomVector()
 {

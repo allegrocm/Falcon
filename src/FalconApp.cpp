@@ -182,7 +182,7 @@ void FalconApp::update(float fulldt)
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
 		mListenerVelocity = Vec3();			//zero by default
-		if(player && player->getShip() && mTieNode1)		//for now, only the master node shows the view of the enemy TIE fighter
+		if(player && player->getShip() && mTieNode1)
 		{
 			Spacecraft* enemy = player->getShip();
 
@@ -239,11 +239,9 @@ void FalconApp::update(float fulldt)
 
 		//the spacebox's position always follows the navigation
 		//so we can never approach the actual objects in it
-		Matrix sb;
 		Matrix nav = mNavigation->getMatrix();
 		nav.invert(nav);
-		Util::setPos(sb, Util::pos(nav));
-		mSpaceBox->getRoot()->setMatrix(sb);
+		mSpaceBox->setViewerPos(Util::pos(nav));
 
 		
 		//neither the TIE fighter nor the MF need to change their audio in response to head movement
@@ -345,7 +343,8 @@ void FalconApp::drawStatus()
 	int rowHeight = 20;
 	int row = 2;
 
-	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f", mAvgFrameRate);
+	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        In the %s System",
+		mAvgFrameRate, mSpaceBox->getSystemName().c_str());
 	drawStringOnScreen(20, rowHeight * row++, "Buttons:  %i, %i, %i, %i, %i, %i",
 		mButtons[0], mButtons[1], mButtons[2], mButtons[3], mButtons[4], mButtons[5]);
 	drawStringOnScreen(20, rowHeight * row++, "Head at:  %.2f, %.2f, %.2f",
