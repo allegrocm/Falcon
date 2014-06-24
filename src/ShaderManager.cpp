@@ -88,7 +88,7 @@ void ShaderManager::reloadShaders()
 std::vector<std::string> fileToLines(std::string fileName)
 {
 	std::vector<std::string> lines;
-	std::ifstream infile(fileName.c_str());						//try open the file
+	::std::ifstream infile(fileName.c_str());						//try open the file
 	if (!infile)
 	{
 		return lines;
