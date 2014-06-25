@@ -126,12 +126,14 @@ void FalconApp::init()
 	mTIEDisplayGroup->addChild(qrc);
 	
 	//HACK:  for temps, put the TIE radar on the main screen
+#ifdef __APPLE__
 #ifndef USE_VRJ
 	qrc = new CameraThatRendersAQuad();
 	qrc->setTexture(mTIEScreen->getCamera()->getTargetTexture(0));
 	qrc->setViewport(10, 10, 480 * 1.6, 480);
 	mRoot->addChild(qrc);
 	mRoot->addChild(mTIEScreen->getCamera());
+#endif
 #endif
 	
 	mEventAudioManager->setListener(mTieNode1 ? "Vader" : "Falcon");

@@ -1,57 +1,205 @@
-<System name="Tarnak">
+<System name="Europa">
 	<!--Each system has a name and a collection of objects-->
 	<Object type="Planet">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
-		<radius>3500</radius>
-		<x>0</x>
-		<y>-5000</y>
-		<z>0</z>
+		<radius>1500</radius>
+		<x>2200</x>
+		<y>3000</y>
+		<z>400</z>
 		<texture>gasgiant_map42.jpg</texture>
 	</Object>
 	<Object type="Planet">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
 		<radius>500</radius>
-		<x>1500</x>
-		<y>700</y>
-		<z>1200</z>
+		<x>-1500</x>
+		<y>-700</y>
+		<z>-2200</z>
 		<texture>pluto.jpg</texture>
 	</Object>
 	<Object type="Object">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
-		<radius>4000</radius>
-		<x>-3500</x>
-		<y>1000</y>
+		<radius>800</radius>
+		<x>1600</x>
+		<y>3000</y>
 		<z>-2400</z>
-		<texture>Ssc2003-06c.jpg</texture>
+		<texture>0124-0906-2509-2407_hubble_space_telescope_image_of_messier_101_galaxy_o.jpg</texture>
 	</Object>
 
 </System>
 
-<System name="Nim-Po">
+<System name="Oceania">
 	<!--Each system has a name and a collection of objects-->
 	<Object type="Planet">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
 		<radius>700</radius>
-		<x>300</x>
+		<x>2300</x>
 		<y>-1000</y>
-		<z>400</z>
+		<z>1400</z>
 		<texture>pluto.jpg</texture>
 	</Object>
 	<Object type="Planet">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
 		<radius>1200</radius>
-		<x>-1000</x>
-		<y>1500</y>
-		<z>100</z>
+		<x>-2000</x>
+		<y>3000</y>
+		<z>1500</z>
 		<texture>Planet_Wight_1600.jpg</texture>
 	</Object>
-	<Object type="Object">
+	<Object type="Billboard">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
-		<radius>4000</radius>
-		<x>-3500</x>
-		<y>1000</y>
-		<z>-2400</z>
-		<texture>Ssc2003-06c.jpg</texture>
+		<radius>1500</radius>
+		<x>2500</x>
+		<y>2900</y>
+		<z>1200</z>
+		<texture>Space_Texture_1_by_zy0rg.png</texture>
 	</Object>
+
+</System>
+
+<System name="Orent">
+  <!--Each system has a name and a collection of objects-->
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>1500</radius>
+    <x>2000</x>
+    <y>-2500</y>
+    <z>-6500</z>
+    <texture>planet_Bog1200.png</texture>
+  </Object>
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>2200</radius>
+    <x>-3000</x>
+    <y>-3500</y>
+    <z>-2000</z>
+    <texture>planet_Telos1200.png</texture>
+  </Object>
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>550</radius>
+    <x>2500</x>
+    <y>1500</y>
+    <z>1300</z>
+    <texture>planet_Arnessk1200.png</texture>
+  </Object>
+  <Object type="Object">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>1300</radius>
+    <x>2000</x>
+    <y>-2500</y>
+    <z>-900</z>
+    <texture>7c257eb6ae6ef1eba78f9847118b1662-d2lh209.png</texture>
+  </Object>
+
+</System>
+
+<System name="Columbia">
+  <!--Each system has a name and a collection of objects-->
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>500</radius>
+    <x>4000</x>
+    <y>-2000</y>
+    <z>800</z>
+    <texture>planet_Dagobah1200.png</texture>
+  </Object>
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>800</radius>
+    <x>-1500</x>
+    <y>-700</y>
+    <z>600</z>
+    <texture>Planet_Avalon_1600.jpg</texture>
+  </Object>
+  <Object type="Object">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>1200</radius>
+    <x>600</x>
+    <y>3000</y>
+    <z>-3400</z>
+    <texture>freespace.png</texture>
+  </Object>
+
+</System>
+
+<System name="Terra_Australis">
+  <!--Each system has a name and a collection of objects-->
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>1000</radius>
+    <x>-2900</x>
+    <y>-1000</y>
+    <z>-1500</z>
+    <texture>Planet_2_d.png</texture>
+  </Object>
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>500</radius>
+    <x>-900</x>
+    <y>-4200</y>
+    <z>-1000</z>
+    <texture>planet_Dank1200.png</texture>
+  </Object>
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>1000</radius>
+    <x>2000</x>
+    <y>1800</y>
+    <z>-800</z>
+    <texture>planet_Trask1200.png</texture>
+  </Object>
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>1200</radius>
+    <x>4000</x>
+    <y>-2000</y>
+    <z>1200</z>
+    <texture>planet_6_d.png</texture>
+  </Object>
+  <Object type="Object">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>4000</radius>
+    <x>1500</x>
+    <y>2000</y>
+    <z>2400</z>
+    <texture>0124-0912-1211-4053_nasa_image_m81_galaxy_o.jpg</texture>
+  </Object>
+
+</System>
+
+<System name="Afrikans">
+  <!--Each system has a name and a collection of objects-->
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>800</radius>
+    <x>800</x>
+    <y>-3500</y>
+    <z>2400</z>
+    <texture>planet_3_d.png</texture>
+  </Object>
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>300</radius>
+    <x>-1200</x>
+    <y>3700</y>
+    <z>-4000</z>
+    <texture>planet_Terminus1200.png</texture>
+  </Object>
+  <Object type="Planet">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>1500</radius>
+    <x>-6000</x>
+    <y>-3500</y>
+    <z>-2000</z>
+    <texture>planet_Bog1200.png</texture>
+  </Object>
+  <Object type="Object">
+    <!--an object has a size, a position, and a texture.  oh and a type-->
+    <radius>1500</radius>
+    <x>4500</x>
+    <y>-2700</y>
+    <z>1400</z>
+    <texture>0124-0906-2509-2407_hubble_space_telescope_image_of_messier_101_galaxy_o.jpg</texture>
+  </Object>
 
 </System>

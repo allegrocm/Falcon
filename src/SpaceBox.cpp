@@ -32,7 +32,7 @@ SpaceBox::SpaceBox()
 	if(!img)
 		Util::logError("Couldn't open Hyades.jpg!");
 	Texture2D* tex = new Texture2D(img);
-
+	mCurrentSystem = 0;
 
 	mRoot->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex);
 	mRoot->getOrCreateStateSet()->setMode(GL_LIGHTING, false);
@@ -46,19 +46,22 @@ SpaceBox::SpaceBox()
 	//we render the spacebox to a separate camera so we can have it very, very far away without it
 	//interfering with close-range depth testing
 	Camera* c = new Camera;
+	Matrix projShift;		//matrix to shift the culling distances farther
+	projShift.ptr()[15] = 100;
+	//c->setProjectionMatrix(projShift);
 	c->setName("Spacebox Camera");
 	mRoot->addChild(c);
 	c->addChild(g);
 	c->setRenderOrder(Camera::NESTED_RENDER, -1);
 	mRoot->setNodeMask(1 << NON_GLOW_LAYER);
 	mRoot->getOrCreateStateSet()->setMode(GL_BLEND, true);
-	reload();
+
 	mNearGroup = new MatrixTransform;
 	mRoot->addChild(mNearGroup);
 	mFarGroup = new MatrixTransform;
 	mRoot->addChild(mFarGroup);
-	
-	loadSystem(0);
+	reload();
+
 	//add a planet!
 //	addPlanet("data/textures/gasgiant_map42.jpg", Vec3(0, -5000, 0), 3500);
 //	addPlanet("data/textures/pluto.jpg", Vec3(1500, 700, 1200), 500);
@@ -91,16 +94,20 @@ void SpaceBox::loadSystem(int which)
 		for(size_t i = 0; i < scene.objects.size(); i++)
 		{
 			SpaceObject o = scene.objects[i];
+			//printf("This object type is %i\n", o.type);
 			if(o.type == SpaceObject::PLANET)
 			{
-				addPlanet(std::string("data/textures/")+o.texName, o.pos, o.size);
+				addPlanet(std::string("data/textures/planets/")+o.texName, o.pos, o.size);
 			}
+			else if(o.type == SpaceObject::BILLBOARD_PLUS)
+				addBillboard(std::string("data/textures/planets/")+o.texName, o.pos, o.size, true);
 			else
-				addBillboard(std::string("data/textures/")+o.texName, o.pos, o.size);
+				addBillboard(std::string("data/textures/planets/")+o.texName, o.pos, o.size, false);
 		}
 		scene.loaded = true;
 		printf("Done loading\n");
 	}
+	else printf("Switch to system %s\n", scene.name.c_str());
 	
 
 	
@@ -113,7 +120,7 @@ void SpaceBox::setViewerPos(Vec3 p)
 	m.ptr()[12] = p.x();
 	m.ptr()[13] = p.y();
 	m.ptr()[14] = p.z();
-	mRoot->setMatrix(m);
+	mFarGroup->setMatrix(m);
 }
 
 
@@ -154,7 +161,7 @@ void SpaceBox::addPlanet(std::string texture, osg::Vec3 pos, float radius)
 }
 
 
-void SpaceBox::addBillboard(std::string texture, Vec3 pos, float height)
+void SpaceBox::addBillboard(std::string texture, Vec3 pos, float height, bool additiveBlend)
 {
 
 	Image* img = Util::loadImage(texture);
@@ -198,7 +205,8 @@ void SpaceBox::addBillboard(std::string texture, Vec3 pos, float height)
 	b->setPosition(0, pos);
 	mSystems[mCurrentSystem].mFarThings->addChild(b);
 
-	b->getOrCreateStateSet()->setAttribute(new BlendFunc(GL_SRC_ALPHA, GL_ONE));
+	if(additiveBlend)
+		b->getOrCreateStateSet()->setAttribute(new BlendFunc(GL_SRC_ALPHA, GL_ONE));
 }
 
 bool SpaceObject::fromXML(TiXmlElement* element)
@@ -206,7 +214,8 @@ bool SpaceObject::fromXML(TiXmlElement* element)
 	std::string eventName = element->Attribute("type");
 	printf("Got a %s\n", eventName.c_str());
 	if(KenXML::CICompare(eventName, "Planet")) type = PLANET;
-	else type = BILLBOARD;
+	else if(KenXML::CICompare(eventName, "BillBoard")) type = BILLBOARD;
+	else type = BILLBOARD_PLUS;
 	
 	
 	for(TiXmlElement* e = element->FirstChildElement(); e; e = e->NextSiblingElement())
@@ -286,7 +295,7 @@ void SpaceBox::reload()
 {
 	mSystems.clear();
 	loadSystems("data/Systems.xml");
-	mCurrentSystem = 0;
+
 	
 	//make a default scene if we didn't get any
 	if(!mSystems.size())
@@ -312,4 +321,5 @@ void SpaceBox::reload()
 		mSystems.push_back(s);
 		
 	}
+	loadSystem(mCurrentSystem);
 }

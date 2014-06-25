@@ -432,6 +432,7 @@ void keyboard(unsigned char key, int x, int y)
 			else glutReshapeWindow(1024, 768);
 			gFullScreen = !gFullScreen;
 			break;
+		case 'Q': printf("Profiler summary:  %s\n", PROFILER.getSortedSummary().c_str()); break;
 		case 27:	viewer = NULL;  exit(1);	break;
 		//case 13: FalconApp::instance().buttonInput(1, true);break;		//return key is button 1
 		case 'F':
@@ -597,7 +598,7 @@ int main( int argc, char **argv )
 	atexit(quitski);
 
     glutMainLoop();
-    
+
     return 0;
 }
 
