@@ -12,7 +12,7 @@
 #include "Util.h"
 #include "KSoundManager.h"
 #include "Defaults.h"
-
+#include "FalconApp.h"
 #include <stdlib.h>
 
 using namespace osg;
@@ -60,14 +60,15 @@ Hyperspace::Hyperspace()
 bool Hyperspace::update(float dt)
 {
 	mAge += dt;
-	float HSDelay = 3;		//when does the animation start, so we time the sound properly
+	float HSDelay = 3;				//when does the animation start, so we time the sound properly
 	float HSDuration = 3.0;			//how long does the animation last?
 	float moveStart = 0.5;			//when do the stars shoot towards us?  relative to the whole animation, not in seconds
+	float systemSwitch = 0.75;		//when does the background system change?
 	if(mHSTime >= 0)
 	{
 		mHSTime += dt;
 	}
-	
+	float switchTimeSeconds = HSDelay + HSDuration * systemSwitch;		//time in seconds we do the system switch
 	if(mHSTime > HSDelay)
 	{
 		mPhase = (mHSTime-HSDelay) / HSDuration;
@@ -76,6 +77,12 @@ bool Hyperspace::update(float dt)
 	{
 		mPhase = 1.0;
 	}
+	if(mHSTime >= switchTimeSeconds && mHSTime - dt < switchTimeSeconds)	//is it time to switch systems??
+	{
+		printf("HS switch!  phase = %.2f, t = %.2f\n", mPhase, mHSTime);
+		FalconApp::instance().switchSystem();
+	}
+	
 //	mPhase= mAge / 2.0;
 	//just loop our animation for now
 

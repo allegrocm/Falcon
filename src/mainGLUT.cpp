@@ -20,6 +20,8 @@
 #include "Layers.h"
 #include "EnemyController.h"
 #include "SpaceBox.h"
+#include "ShaderManager.h"
+
 
 int screenWidth = 1024;
 int screenHeight = 768;
@@ -404,6 +406,7 @@ void keyboard(unsigned char key, int x, int y)
 		case 'a': gCamera.setLeft(true);	break;
 		case 's': gCamera.setDown(true);	break;
 		case 'S': gSloMo = !gSloMo; break;
+		case 'G': FalconApp::instance().toggleShaders(); break;
 		case 'd': gCamera.setRight(true);	break;
 		case 'z': gCamera.setLower(true);		break;
 		case 'x': gCamera.setRaise(true);		break;
@@ -413,6 +416,7 @@ void keyboard(unsigned char key, int x, int y)
 		case 'T': FalconApp::instance().toggleTIEMode();	break;		//switch views between TIE figher and Falcon
 		case 'L': FalconApp::instance().getSpaceBox()->reload(); break;
 		case 'P': FalconApp::instance().getSpaceBox()->nextSystem(); break;
+		case 'r': ShaderManager::instance().reloadShaders();	break;
 		case 'R':
 		{
 			//toggle radar display
@@ -569,7 +573,7 @@ int main( int argc, char **argv )
 {
     glutInit(&argc, argv);
 	//osg::setNotifyLevel(osg::DEBUG_FP);
-	osg::setNotifyLevel(osg::FATAL);
+//	osg::setNotifyLevel(osg::FATAL);
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ALPHA );
     glutInitWindowPosition( 100, 100 );
     glutInitWindowSize( 800, 600 );

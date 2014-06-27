@@ -121,9 +121,9 @@ void StupidPlaceholderShip::loadTIEModel()
 void StupidPlaceholderShip::playerControl(float dt)
 {
 	EnemyControlInput input = mPlayer->getInput();
-	if(input.button1)		//autopilot
+	if(input.button1 || input.noInput)		//autopilot
 	{
-		AIControl(dt, false);
+		AIControl(dt, input.noInput);		//can't shoot unless there is there-is-no-joystick input
 		return;
 	}
 //	printf("PC\n");
@@ -179,7 +179,7 @@ void StupidPlaceholderShip::playerControl(float dt)
 	setPos(pos);
 	vel = getForward() * pitchRot * yawRot;
 	vel.normalize();
-	float thrust = (input.thrustAxis + 1.0) * 0.5 + 0.25;		//minimum speed
+	float thrust = (input.thrustAxis + 1.0) * 0.625;
 	mTargetSpeed = thrust * mTopSpeed;
 	
 	//slow down slightly as we turn!

@@ -76,6 +76,8 @@ public:
 	
 	bool lowerTurretAllowed()						{return mLowerTurretAllowed;}
 	SpaceBox* getSpaceBox()							{return mSpaceBox;}		//for scene loading
+	void switchSystem();							//called when we warp to a new solar system
+	void toggleShaders();
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call

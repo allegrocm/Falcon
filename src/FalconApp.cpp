@@ -39,7 +39,7 @@
 #include "EventAudio.h"
 #include "RadarScreen.h"
 #include "TIEComputer.h"
-
+#include "ShaderManager.h"
 using namespace osg;
 
 
@@ -61,6 +61,7 @@ void FalconApp::init()
 	mTotalTime = 0;
 	mRoot = new osg::Group;
 	mNavigation = new osg::MatrixTransform;
+
 	mRoot->addChild(mNavigation.get());
 	mRoot->getOrCreateStateSet()->setMode(GL_NORMALIZE, true);
 	mAvgFrameRate = 30;
@@ -69,7 +70,8 @@ void FalconApp::init()
 	mScreen = new ComputerScreen();
 	mTIEScreen = new TIEComputer();
 
-
+	
+	
 	//quickly add a lil spacebox
 	mSpaceBox = new SpaceBox();
  	mModelGroup->addChild(mSpaceBox->getRoot());
@@ -108,10 +110,18 @@ void FalconApp::init()
 //	mFalcon->getAimedPart()->addChild(mScreen->getRoot());
 	mParticleFX = new ParticleFX();
 	mModelGroup->addChild(mParticleFX->getRoot());
-	
+
+//todo: hack:  no bloom temporarily
+	bool bloom = true;
 	mBloom = new BloomController();
-	mRoot->addChild(mBloom->getRoot());
-	mBloom->getScene()->addChild(mNavigation);
+	if(bloom)
+	{
+
+		mRoot->addChild(mBloom->getRoot());
+		mBloom->getScene()->addChild(mNavigation);
+	}
+	else
+		mRoot->addChild(mNavigation);
 	
 	
 	//audio only plays on the master and tie fighter nodes
@@ -126,7 +136,7 @@ void FalconApp::init()
 	mTIEDisplayGroup->addChild(qrc);
 	
 	//HACK:  for temps, put the TIE radar on the main screen
-#ifdef __APPLE__
+#if(0)
 #ifndef USE_VRJ
 	qrc = new CameraThatRendersAQuad();
 	qrc->setTexture(mTIEScreen->getCamera()->getTargetTexture(0));
@@ -135,9 +145,17 @@ void FalconApp::init()
 	mRoot->addChild(mTIEScreen->getCamera());
 #endif
 #endif
-	
 	mEventAudioManager->setListener(mTieNode1 ? "Vader" : "Falcon");
-
+	
+	//add some uniforms for use with per-pixel lighting shaders
+	mModelGroup->getOrCreateStateSet()->addUniform(new Uniform("tex0", 0));
+	mModelGroup->getOrCreateStateSet()->addUniform(new Uniform("tex1", 1));
+	//add a default white texture for things that don't have a texture
+	Texture2D* t = new Texture2D(Util::loadImage("data/textures/white.png"));
+	t->setFilter(Texture::MAG_FILTER, Texture::NEAREST);
+	t->setFilter(Texture::MIN_FILTER, Texture::NEAREST);
+	mModelGroup->getOrCreateStateSet()->setTextureAttribute(0, t);
+	toggleShaders();
 }
 
 
@@ -538,4 +556,23 @@ Spacecraft* FalconApp::getEnemyPlayerShip()
 
 	return playerShip;
 	
+}
+
+void FalconApp::toggleShaders()
+{
+	return;
+	static bool shaders = false;
+	shaders = !shaders;
+	printf("shaders set to %i\n", shaders);
+	osg::Program* shader = ShaderManager::loadShader("data/shaders/perPixelLighting");
+	if(shaders)
+		mFalcon->getRoot()->getOrCreateStateSet()->setAttributeAndModes( shader, osg::StateAttribute::ON);
+	else
+		mFalcon->getRoot()->getOrCreateStateSet()->removeAttribute(shader);
+
+}
+
+void FalconApp::switchSystem()
+{
+	mSpaceBox->nextSystem();
 }
