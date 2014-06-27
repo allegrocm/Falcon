@@ -345,6 +345,37 @@ osg::Vec3 randomVector()
 	return v;
 }
 
+osg::Vec3 vectorInCone(osg::Vec3 generalDirection, float maxAngle, float minAngle)
+{
+	//construct a coordinate system around our direction
+	if(0.01 > generalDirection.length()) generalDirection = Vec3(1, 0, 0);
+	generalDirection.normalize();
+	Vec3 perp1 = generalDirection ^ Vec3(0.5, 0.2, 0.1);
+	if(perp1.length() < 0.1)
+		perp1 = generalDirection ^ Vec3(0.0, 0.5, 0.5);
+	
+	perp1.normalize();
+	
+	Vec3 perp2 = generalDirection ^ perp1;
+	perp2.normalize();
+	
+	
+	//now point our general direction somewhere along this cone we've made
+	float phi = random(maxAngle, minAngle) / 57.3;
+
+	float s = sinf(phi);
+	float c = cosf(phi);
+	
+	float theta = 6.28 * rand() / RAND_MAX;
+	float st = sinf(theta);
+	float ct = cosf(theta);
+	
+	generalDirection = generalDirection * c + (perp1 * ct + perp2 * st) * s;
+	generalDirection.normalize();
+	return generalDirection;
+}
+
+
 void printMatrix(Matrixf m)
 {
 	printf("Matrix:\n");

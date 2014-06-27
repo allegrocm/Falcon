@@ -22,31 +22,8 @@ Debris::Debris(osg::Node* model, osg::Vec3 generalDirection, float directionDelt
 	if(model)
 		mOtherPat->addChild(model);
 	
-	if(0.01 > generalDirection.length()) generalDirection = Vec3(1, 0, 0);		//construct a coordinate system around our direction
-	generalDirection.normalize();
-	Vec3 perp1 = generalDirection ^ Vec3(0.5, 0.2, 0.1);
-	if(perp1.length() < 0.1)
-		perp1 = generalDirection ^ Vec3(0.0, 0.5, 0.5);
-	
-	perp1.normalize();
-	
-	Vec3 perp2 = generalDirection ^ perp1;
-	perp2.normalize();
-	
-	
-	//now point our general direction somewhere along this cone we've made
-	float phi = directionDelta * (-1.0 + 2.0 * rand() / RAND_MAX) / 57.3;
-
-	float s = sinf(phi);
-	float c = cosf(phi);
-	
-	float theta = 6.28 * rand() / RAND_MAX;
-	float st = sinf(theta);
-	float ct = cosf(theta);
-	
-	
 	//final direction/velocity
-	mVel = generalDirection * c + (perp1 * ct + perp2 * st) * s;
+	mVel = Util::vectorInCone(generalDirection, directionDelta);
 	mVel.normalize();
 	mVel *= speed;
 	

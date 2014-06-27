@@ -24,6 +24,7 @@
 #include "GameController.h"
 #include "EventAudio.h"
 #include "EnemyController.h"
+#include "ShaderManager.h"
 
 using namespace osg;
 
@@ -92,7 +93,7 @@ Falcon::Falcon()
 	mAutoTurret = mGun;		//auto turret has same properties as the main one
 	mAutoTurret.mShotDelay = ROM::LOWER_TURRET_FIRE_DELAY;
 	mAutoTurret.mBurstDelay = ROM::LOWER_TURRET_BURST_DELAY;
-
+//	ShaderManager::instance().applyShaderToNode("data/shaders/PerPixelLighting", n);
 }
 
 bool Falcon::update(float dt)
@@ -164,8 +165,10 @@ void Falcon::updateAutoTurret(float dt)
 
 
 	//gun starts aiming in front and then catches down
-	float leadAmount = 2.0 - (mTurretVisibleTime - ROM::LOWER_TURRET_GRACE_PERIOD) / ROM::LOWER_TURRET_CATCHUP_TIME;
-	if(leadAmount < 1) leadAmount = 1;		//don't overshoot
+	float deadliness = (mTurretVisibleTime - ROM::LOWER_TURRET_GRACE_PERIOD) / ROM::LOWER_TURRET_CATCHUP_TIME;
+	if(deadliness > 1) deadliness = 1;
+	float leadAmount = 2.0 - deadliness;
+
 //	printf("fire with lead:  %.2f (viz: %.2f, grace:  %.2f)\n", leadAmount, mTurretVisibleTime, ROM::LOWER_TURRET_GRACE_PERIOD);
 	//lead by that amount
 	pos += vel * travelTime * leadAmount;
@@ -179,7 +182,7 @@ void Falcon::updateAutoTurret(float dt)
 	fireDir.normalize();
 //	b->setTransform(wand);
 	b->setPos(turretPos);
-	b->setForward(fireDir);
+	b->setForward(Util::vectorInCone(fireDir, 4 * (1.0 - deadliness), 1.0 * (1.0-deadliness)));
 	b->mIsEnemy = false;
 //	printf("AT:  %.2f, %i, lead:  %.2f\n", mAutoTurret.mBurstTimer, mAutoTurret.mBurstCounter, leadAmount);
 	//printf("soundvolume: %f\n", ROM::FALCON_FIRE_VOLUME);

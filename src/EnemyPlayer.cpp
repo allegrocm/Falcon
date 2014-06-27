@@ -26,6 +26,7 @@ void EnemyPlayer::update(float dt)
 
 void EnemyPlayer::setInput(EnemyControlInput i)
 {
+	i.noInput = false;
 	mInput = i;
 }
 

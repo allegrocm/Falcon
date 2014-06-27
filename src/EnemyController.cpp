@@ -80,17 +80,20 @@ void EnemyController::update(float dt)
 	}
 
 		//should we spawn new enemies?  Don't spawn unless we're actually playing
-	if(mLeftToSpawn && GameController::instance().getMode() == GameController::MAIN_GAME)
+	if(GameController::instance().getMode() == GameController::MAIN_GAME)
 	{
 		int diff = mMaxEnemies - mEnemies.size();		//how many more enemies can we put in play?
 		float chance = 0.4 * diff;
-		
+
 		//never let us have no enemies
 		if(!mEnemies.size())
 			chance = 10000;
+		if(!mLeftToSpawn) chance = 0;		///..unlesss there are none left to spawn
+
+		//but always spawn if there's a human player needing a ship
 		//is there a human player waiting to respawn?
 		//if it's ready, spawn right away.  otherwise don't spawn at all
-		if(!mPlayer->getShip())
+		if(!mPlayer->getShip() && (mLeftToSpawn || mEnemies.size()))
 		{
 			chance = mPlayer->isReadyForShip() * 1000;
 		}
@@ -114,7 +117,8 @@ void EnemyController::spawnEnemy(bool initing)
 			playerForShip = mEnemyPlayers[i];
 	}
 	
-	mLeftToSpawn--;
+	if(mLeftToSpawn != 0)
+		mLeftToSpawn--;
 	StupidPlaceholderShip* sps;
 	if(playerForShip)
 	{

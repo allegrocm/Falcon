@@ -88,6 +88,7 @@ namespace Util
 	//number generation
 	float random(float minVal, float maxVal);
 	osg::Vec3 randomVector();			//a random unit vector
+	osg::Vec3 vectorInCone(osg::Vec3 axis, float maxAngleDegrees, float minAngleDegrees = 0);
 	//this loads a model with the given name, and scales, rotates, and translates it (in the order of the arguments) to a useable state
 	//handy for importing downloaded models which are usually way way way too big
 	//(rotations are in degrees!)

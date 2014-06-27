@@ -235,7 +235,7 @@ void TIEComputer::updateStatusText(float dt)
 			statusText = "Waiting for the game to start...";
 		}
 		else
-		if(EnemyController::instance().getShipsLeftToSpawn() && player)
+		if(player && EnemyController::instance().getShips().size())
 			statusText = Util::stringWithFormat("Destroyed!  Waiting to respawn in %.2f...", player->deadTimer());
 		else
 			statusText = "You have failed to kill the Millennium Falcon!";

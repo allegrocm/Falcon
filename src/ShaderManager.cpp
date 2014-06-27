@@ -148,7 +148,7 @@ std::string ShaderManager::loadAndProcessFile(std::string name)
 void ShaderManager::addFragmentShaderToProgram(std::string programName, std::string fileName)
 {
 	Program* shader = loadProgram(programName);
-
+	
 	std::string fragName = osgDB::findDataFile(fileName);
 	if(fragName != "")
 	{
