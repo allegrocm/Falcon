@@ -285,7 +285,7 @@ bool SpaceBox::loadSystems(std::string file)
 void SpaceBox::reload()
 {
 	mSystems.clear();
-	loadSystems("data/Systems.xml");
+	loadSystems("data/systems.xml");
 	mCurrentSystem = 0;
 	
 	//make a default scene if we didn't get any
@@ -308,7 +308,7 @@ void SpaceBox::reload()
 		o.texName = "Ssc2003-06c.jpg";
 		o.pos = Vec3(-3500, 1000, -2400);
 		s.objects.push_back(o);
-
+		s.name = "NoLoadium";
 		mSystems.push_back(s);
 		
 	}

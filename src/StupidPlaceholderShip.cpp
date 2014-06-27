@@ -40,10 +40,10 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	float r = 900;
 	Vec3 pos = Vec3(sinf(theta)*cosf(phi) * r, sinf(phi)*r, cosf(theta)*cosf(phi)*r);
 	setPos(pos);
-	setForward(pos * -1.0);
+	setForward(Util::vectorInCone(pos * -1.0, 20, 10));
 	mSpeed = mTopSpeed = mTargetSpeed = 100;
 	mSpeed = 10;		//start with a low speed and spool up quickly
-	setVel(Vec3(0, 0, -mSpeed));
+	setVel(getForward() * mSpeed);
 	mMovingAway = false;
 	mTurning = false;
 
@@ -298,7 +298,7 @@ bool StupidPlaceholderShip::update(float dt)
 
 	setForward(mVel);
 	//now adjust speed
-	mSpeed += (mTargetSpeed - mSpeed) * dt;
+	mSpeed += (mTargetSpeed - mSpeed) * dt * 0.5;
 	bool up = Spacecraft::update(dt);
 
 	//send our position and velocity to the SoundManager so we can have stereo and doppler and all that good stuff

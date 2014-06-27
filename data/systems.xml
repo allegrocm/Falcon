@@ -27,31 +27,3 @@
 
 </System>
 
-<System name="Nim-Po">
-	<!--Each system has a name and a collection of objects-->
-	<Object type="Planet">
-		<!--an object has a size, a position, and a texture.  oh and a type-->
-		<radius>700</radius>
-		<x>300</x>
-		<y>-1000</y>
-		<z>400</z>
-		<texture>pluto.jpg</texture>
-	</Object>
-	<Object type="Planet">
-		<!--an object has a size, a position, and a texture.  oh and a type-->
-		<radius>1200</radius>
-		<x>-1000</x>
-		<y>1500</y>
-		<z>100</z>
-		<texture>Planet_Wight_1600.jpg</texture>
-	</Object>
-	<Object type="Object">
-		<!--an object has a size, a position, and a texture.  oh and a type-->
-		<radius>4000</radius>
-		<x>-3500</x>
-		<y>1000</y>
-		<z>-2400</z>
-		<texture>Ssc2003-06c.jpg</texture>
-	</Object>
-
-</System>
