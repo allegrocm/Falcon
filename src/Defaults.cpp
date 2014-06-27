@@ -15,12 +15,18 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <osgDB/fstream>
 #include <vector>
 #include <climits>
 #include <cctype>
 #include <assert.h>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
-using namespace std;
+using std::string;
+using std::vector;
+//using namespace std;
 //utility functions...written by Joe Heiniger for the Radius project
 
 void
@@ -163,7 +169,7 @@ bool Defaults::reload()
 	mLoadedSomething = true; 
 	mDefaultsWeCouldntFind.clear();
 	mData.clear();
-	std::ifstream infile(mFileName.c_str());						//try open the file
+	osgDB::ifstream infile(mFileName.c_str());						//try open the file
 	if (!infile)
 	{
 		printf("Unable to find Defaults file %s\n", mFileName.c_str());

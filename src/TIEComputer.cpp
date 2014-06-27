@@ -5,6 +5,15 @@
 //  Created by Ken Kopecky II on 6/12/14.
 //
 //
+#include <iostream>
+#ifdef WIN32
+#include <windows.h>
+#endif
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 
 #include "TIEComputer.h"
 #include "PrerenderCamera.h"

@@ -22,7 +22,7 @@ class TiXmlElement;		//for XML parsing
 class SpaceObject
 {
 public:
-	enum ObjectType {PLANET, BILLBOARD, NUM_OBJECT_TYPES};
+	enum ObjectType {PLANET, BILLBOARD, BILLBOARD_PLUS, NUM_OBJECT_TYPES};		//billboard plus is additively blended
 	ObjectType type;
 	float size;	//height/radius
 	osg::Vec3 pos;
@@ -47,6 +47,7 @@ public:
 	bool loaded;
 	osg::ref_ptr<osg::Group> mFarThings;
 	osg::ref_ptr<osg::Group> mNearThings;
+
 };
 
 
@@ -72,8 +73,9 @@ protected:
 	osg::ref_ptr<osg::MatrixTransform> mRoot;
 	osg::ref_ptr<osg::MatrixTransform> mNearGroup;		//planets
 	osg::ref_ptr<osg::MatrixTransform> mFarGroup;		//far-away things
+	osg::ref_ptr<osg::Geode> mBox;		//what with the stars
 	void addPlanet(std::string texture, osg::Vec3 pos, float radius);
-	void addBillboard(std::string texture, osg::Vec3 pos, float height);
+	void addBillboard(std::string texture, osg::Vec3 pos, float height, bool additiveBlend);
 	std::vector<SpaceScene> mSystems;
 	int mCurrentSystem;		//for cycling through the systems
 	

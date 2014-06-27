@@ -225,6 +225,18 @@ void GameObject::drawDebug()
 
 bool GameObject::checkRaycast(osg::Vec3 origin, osg::Vec3 vec, osg::Vec3& hitPos)
 {
+	__FUNCTION_HEADER__
+	BoundingSphere bs = mRoot->getBound();
+	//if(bs)
+	{
+	
+		float dist = (origin-bs.center()).length();
+		if(dist - vec.length() < bs.radius())
+		{
+		//	printf("early out!\n");
+		//	return false;
+		}
+	}
 	osgUtil::IntersectVisitor iv;
 	//make a line segment representing the laser beam
 	ref_ptr<LineSegment> seg = new LineSegment(origin, origin+vec);

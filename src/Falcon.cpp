@@ -267,6 +267,11 @@ void Falcon::wasHit(Bullet* b, osg::Vec3 hitPos)
 		EventAudio::instance().eventHappened("quarterHealth");		//maybe play a sound when health gets low
 	}
 
+	if(oldPercent > 0 && newPercent <= 0)
+	{
+		EventAudio::instance().eventHappened("noHealth");
+	}
+
 //	printf("Health:  %i\n", 	GameController::instance().getStats().health);
 //	FalconApp::instance().getFX()->makeExplosion(b->getPos(), 1.5);
 }

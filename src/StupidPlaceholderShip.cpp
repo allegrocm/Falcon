@@ -179,7 +179,7 @@ void StupidPlaceholderShip::playerControl(float dt)
 	setPos(pos);
 	vel = getForward() * pitchRot * yawRot;
 	vel.normalize();
-	float thrust = (input.thrustAxis + 1.0) * 0.625;
+	float thrust = (input.thrustAxis + 1.0) * 0.625 + 0.1;		//min speed
 	mTargetSpeed = thrust * mTopSpeed;
 	
 	//slow down slightly as we turn!
