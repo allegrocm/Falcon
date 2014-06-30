@@ -65,6 +65,10 @@ Falcon::Falcon()
 	{
 		ScreenImage* reticle1 = new ScreenImage();
 
+		//don't know why this works
+		//putting anything in the transparent bin seems to make it vanish
+		//maybe something to do with the bloom effect
+		reticle1->transform->getOrCreateStateSet()->setRenderingHint(StateSet::OPAQUE_BIN);
 		reticle1->setImage(Util::findDataFile("data/textures/reticleSingle.png"));
 		reticle1->setPos(Vec3(0, 0, -100 * (1+i)));
 		reticle1->setHeight(2);
