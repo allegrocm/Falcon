@@ -64,7 +64,7 @@ Falcon::Falcon()
 	for(int i = 0; i < numRings; i++)
 	{
 		ScreenImage* reticle1 = new ScreenImage();
-
+		reticle1->transform->getOrCreateStateSet()->setRenderingHint(StateSet::OPAQUE_BIN);
 		reticle1->setImage(Util::findDataFile("data/textures/reticleSingle.png"));
 		reticle1->setPos(Vec3(0, 0, -100 * (1+i)));
 		reticle1->setHeight(2);
@@ -93,6 +93,10 @@ Falcon::Falcon()
 	mAutoTurret = mGun;		//auto turret has same properties as the main one
 	mAutoTurret.mShotDelay = ROM::LOWER_TURRET_FIRE_DELAY;
 	mAutoTurret.mBurstDelay = ROM::LOWER_TURRET_BURST_DELAY;
+	
+	mGlowUniform = new Uniform("glowColor", Vec4(1.0, 0.0, 0.0, 0.0));
+	mPat->getOrCreateStateSet()->addUniform(mGlowUniform);
+	mGlowTime = 0;
 //	ShaderManager::instance().applyShaderToNode("data/shaders/PerPixelLighting", n);
 }
 
@@ -110,6 +114,19 @@ bool Falcon::update(float dt)
 	if(FalconApp::instance().lowerTurretAllowed())
 		updateAutoTurret(dt);
 	
+
+	::Stats& stats = GameController::instance().getStats();
+	float percent = (float)stats.health / (float)stats.maxHealth;
+	float glowAmount = 0.5 - 0.3 * cosf(mGlowTime * 5.0);
+	if(percent > .25)
+	{
+		mGlowTime = 0;
+		glowAmount = 0;
+	}
+	else
+		mGlowTime += dt;
+
+	mGlowUniform->set(Vec4(1.0, 0.05, 0.05, glowAmount * 0.25));
 	return true;
 
 }
