@@ -103,7 +103,7 @@ The event occurs 100 times per second so use a very low probability-->
 	</Event>
 
   <!--played when the falcon's hitpoints drop below 50%-->
-  <Event name="halfHealth">
+  <Event name="NotHalfHealth">
     <soundChance>1</soundChance>
     <sound>
       <filename>han/burnout.wav</filename>

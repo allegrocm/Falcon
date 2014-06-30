@@ -40,8 +40,8 @@ SpaceBox::SpaceBox()
 
 	osg::Box* cube = new Box(Vec3(), 10000);
 	ShapeDrawable* sd = new ShapeDrawable(cube);
-	Geode* g = new Geode();
-	g->addDrawable(sd);
+	mBox = new Geode();
+	mBox->addDrawable(sd);
 
 	//we render the spacebox to a separate camera so we can have it very, very far away without it
 	//interfering with close-range depth testing
@@ -51,15 +51,18 @@ SpaceBox::SpaceBox()
 	//c->setProjectionMatrix(projShift);
 	c->setName("Spacebox Camera");
 	mRoot->addChild(c);
-	c->addChild(g);
+
 	c->setRenderOrder(Camera::NESTED_RENDER, -1);
 	mRoot->setNodeMask(1 << NON_GLOW_LAYER);
 	mRoot->getOrCreateStateSet()->setMode(GL_BLEND, true);
 
 	mNearGroup = new MatrixTransform;
-	mRoot->addChild(mNearGroup);
+	//mRoot->addChild(mNearGroup);
 	mFarGroup = new MatrixTransform;
-	mRoot->addChild(mFarGroup);
+	//mRoot->addChild(mFarGroup);
+	mFarGroup->addChild(mBox);
+	c->addChild(mFarGroup);
+	c->addChild(mNearGroup);
 	reload();
 
 	//add a planet!
@@ -86,7 +89,9 @@ void SpaceBox::loadSystem(int which)
 	
 	//add in this scene's object groups
 	mNearGroup->addChild(scene.mNearThings);
+	mFarGroup->addChild(mBox);
 	mFarGroup->addChild(scene.mFarThings);
+
 
 	if(!scene.loaded)		//load the scene if we haven't already
 	{
@@ -229,6 +234,7 @@ bool SpaceObject::fromXML(TiXmlElement* element)
 		else if(KenXML::CICompare(what, "height"))	KenXML::readValue(e, size);
 	}
 	
+	Util::loadImage(std::string("data/textures/planets/") + texName);
 	return true;
 	
 
@@ -294,7 +300,8 @@ bool SpaceBox::loadSystems(std::string file)
 void SpaceBox::reload()
 {
 	mSystems.clear();
-	loadSystems("data/Systems.xml");
+
+	loadSystems("data/systems.xml");
 
 	
 	//make a default scene if we didn't get any
@@ -317,7 +324,7 @@ void SpaceBox::reload()
 		o.texName = "Ssc2003-06c.jpg";
 		o.pos = Vec3(-3500, 1000, -2400);
 		s.objects.push_back(o);
-
+		s.name = "NoLoadium";
 		mSystems.push_back(s);
 		
 	}

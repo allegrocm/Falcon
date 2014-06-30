@@ -1,31 +1,35 @@
-<System name="Europa">
+<System name="Tarnak">
 	<!--Each system has a name and a collection of objects-->
 	<Object type="Planet">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
-		<radius>1500</radius>
-		<x>2200</x>
-		<y>3000</y>
-		<z>400</z>
+		<radius>3500</radius>
+		<x>0</x>
+		<y>-5000</y>
+		<z>0</z>
 		<texture>gasgiant_map42.jpg</texture>
 	</Object>
 	<Object type="Planet">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
 		<radius>500</radius>
-		<x>-1500</x>
-		<y>-700</y>
-		<z>-2200</z>
+		<x>1500</x>
+		<y>700</y>
+		<z>1200</z>
 		<texture>pluto.jpg</texture>
 	</Object>
 	<Object type="Object">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
-		<radius>800</radius>
-		<x>1600</x>
-		<y>3000</y>
+		<radius>4000</radius>
+		<x>-3500</x>
+		<y>1000</y>
 		<z>-2400</z>
-		<texture>0124-0906-2509-2407_hubble_space_telescope_image_of_messier_101_galaxy_o.jpg</texture>
+		<texture>Ssc2003-06c.jpg</texture>
 	</Object>
 
 </System>
+
+
+
+
 
 <System name="Oceania">
 	<!--Each system has a name and a collection of objects-->
@@ -45,7 +49,7 @@
 		<z>1500</z>
 		<texture>Planet_Wight_1600.jpg</texture>
 	</Object>
-	<Object type="Billboard">
+	<Object type="Object">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
 		<radius>1500</radius>
 		<x>2500</x>
@@ -61,9 +65,9 @@
   <Object type="Planet">
     <!--an object has a size, a position, and a texture.  oh and a type-->
     <radius>1500</radius>
-    <x>2000</x>
-    <y>-2500</y>
-    <z>-6500</z>
+    <x>1200</x>
+    <y>-1500</y>
+    <z>-4000</z>
     <texture>planet_Bog1200.png</texture>
   </Object>
   <Object type="Planet">
@@ -121,6 +125,36 @@
   </Object>
 
 </System>
+
+<System name="Europa">
+	<!--Each system has a name and a collection of objects-->
+	<Object type="Planet">
+		<!--an object has a size, a position, and a texture.  oh and a type-->
+		<radius>1500</radius>
+		<x>2200</x>
+		<y>3000</y>
+		<z>400</z>
+		<texture>gasgiant_map42.jpg</texture>
+	</Object>
+	<Object type="Planet">
+		<!--an object has a size, a position, and a texture.  oh and a type-->
+		<radius>500</radius>
+		<x>-1500</x>
+		<y>-700</y>
+		<z>-2200</z>
+		<texture>pluto.jpg</texture>
+	</Object>
+	<Object type="Object">
+		<!--an object has a size, a position, and a texture.  oh and a type-->
+		<radius>800</radius>
+		<x>1600</x>
+		<y>3000</y>
+		<z>-2400</z>
+		<texture>0124-0906-2509-2407_hubble_space_telescope_image_of_messier_101_galaxy_o.jpg</texture>
+	</Object>
+
+</System>
+
 
 <System name="Terra_Australis">
   <!--Each system has a name and a collection of objects-->
