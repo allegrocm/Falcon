@@ -137,7 +137,7 @@ The event occurs 100 times per second so use a very low probability-->
       <volume>1.0</volume>
       <pan>-1</pan>
     </sound>
-    <listener>Vader</listener>
+    <listener>Falcon</listener>
   </Event>
 
 </EventSounds>
