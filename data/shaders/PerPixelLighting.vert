@@ -8,6 +8,6 @@ void main()
 	gl_TexCoord[2] = gl_MultiTexCoord2;
 	gl_TexCoord[3] = gl_MultiTexCoord3;
 
-	vertexNormal = gl_NormalMatrix * gl_Normal;
+	vertexNormal = normalize(gl_NormalMatrix * gl_Normal);
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
