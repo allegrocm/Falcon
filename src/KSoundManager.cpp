@@ -514,3 +514,21 @@ void KSoundManager::previousSong()
 		skipSong();
 	}
 }
+
+void KSoundManager::setSoundLoop(SkySound* channel, bool loop)
+{
+	if(!channel) return;
+	channel->setLoopCount(loop ? 99999999 : 1);
+	channel->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+//	printf("set lupin to %i\n", loop);
+
+}
+
+bool KSoundManager::soundIsPlaying(SkySound* channel)
+{
+	bool isPlaying = false;
+	if(!channel) return false;
+	channel->isPlaying(&isPlaying);
+	return isPlaying;
+}
+

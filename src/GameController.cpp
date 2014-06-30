@@ -28,6 +28,7 @@ GameController& GameController::instance()
 GameController::GameController()
 {
 	reset();
+	mWeLost = false;
 }
 
 void GameController::reset()
@@ -39,6 +40,7 @@ void GameController::reset()
 	mStats.reset();
 	KSoundManager::instance()->setMusicVolume(ROM::MUSIC_VOLUME);
 	mSoundTimer = 0;
+
 	
 }
 
@@ -90,6 +92,7 @@ void GameController::startGame()
 	mMode = MAIN_GAME;
 	mStats.reset();
 	mModeTime = 0;
+	mWeLost = false;
 
 }
 
@@ -185,6 +188,10 @@ void GameController::mainGame(float dt)
 
 		
 	}
+	else if(mWeLost)		//did we lose?  run away
+	{
+		mSwitchTime -= dt;
+	}
 	else
 	{
 		EventAudio::instance().eventHappened("randomFighting");	//triggered every frame
@@ -192,6 +199,14 @@ void GameController::mainGame(float dt)
 	
 	
 	
+}
+
+void GameController::falconLost()
+{
+	mWeLost = true;
+	mSwitchTime = 10.0;
+	FalconApp::instance().getScreen()->setStatusText("WARNING:  HULL BREACH.");
+	FalconApp::instance().getScreen()->setIsUp(true);		//put the screen back up
 }
 
 

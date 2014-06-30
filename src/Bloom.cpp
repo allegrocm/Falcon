@@ -59,7 +59,12 @@ BloomController::BloomController()
 	mGlowCamera->setClearMask(GL_COLOR_BUFFER_BIT);							//glow camera draws second, only clears color
 	mNonGlowCamera->setRenderOrder(osg::Camera::NESTED_RENDER, 4);
 	mNonGlowCamera->setClearColor(Vec4(1, 1, 0, 1));
-	ShaderManager::applyShaderToNode("data/shaders/JustDepth", mNonGlowCamera);		//use a shader to make everything the noglow camera draws black
+	
+	ShaderManager::applyShaderToNode("data/shaders/JustDepth", mNonGlowCamera, true);		//use a shader to make everything the noglow camera draws black
+	
+	
+	//non-glowy things can glow if overriddent hough!
+	mNonGlowCamera->getOrCreateStateSet()->addUniform(new Uniform("glowColor", Vec4(0, 0, 0, 0)));
 	mGlowCamera->setClearColor(Vec4(1, 1, 1, 1));
 	mGlowCamera->setRenderOrder(osg::Camera::NESTED_RENDER, 5);
 	

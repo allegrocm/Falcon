@@ -36,6 +36,7 @@ EnemyController::EnemyController(bool TIENode)
 
 void EnemyController::reset()
 {
+	killAll();
 //just add a few generic spaceships for now
 	int numToMake = 3;
 
@@ -117,11 +118,17 @@ void EnemyController::spawnEnemy(bool initing)
 			playerForShip = mEnemyPlayers[i];
 	}
 	
+	//if we're resetting, make sure the enemy player has a ship
+	if(mPlayer && mPlayer->getShip() == NULL && initing)
+		playerForShip = mPlayer;
+		
 	if(mLeftToSpawn != 0)
 		mLeftToSpawn--;
 	StupidPlaceholderShip* sps;
+	printf("Spawn ship!  %i left\n", mLeftToSpawn);
 	if(playerForShip)
 	{
+		printf("Vader tie!\n");
 		sps = new VaderTIE();
 		sps->setPlayer(playerForShip);
 		playerForShip->setShip(sps);
@@ -129,7 +136,7 @@ void EnemyController::spawnEnemy(bool initing)
 	else sps = new StupidPlaceholderShip();
 	sps->loadTIEModel();
 	addShip(sps);
-	printf("Spawn ship!\n");
+
 
 	//events and things only happen if we're not initializing the controller
 	if(!initing)
@@ -162,6 +169,7 @@ void EnemyController::drawDebug()
 
 void EnemyController::killAll()
 {
+	printf("******** kill em all!\n");
 	for(size_t i = 0; i < mEnemies.size(); i++)
 	{
 		mEnemies[i]->explode();

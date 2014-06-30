@@ -216,6 +216,7 @@ void SpaceBox::addBillboard(std::string texture, Vec3 pos, float height, bool ad
 
 bool SpaceObject::fromXML(TiXmlElement* element)
 {
+	__FUNCTION_HEADER__
 	std::string eventName = element->Attribute("type");
 	printf("Got a %s\n", eventName.c_str());
 	if(KenXML::CICompare(eventName, "Planet")) type = PLANET;
@@ -234,6 +235,7 @@ bool SpaceObject::fromXML(TiXmlElement* element)
 		else if(KenXML::CICompare(what, "height"))	KenXML::readValue(e, size);
 	}
 	
+	//preload all the textures
 	Util::loadImage(std::string("data/textures/planets/") + texName);
 	return true;
 	
@@ -243,7 +245,7 @@ bool SpaceObject::fromXML(TiXmlElement* element)
 
 bool SpaceBox::loadSystems(std::string file)
 {
-
+	__FUNCTION_HEADER__
 	TiXmlDocument* doc = KenXML::loadXmlFile(file);
 	if(!doc)
 	{

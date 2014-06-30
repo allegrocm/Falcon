@@ -57,6 +57,7 @@ Hyperspace::Hyperspace()
 	
 }
 
+bool Hyperspace::done()	{return (mHSTime < 0);}
 bool Hyperspace::update(float dt)
 {
 	mAge += dt;
@@ -79,7 +80,7 @@ bool Hyperspace::update(float dt)
 	}
 	if(mHSTime >= switchTimeSeconds && mHSTime - dt < switchTimeSeconds)	//is it time to switch systems??
 	{
-		printf("HS switch!  phase = %.2f, t = %.2f\n", mPhase, mHSTime);
+//		printf("HS switch!  phase = %.2f, t = %.2f\n", mPhase, mHSTime);
 		FalconApp::instance().switchSystem();
 	}
 	

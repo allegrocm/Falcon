@@ -55,6 +55,8 @@ public:
 	bool canPlaySound()	{return (mSoundTimer < 0);}
 	void justPlayedSound()	{mSoundTimer = 5;}	//did we play a sound elsewhere that we don't want Han talking over?
 	void reset();
+	void falconLost();			// ):
+	bool vaderWon()	{return mWeLost;}
 protected:
 	float mTime;
 	float mJumpTime;			//we've initialized hyperjump.  how long till it happens?
@@ -65,5 +67,6 @@ protected:
 	float mModeTime;				//how long have we been in this mode?
 	float mLastDT;					//supports the modeTimeJustPassed() function
 	float mSoundTimer;	//don't play other random sounds till this is < 0
+	bool mWeLost;				//did the falcon lose?
 };
 #endif /* defined(__Millennium_Falcon__GameController__) */

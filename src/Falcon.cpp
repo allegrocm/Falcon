@@ -64,6 +64,10 @@ Falcon::Falcon()
 	for(int i = 0; i < numRings; i++)
 	{
 		ScreenImage* reticle1 = new ScreenImage();
+
+		//don't know why this works
+		//putting anything in the transparent bin seems to make it vanish
+		//maybe something to do with the bloom effect
 		reticle1->transform->getOrCreateStateSet()->setRenderingHint(StateSet::OPAQUE_BIN);
 		reticle1->setImage(Util::findDataFile("data/textures/reticleSingle.png"));
 		reticle1->setPos(Vec3(0, 0, -100 * (1+i)));
@@ -97,12 +101,15 @@ Falcon::Falcon()
 	mGlowUniform = new Uniform("glowColor", Vec4(1.0, 0.0, 0.0, 0.0));
 	mPat->getOrCreateStateSet()->addUniform(mGlowUniform);
 	mGlowTime = 0;
+	
+	mKlaxon = NULL;//
+//	KSoundManager::instance()->stopSound(mKlaxon);
+//	KSoundManager::instance()
 //	ShaderManager::instance().applyShaderToNode("data/shaders/PerPixelLighting", n);
 }
 
 bool Falcon::update(float dt)
 {
-
 	Matrix wand = FalconApp::instance().getWandMatrix();
 	mAimedPart->setAttitude(wand.getRotate());
 	mUpperAimedPart->setAttitude(wand.getRotate());
@@ -122,11 +129,30 @@ bool Falcon::update(float dt)
 	{
 		mGlowTime = 0;
 		glowAmount = 0;
+		
 	}
 	else
 		mGlowTime += dt;
 
 	mGlowUniform->set(Vec4(1.0, 0.05, 0.05, glowAmount * 0.25));
+
+	if(GameController::instance().getMode() == 0)
+	{
+		//kill our klaxon if we've started over
+		if(mKlaxon)
+		{
+//			printf("klax on!\n");
+			KSoundManager::instance()->setSoundLoop(mKlaxon, false);
+			if(KSoundManager::instance()->soundIsPlaying(mKlaxon) == false)
+			{
+//				printf("Klaxon is done!\n");
+				KSoundManager::instance()->letSoundDie(mKlaxon);
+				mKlaxon = NULL;
+			}
+			
+		}
+
+	}
 	return true;
 
 }
@@ -266,6 +292,8 @@ void Falcon::jump()
 
 void Falcon::wasHit(Bullet* b, osg::Vec3 hitPos)
 {
+	//we can't get damaged till the game has started
+	if(GameController::instance().getMode() != GameController::MAIN_GAME) return;
 	//reduce hitpoints
 	::Stats& stats = GameController::instance().getStats();
 	EventAudio::instance().eventHappened("falconHit");
@@ -282,15 +310,25 @@ void Falcon::wasHit(Bullet* b, osg::Vec3 hitPos)
 	if(oldPercent > 0.25 && newPercent <= 0.25)
 	{
 		EventAudio::instance().eventHappened("quarterHealth");		//maybe play a sound when health gets low
+		//start playing our klaxon.  we'll kill it when it's time
+		if(mKlaxon) KSoundManager::instance()->letSoundDie(mKlaxon);
+		mKlaxon = KSoundManager::instance()->playSound("data/sounds/Buzzer3.wav", 0.75, 0, true);
 	}
 
 	if(oldPercent > 0 && newPercent <= 0)
 	{
 		EventAudio::instance().eventHappened("noHealth");
+		mHyperspace->go();		//gotta go now!
+		GameController::instance().falconLost();
 	}
 
 //	printf("Health:  %i\n", 	GameController::instance().getStats().health);
 //	FalconApp::instance().getFX()->makeExplosion(b->getPos(), 1.5);
+}
+
+bool Falcon::isJumping()
+{
+	return !(mHyperspace->done());
 }
 
 

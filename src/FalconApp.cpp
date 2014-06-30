@@ -136,7 +136,7 @@ void FalconApp::init()
 	mTIEDisplayGroup->addChild(qrc);
 	
 	//HACK:  for temps, put the TIE radar on the main screen
-#if(0)
+#if(1)
 #ifndef USE_VRJ
 	qrc = new CameraThatRendersAQuad();
 	qrc->setTexture(mTIEScreen->getCamera()->getTargetTexture(0));
@@ -363,8 +363,8 @@ void FalconApp::drawStatus()
 	int rowHeight = 20;
 	int row = 2;
 
-	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        In the %s System",
-		mAvgFrameRate, mSpaceBox->getSystemName().c_str());
+	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System",
+		mAvgFrameRate, mGameController->getMode(), mSpaceBox->getSystemName().c_str());
 	drawStringOnScreen(20, rowHeight * row++, "Buttons:  %i, %i, %i, %i, %i, %i",
 		mButtons[0], mButtons[1], mButtons[2], mButtons[3], mButtons[4], mButtons[5]);
 	drawStringOnScreen(20, rowHeight * row++, "Head at:  %.2f, %.2f, %.2f",
@@ -560,11 +560,11 @@ Spacecraft* FalconApp::getEnemyPlayerShip()
 
 void FalconApp::toggleShaders()
 {
-	return;
+//	return;
 	static bool shaders = false;
 	shaders = !shaders;
 	printf("shaders set to %i\n", shaders);
-	osg::Program* shader = ShaderManager::loadShader("data/shaders/perPixelLighting");
+	osg::Program* shader = ShaderManager::loadShader("data/shaders/perVertexLighting");
 	if(shaders)
 		mFalcon->getRoot()->getOrCreateStateSet()->setAttributeAndModes( shader, osg::StateAttribute::ON);
 	else

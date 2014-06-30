@@ -29,7 +29,7 @@ public:
 
 	//shoot bullets at the enemy player
 	void updateAutoTurret(float dt);
-
+	bool isJumping();
 protected:
 
 	osg::Vec3 mAimTarget;		//where is the gun aiming?
@@ -38,5 +38,8 @@ protected:
 	Hyperspace* mHyperspace;
 	Gun mAutoTurret;	//under-belly auto turret.  may not have any graphical rep.  fires at the enemy player
 	float mTurretVisibleTime;		//how long has the turret been able to see the enemy player?
+	osg::ref_ptr<osg::Uniform> mGlowUniform;
+	float mGlowTime;		//for flashing glow
+	SkySound* mKlaxon;			//we're in danger!
 };
 #endif /* defined(__Millennium_Falcon__Falcon__) */

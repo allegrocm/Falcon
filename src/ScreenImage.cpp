@@ -90,7 +90,7 @@ void ScreenImage::setPos(Vec3 v)
 
 void ScreenImage::setImage(std::string name)
 {
-	Image* img = osgDB::readImageFile(name);
+	Image* img = Util::loadImage(name);
 	if(!img)
 	{
 		Util::logError("Couldn't load image %s", name.c_str());

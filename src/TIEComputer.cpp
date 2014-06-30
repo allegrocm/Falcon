@@ -56,7 +56,7 @@ TIEComputer::TIEComputer()
 	//add the background image
 	ScreenImage* image = new ScreenImage();
 	mCamera->addChild(image->transform);
-	image->setImage("data/textures/TIEPuterMask.png");
+	image->setImage("data/textures/TIEPuterMaskPOT.png");
 	image->setHeight(1);
 //	image->setColor(Vec4(0.7, 0.7, 1.0, 1));
 	image->setPos(Vec3(0, 0, .5));		//put this in front of the other images
@@ -66,7 +66,7 @@ TIEComputer::TIEComputer()
 	//now add the little radar screen overlay
 	image = new ScreenImage();
 	mCamera->addChild(image->transform);
-	image->setImage("data/textures/TIEPuterRaderOverlay.png");
+	image->setImage("data/textures/TIEPuterRaderOverlayPOT.png");
 	image->setHeight(1);
 //	image->setColor(Vec4(0.7, 0.7, 1.0, 1));
 //	image->setPos(Vec3(0, 0, 1));		//put this in front of the other images
@@ -104,8 +104,8 @@ TIEComputer::TIEComputer()
 		mArrowImage[i] = new ScreenImage();
 		mCamera->addChild(mArrowImage[i]->transform);
 		mArrowImage[i]->setImage("data/textures/TIERadarArrow2.png");
-		mArrowImage[i]->setHeight(.2);
-		mArrowImage[i]->setAspect(0.5);
+		mArrowImage[i]->setHeight(.15);
+		mArrowImage[i]->setAspect(1);
 		mArrowImage[i]->setColor(ROM::VADER_DISPLAY_COLOR);
 
 
@@ -253,6 +253,10 @@ void TIEComputer::updateStatusText(float dt)
 		statusText = "AUTOPILOT";
 	else if(playerShip->getHP() < ROM::VADER_TIE_HP / 3)
 		statusText = "WARNING:  HULL CRITICAL";
+	
+	if(GameController::instance().vaderWon())
+		statusText = "You've defeated the Millennium Falcon!";
+		
 	mAIText->setText(statusText);
 	mAITextFlashTime += dt;
 	float textFlashRate = 1.0;

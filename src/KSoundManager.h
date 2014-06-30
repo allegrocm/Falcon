@@ -110,6 +110,8 @@ public:
 	void setSoundDopplerLevel(SkySound* soundChannel, float doppy);	//set whether this sound is modulated by the Doppler effect
 	void letSoundDie(SkySound* soundchannel);	//removes all priority from this sound so it can be canceled with no trouble
 	void stopSound(SkySound* sound);
+	void setSoundLoop(SkySound* coundChannel, bool loop);
+	bool soundIsPlaying(SkySound* channel);
 	void loadPlaylist(std::string name);
 	void skipSong();			//skip playlist songs
 	void previousSong();		//rewind the playlist

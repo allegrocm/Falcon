@@ -229,6 +229,7 @@ void setLight(float x, float y, float z)
 
 void display(void)
 {
+	float tin = PROFILER.getTime();
     // update and render the scene graph
 	osg::Camera* currentCam = viewer->getCamera();
 
@@ -330,6 +331,10 @@ void display(void)
 	FalconApp::instance().drawStatus();
     // Swap Buffers
     glutSwapBuffers();
+	static int first = 0;
+	if(!first) printf("first frame time:  %.2f s\n", PROFILER.getTime() - tin);
+	first++;
+	
 }
 
 
