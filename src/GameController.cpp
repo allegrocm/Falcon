@@ -109,7 +109,8 @@ void GameController::enemyWasKilled(Spacecraft* c)
 		EventAudio::instance().eventHappened("lastEnemyKilled");
 
 	}
-	EventAudio::instance().eventHappened("EnemyKilled");
+	if(!mWeLost)
+		EventAudio::instance().eventHappened("EnemyKilled");
 	mStats.score += c->getScore();
 
 }

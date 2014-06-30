@@ -341,7 +341,7 @@ bool ComputerScreen::update(float dt)
 	mHealthImage->setColor(healthColor);
 	
 	
-	//finally, update position based on the want matrix
+	//finally, update position based on the wand matrix
 	
 //	mUpness = MIDIControl::slider(1);
 	float posUpness = mUpness;		//the upness we'll use when positioning the HUD
@@ -379,7 +379,6 @@ bool ComputerScreen::update(float dt)
 	float scale = 1.0 +  posUpness;
 	mPat->setScale(Vec3(scale, scale, scale));
 
-
 	Matrix mat = FalconApp::instance().getWandMatrix();
 	
 	Vec3 wandX(mat.ptr()[0], mat.ptr()[1], mat.ptr()[2]);
@@ -406,6 +405,7 @@ bool ComputerScreen::update(float dt)
 		flatWand.ptr()[i+8] += (wandZ.ptr()[i] - flatWand.ptr()[i+8])* (1.0 -pitchEffect);
 	}
 	
+	
 	//the height of the HUD is constant if it's "up"
 //	for(int i = 0; i < 3; i++)
 	{
@@ -415,6 +415,17 @@ bool ComputerScreen::update(float dt)
 			flatWand.ptr()[12+i] += fwdAmount * wandZ.ptr()[i] * -1;
 	}
 	
+	//if we lose tracking on the wand, fix it!
+	wandZ.y() = 0;
+	if(wandZ.length() < 0.2) wandZ = wandY;
+	wandZ.y() = 0;
+	wandZ.normalize();
+	float dist = 3;
+	if(Util::pos(flatWand).length() > 8)
+	{
+		flatWand.ptr()[12] = wandZ.x() * -dist;
+		flatWand.ptr()[14] = wandZ.z()*-dist;
+	}
 	Matrix newScreen = ROM::SCREEN_OFFSET * flatWand;
 	
 	

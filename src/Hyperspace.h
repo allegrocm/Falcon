@@ -21,7 +21,8 @@ public:
 	bool update(float dt);
 	void go();
 	bool done();		//have we finished the jump?
-
+	float getHSTime()	{return mHSTime;}
+	float getHSPhase()	{return mPhase;}
 protected:
 	float mHSTime;				//used to time hyperspace things
 	float mPhase;			//what phase of the jump are we in?

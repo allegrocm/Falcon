@@ -94,7 +94,7 @@ void JugglerInterface::latePreFrame()
 			FalconApp::instance().buttonInput(i, true);
 		else if((*button)->getData() == gadget::Digital::TOGGLE_OFF)
 			FalconApp::instance().buttonInput(i, false);
-			
+		
 	}
 	
 	//send enemy controls if possible

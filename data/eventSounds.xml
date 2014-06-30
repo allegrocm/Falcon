@@ -51,11 +51,11 @@
 
 
 <!--played a few seconds before we start the hyperspace jump.  A little before the preJump event-->
-	<Event name="nottimeToGo">
+	<Event name="timeToGo">
 		<soundChance>1</soundChance>
 		<sound>
-			<filename>han/getusoutofhere.mp3</filename>
-			<volume>1.0</volume>
+			<filename>WeDidIt.mp3</filename>
+			<volume>0.7</volume>
 			<pan>-1</pan>
 		</sound>
 		<listener>Falcon</listener>
@@ -118,6 +118,17 @@ The event occurs 100 times per second so use a very low probability-->
     <listener>Falcon</listener>
   </Event>
 
+  <!--played when the falcon's hitpoints drop below 25%-->
+  <Event name="QuarterHealthVaderListener">
+    <soundChance>1</soundChance>
+    <sound>
+      <filename>IHaveYouNow.mp3</filename>
+      <volume>1.0</volume>
+      <pan>0</pan>
+    </sound>
+    <listener>Vader</listener>
+  </Event>
+  
   <!--played when the falcon's hitpoints are all gone-->
   <Event name="NoHealth">
     <soundChance>1</soundChance>
@@ -126,6 +137,7 @@ The event occurs 100 times per second so use a very low probability-->
       <volume>1.0</volume>
       <pan>-1</pan>
     </sound>
+    <listener>Vader</listener>
   </Event>
 
 </EventSounds>

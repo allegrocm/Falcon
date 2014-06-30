@@ -40,6 +40,8 @@
 #include "RadarScreen.h"
 #include "TIEComputer.h"
 #include "ShaderManager.h"
+#include "Hyperspace.h"
+
 using namespace osg;
 
 
@@ -146,7 +148,7 @@ void FalconApp::init()
 #endif
 #endif
 	mEventAudioManager->setListener(mTieNode1 ? "Vader" : "Falcon");
-	
+	printf("eventaudio listener: %s\n", mTieNode1 ? "Vader" : "Falcon");
 	//add some uniforms for use with per-pixel lighting shaders
 	mModelGroup->getOrCreateStateSet()->addUniform(new Uniform("tex0", 0));
 	mModelGroup->getOrCreateStateSet()->addUniform(new Uniform("tex1", 1));
@@ -161,7 +163,7 @@ void FalconApp::init()
 
 void FalconApp::buttonInput(unsigned int button, bool pressed)
 {
-//	printf("Button %i: %i\n", button, pressed);
+	//printf("Button %i: %i\n", button, pressed);
 	if(button < NUMBUTTONS)
 	{
 		if(pressed && (mButtons[button] == TOGGLE_OFF || mButtons[button] == OFF))
@@ -169,8 +171,11 @@ void FalconApp::buttonInput(unsigned int button, bool pressed)
 		if(!pressed && (mButtons[button] == TOGGLE_ON || mButtons[button] == ON))
 			mButtons[button] = TOGGLE_OFF;
 
-
+	
 	}
+	
+	if(mButtons[3] == TOGGLE_ON)
+		mSpaceBox->nextSystem();
 
 }
 
@@ -202,23 +207,48 @@ void FalconApp::update(float fulldt)
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
 		mListenerVelocity = Vec3();			//zero by default
+		
+		//updating navigation for the TIE fighter
 		if(player && player->getShip() && mTieNode1)
 		{
 			Spacecraft* enemy = player->getShip();
 
 			Matrix nav = enemy->getTransform();
 
-			float ahead = -65;
-			float lower = -3;
+			float ahead = -50.3;
+			float lower = 0;
+			float right = 0.00;
 #ifndef USE_VRJ
 			ahead = -3;
+			lower = -3;
 #else
 #warning look into TIE camera position
 #endif
 			for(int i = 0; i < 3; i++)
 			{
-				nav.ptr()[12+i] += nav.ptr()[8+i] * ahead + nav.ptr()[4+i] * lower;
+				nav.ptr()[12+i] += nav.ptr()[8+i] * ahead + nav.ptr()[4+i] * lower + nav.ptr()[i]*right;
 			}
+			
+			//if the TIE fighter has won and the falcon is jumping out, do a back-view of it
+			if(mFalcon->getHyperspace()->done() == false && GameController::instance().vaderWon())
+			{
+				Vec3 viewPos(20, 40, 100);
+				Vec3 z(viewPos);
+				z.normalize();
+				float HSTime = mFalcon->getHyperspace()->getHSTime();
+				float HSPhase = mFalcon->getHyperspace()->getHSPhase();
+				Vec3 up(0, 1, 0);
+				Vec3 x = up ^ z;
+				x.normalize();
+				viewPos += z * 10 * HSTime;
+				Util::setZAxis(nav, z);
+				Util::setXAxis(nav, x);
+				Util::setYAxis(nav, up);
+				nav = nav * Matrix::rotate(HSPhase, z);
+				Util::setPos(nav, viewPos);
+			
+			}
+			
 			//Util::printMatrix(nav);
 			nav.invert(nav);
 			
@@ -423,6 +453,12 @@ void FalconApp::handleArguments(int* argc, char **argv)
 			mIsMaster = true;
 			printf("We are the master node!\n");
 //			handled = true;
+		}
+		else if(KenXML::CICompare(arg, "--noTurret"))		//no lower turret allowed
+		{
+			mLowerTurretAllowed = false;
+			handled = true;
+			printf("Lower turret turned off\n");
 		}
 		else if(KenXML::CICompare(arg, "--tienode"))
 		{

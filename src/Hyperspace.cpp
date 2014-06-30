@@ -93,7 +93,11 @@ bool Hyperspace::update(float dt)
 	float z = -250;
 
 	
-	if(mHSTime > HSDuration + HSDelay) z = 10000;
+	if(mHSTime > HSDuration + HSDelay)
+	{ 
+		z = 10000;
+		mHSTime = -1;
+	}
 	//start moving towards the camera after a certain amount of time
 	if(mPhase > moveStart)
 	{

@@ -149,7 +149,7 @@ void EventAudio::eventHappened(std::string name)
 	}
 	
 	//can we play a new sound yet?
-	if(mSoundTimer > 0) return;
+	//if(mSoundTimer > 0) return;
 	if(e->playAgainTimer > 0) return;	//too soon for this event to trigger again
 	//only play a sound a certain percent of the time
 	if(1.0 * r1 / RAND_MAX > e->probability) return;

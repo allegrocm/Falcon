@@ -222,9 +222,9 @@
   <Object type="Planet">
     <!--an object has a size, a position, and a texture.  oh and a type-->
     <radius>1500</radius>
-    <x>-6000</x>
-    <y>-3500</y>
-    <z>-2000</z>
+    <x>-4000</x>
+    <y>-2400</y>
+    <z>-1400</z>
     <texture>planet_Bog1200.png</texture>
   </Object>
   <Object type="Object">

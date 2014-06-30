@@ -134,11 +134,11 @@ bool Falcon::update(float dt)
 	else
 		mGlowTime += dt;
 
-	mGlowUniform->set(Vec4(1.0, 0.05, 0.05, glowAmount * 0.25));
-
-	if(GameController::instance().getMode() == 0)
+	
+	
+	if(GameController::instance().getMode() == 0 || (percent > 0 && mHyperspace->done() == false))
 	{
-		//kill our klaxon if we've started over
+		//kill our klaxon if we've started over or begun to jump safely
 		if(mKlaxon)
 		{
 //			printf("klax on!\n");
@@ -151,8 +151,9 @@ bool Falcon::update(float dt)
 			}
 			
 		}
-
+		glowAmount = 0;
 	}
+	mGlowUniform->set(Vec4(1.0, 0.05, 0.05, glowAmount * 0.25));
 	return true;
 
 }
@@ -310,13 +311,15 @@ void Falcon::wasHit(Bullet* b, osg::Vec3 hitPos)
 	if(oldPercent > 0.25 && newPercent <= 0.25)
 	{
 		EventAudio::instance().eventHappened("quarterHealth");		//maybe play a sound when health gets low
+		EventAudio::instance().eventHappened("QuarterHealthVaderListener");		//maybe play a sound when health gets low
 		//start playing our klaxon.  we'll kill it when it's time
 		if(mKlaxon) KSoundManager::instance()->letSoundDie(mKlaxon);
-		mKlaxon = KSoundManager::instance()->playSound("data/sounds/Buzzer3.wav", 0.75, 0, true);
+		mKlaxon = KSoundManager::instance()->playSound("data/sounds/Buzzer3.wav", FalconApp::instance().tieNode1() ? 0:0.5, 0, true);
 	}
 
 	if(oldPercent > 0 && newPercent <= 0)
 	{
+		printf("No health left!\n");
 		EventAudio::instance().eventHappened("noHealth");
 		mHyperspace->go();		//gotta go now!
 		GameController::instance().falconLost();

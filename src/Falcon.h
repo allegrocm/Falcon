@@ -30,6 +30,7 @@ public:
 	//shoot bullets at the enemy player
 	void updateAutoTurret(float dt);
 	bool isJumping();
+	Hyperspace* getHyperspace()	{return mHyperspace;}
 protected:
 
 	osg::Vec3 mAimTarget;		//where is the gun aiming?

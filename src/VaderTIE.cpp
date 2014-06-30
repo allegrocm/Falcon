@@ -40,7 +40,7 @@ void VaderTIE::loadTIEModel()
 	printf("Load thai model:  schmancy\n");
 	//load a ship model.  we can also pre-transform the model into our coordinate system
 //	MatrixTransform* red = Util::loadModel("data/models/tief3DS/TIEFReduced.3DS", 1.0, -90);
-	MatrixTransform* nbest = Util::loadModel("data/models/vadertie3DS/vadertie.3ds", 1.1 / 25.4, 90, 0, 180);
+	MatrixTransform* nbest = Util::loadModel("data/models/vadertie3DS/vadertie.3ds", 1.1 / 25.4, 90, 0, 180, Vec3(-.08, 0, 0));
 //	FalconApp::instance().getModelGroup()->addChild(nbest);
 //	MatrixTransform* nbest = Util::loadModel("data/models/vadertie3DS/vadertie.3ds", 1.0, -90);
 //	MatrixTransform* lod = Util::loadModel("data/models/tief3DS/TIEF_10.3ds", 1.0, -90);

@@ -593,7 +593,7 @@ int main( int argc, char **argv )
 	glutSpecialFunc(keySpecial);
 	glutSpecialUpFunc(keySpecialUp);
 	glutKeyboardUpFunc(keyUpBoard);
-//	FalconApp::instance().handleArguments(&argc, argv);
+	FalconApp::instance().handleArguments(&argc, argv);
 	FalconApp::instance().toggleTIEMode();
     // create the view of the scene.
     viewer = new osgViewer::Viewer;
