@@ -227,7 +227,37 @@ void FalconApp::update(float fulldt)
 		mFalcon->setPos(Vec3(0, 0, -mFalcon->getHyperspace()->getZ()));
 		
 		//updating navigation for the TIE fighter
-		if(player && player->getShip() && mTieNode1)
+
+		//if the TIE fighter has won and the falcon is jumping out, do a back-view of it
+		if(mFalcon->getHyperspace()->done() == false && mTieNode1)
+		{
+			Matrix nav;
+			Vec3 viewPos(20, 40, 100);
+			Vec3 z(viewPos -mFalcon->getPos());
+			z.normalize();
+			float HSTime = mFalcon->getHyperspace()->getHSTime();
+			
+			//wait a few seconds before we start spinning
+			float spinDelay = 5.0;
+			float spin = HSTime-spinDelay;
+			if(spin < 0) spin = 0;
+			
+			Vec3 up(0, 1, 0);
+			Vec3 x = up ^ z;
+			x.normalize();
+			viewPos += z * 10 * HSTime;
+			Util::setZAxis(nav, z);
+			Util::setXAxis(nav, x);
+			Util::setYAxis(nav, up);
+			nav = nav * Matrix::rotate(spin, z);
+			Util::setPos(nav, viewPos);
+		
+			nav.invert(nav);
+			
+			mNavigation->setMatrix(nav);
+		}
+
+		else if(player && player->getShip() && mTieNode1)
 		{
 			Spacecraft* enemy = player->getShip();
 
@@ -247,30 +277,7 @@ void FalconApp::update(float fulldt)
 				nav.ptr()[12+i] += nav.ptr()[8+i] * ahead + nav.ptr()[4+i] * lower + nav.ptr()[i]*right;
 			}
 			
-			//if the TIE fighter has won and the falcon is jumping out, do a back-view of it
-			if(mFalcon->getHyperspace()->done() == false && GameController::instance().vaderWon())
-			{
-				Vec3 viewPos(20, 40, 100);
-				Vec3 z(viewPos -mFalcon->getPos());
-				z.normalize();
-				float HSTime = mFalcon->getHyperspace()->getHSTime();
-				
-				//wait a few seconds before we start spinning
-				float spinDelay = 5.0;
-				float spin = HSTime-spinDelay;
-				if(spin < 0) spin = 0;
-				
-				Vec3 up(0, 1, 0);
-				Vec3 x = up ^ z;
-				x.normalize();
-				viewPos += z * 10 * HSTime;
-				Util::setZAxis(nav, z);
-				Util::setXAxis(nav, x);
-				Util::setYAxis(nav, up);
-				nav = nav * Matrix::rotate(spin, z);
-				Util::setPos(nav, viewPos);
 			
-			}
 			
 			
 			//Util::printMatrix(nav);
@@ -435,9 +442,9 @@ void FalconApp::drawStatus()
 	glColor3f(.6, .6, .9);
 	int rowHeight = 20;
 	int row = 2;
-
-	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System (SP:%.0f)",
-		mAvgFrameRate, mGameController->getMode(), mSpaceBox->getSystemName().c_str(), mSPOffset);
+::Stats& stats = GameController::instance().getStats();	
+	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System (%i/%i)",
+		mAvgFrameRate, mGameController->getMode(), mSpaceBox->getSystemName().c_str(), stats.health, stats.maxHealth);
 	drawStringOnScreen(20, rowHeight * row++, "Buttons:  %i, %i, %i, %i, %i, %i",
 		mButtons[0], mButtons[1], mButtons[2], mButtons[3], mButtons[4], mButtons[5]);
 	drawStringOnScreen(20, rowHeight * row++, "Head at:  %.2f, %.2f, %.2f",

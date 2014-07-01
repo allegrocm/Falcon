@@ -3,7 +3,7 @@
 #the parameter names are NOT case sensitive, but if you provide a filename for a sound or texture or model, that IS.
 
 #how many shots to kill the Falcon?
-FalconHitPoints = 320
+FalconHitPoints = 200
 
 hyperspaceSound = hyperspace.mp3
 mainMusic =	imperialProbe.mp3

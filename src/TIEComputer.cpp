@@ -256,7 +256,10 @@ void TIEComputer::updateStatusText(float dt)
 	
 	if(GameController::instance().vaderWon())
 		statusText = "You've defeated the Millennium Falcon!";
-		
+	
+	//otherwise show the Falcon health
+	::Stats& stats = GameController::instance().getStats();
+	if(statusText == "") statusText = Util::stringWithFormat("Falcon:  %i/%i\n", stats.health, stats.maxHealth);
 	mAIText->setText(statusText);
 	mAITextFlashTime += dt;
 	float textFlashRate = 1.0;
