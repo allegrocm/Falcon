@@ -166,9 +166,11 @@ void FalconApp::init()
 	mModelGroup->getOrCreateStateSet()->setTextureAttribute(0, t);
 	toggleShaders();
 	
-//	MatrixTransform* ds = Util::loadModel("data/models/isd4(MAX3_3DS)/isd.3ds", 1, 0, 0, 0);
+//	MatrixTransform* ds = Util::loadModel("data/models/Star_Destroyer/star_destroyer.obj", 1, -90, 90, 0);
 //	mModelGroup->addChild(ds);
-//	Util::printNodeHierarchy(ds);
+//	Util::makeTangentSpace(ds);
+//	ds->setNodeMask(1 << BACKGROUND_LAYER);
+////	Util::printNodeHierarchy(ds);
 //	ShaderManager::instance().applyShaderToNode("data/shaders/DeathStar", ds);
 }
 
@@ -430,7 +432,7 @@ void FalconApp::drawStatus()
 	}
 
 #endif
-	glColor3f(1, 1, 1);
+	glColor3f(.6, .6, .9);
 	int rowHeight = 20;
 	int row = 2;
 
@@ -651,6 +653,6 @@ void FalconApp::toggleShaders()
 
 void FalconApp::switchSystem()
 {
-	mSPOffset = 50000;
+	mSPOffset = 100000;
 	mSpaceBox->nextSystem();
 }

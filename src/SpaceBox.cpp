@@ -36,13 +36,13 @@ SpaceBox::SpaceBox()
 
 	mRoot->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex);
 	mRoot->getOrCreateStateSet()->setMode(GL_LIGHTING, false);
-//	mRoot->getOrCreateStateSet()->setAttribute(new Depth(Depth::LESS, 0, 1, false));		//don't write to the depth buffer
 
-	osg::Box* cube = new Box(Vec3(), 100000);
+
+	osg::Box* cube = new Box(Vec3(), 20000);
 	ShapeDrawable* sd = new ShapeDrawable(cube);
 	mBox = new Geode();
 	mBox->addDrawable(sd);
-
+	mBox->getOrCreateStateSet()->setAttribute(new Depth(Depth::LESS, 0, 1, false));		//don't write to the depth buffer
 	//we render the spacebox to a separate camera so we can have it very, very far away without it
 	//interfering with close-range depth testing
 	Camera* c = new Camera;

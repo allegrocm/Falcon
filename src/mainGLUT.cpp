@@ -406,7 +406,7 @@ void keyboard(unsigned char key, int x, int y)
 	switch(key)
 	{
 		//handle key input
-//		case 'J': GameController::instance().falconLost(); break;
+		case 'J': GameController::instance().getStats().health = 1; break;
 		case 'q': gCamera.setStrafeLeft(true);	break;
 		case 'w': gCamera.setUp(true);	break;
 		case 'e': gCamera.setStrafeRight(true);	break;

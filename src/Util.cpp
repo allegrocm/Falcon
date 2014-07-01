@@ -786,12 +786,16 @@ void makeTangentSpace(Node* n)
 
 void addTangentSpaceCoordinates(osg::Geometry* geom)
 {
+	osg::Vec2Array* texes0 = (osg::Vec2Array*)(geom->getTexCoordArray(0));
+	if(!texes0)
+	{
+//		printf("Gen TS vectors:  no tex array\n");
+		return;
+	}
 
 //	printf("going through drawable\n");
 	osgUtil::TangentSpaceGenerator* tg = new osgUtil::TangentSpaceGenerator;
 	tg->generate(geom, 0);
-	osg::Vec2Array* texes0 = (osg::Vec2Array*)(geom->getTexCoordArray(0));
-	if(!texes0) printf("Gen TS vectors:  no tex array\n");
 //	printf("array sizes:  %i, %i, %i\n", (int)(texes0->size()), (int)(tg->getTangentArray()->size()), (int)(tg->getBinormalArray()->size()));
 	//for(int i = 0; i < texes0->size(); i++)
 	//	printf("tex coord:  %.2f, %.2f\n", texes0->at(i)[0], texes0->at(i)[1]);

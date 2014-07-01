@@ -64,7 +64,7 @@ bool Hyperspace::update(float dt)
 	float HSDelay = 3;				//when does the animation start, so we time the sound properly
 	float HSDuration = 3.0;			//how long does the animation last?
 	float moveStart = 0.5;			//when do the stars shoot towards us?  relative to the whole animation, not in seconds
-	float systemSwitch = 0.75;		//when does the background system change?
+	float systemSwitch = 0.55;		//when does the background system change?
 	float resetTime = 1;			//how long after we've finished till we're "done"?
 	if(mHSTime >= 0)
 	{

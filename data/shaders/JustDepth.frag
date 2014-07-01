@@ -5,5 +5,6 @@ void main()
 {
 
 	gl_FragColor = glowColor * glowColor.a;
+	gl_FragColor.rgb += gl_FrontMaterial.emission.rgb;
 	
 }

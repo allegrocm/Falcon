@@ -1,49 +1,45 @@
 
-varying vec4 vertexColor;
 
-vec4 ambientColor;
-vec4 diffuseColor;
-vec4 specColor;
+varying vec4 projCoords;
 
-vec3 surfaceNormal;		//includes bump/normal map, if applicable
+//these are actually in...view space or something
+varying vec3 oNormal;
+varying vec3 owsTangent;		//original worldspace tangent
+varying vec3 owsBinormal;		//original worldspace binormal
+varying vec3 owsNormal;			//original worldspace normal
 
-vec3 vertexNormal;
-
-void calcLighting()
-{
-	ambientColor = gl_LightModel.ambient;
-	diffuseColor = vec4(0.0);
-	specColor = vec4(0.0);
-	for(int i = 0; i < 2; i++)
-	{
-		ambientColor += gl_LightSource[i].ambient;
-		float lightDotSurface = clamp(dot(normalize(gl_LightSource[i].position.xyz), surfaceNormal), 0.0, 1.0);
-		diffuseColor += gl_LightSource[i].diffuse * lightDotSurface;
-		vec3 lightReflect = normalize(reflect(gl_LightSource[i].position.rgb * -1.0, surfaceNormal));
-		float specEx = gl_FrontMaterial.shininess;		//specular exponent
-		float specAmount = lightReflect.z;
-		specColor.rgb =+ vec3(specAmount);
-	}
-//	ambientColor *= gl_FrontMaterial.ambient;
-//	specColor *= gl_FrontMaterial.specular;
-//	diffuseColor *= gl_FrontMaterial.diffuse;
-	vertexColor = ambientColor * gl_FrontMaterial.ambient;
-	vertexColor += specColor * gl_FrontMaterial.specular+ diffuseColor * gl_FrontMaterial.diffuse;
-
-}
-
-
-
+varying vec4 vert;
 void main()
 {
-	//pass on tex coordinates
+	vert = gl_Vertex;
+	projCoords = gl_ModelViewProjectionMatrix * gl_Vertex;
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 	gl_TexCoord[1] = gl_MultiTexCoord1;
 	gl_TexCoord[2] = gl_MultiTexCoord2;
 	gl_TexCoord[3] = gl_MultiTexCoord3;
 
-	vertexNormal = normalize(gl_NormalMatrix * gl_Normal);
-	surfaceNormal = vertexNormal;
-	calcLighting();
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	
+	//calculate the tangent and binormal
+	vec4 tang = gl_MultiTexCoord2;
+	vec4 bin = gl_MultiTexCoord3;
+	vec4 norm;
+	norm.xyz = gl_NormalMatrix * gl_Normal;
+	norm.w = 0.0;
+
+	owsNormal = norm.xyz;
+	norm.w = 0.0;
+	tang.w = 0.0;
+	bin.w = 0.0;
+	tang.xyz = gl_NormalMatrix * tang.xyz;
+
+	bin.xyz = gl_NormalMatrix * bin.xyz;
+//	tang = gl_ModelViewMatrixInverse * tang;
+//	bin = gl_ModelViewMatrixInverse * bin;
+//	norm = gl_ModelViewMatrixInverse * norm;
+	owsTangent = tang.xyz;
+	owsBinormal = bin.xyz;
+//	owsNormal = gl_Normal;
+	gl_Position = projCoords;
+	oNormal = normalize(gl_Normal);
+	
 }
