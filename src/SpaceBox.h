@@ -14,6 +14,7 @@
 //a skybox.  but in space
 
 #include <osg/MatrixTransform>
+#include <osg/PositionAttitudeTransform>
 
 class TiXmlElement;		//for XML parsing
 
@@ -47,7 +48,7 @@ public:
 	bool loaded;
 	osg::ref_ptr<osg::Group> mFarThings;
 	osg::ref_ptr<osg::Group> mNearThings;
-
+	
 };
 
 
@@ -68,10 +69,11 @@ public:
 		mCurrentSystem = (mCurrentSystem+1)%mSystems.size();
 		loadSystem(mCurrentSystem);
 	}
+	osg::PositionAttitudeTransform* getNearGroup()	{return mNearGroup;}
 	std::string getSystemName()	{return mSystems[mCurrentSystem].name;}
 protected:
 	osg::ref_ptr<osg::MatrixTransform> mRoot;
-	osg::ref_ptr<osg::MatrixTransform> mNearGroup;		//planets
+	osg::ref_ptr<osg::PositionAttitudeTransform> mNearGroup;		//planets
 	osg::ref_ptr<osg::MatrixTransform> mFarGroup;		//far-away things
 	osg::ref_ptr<osg::Geode> mBox;		//what with the stars
 	void addPlanet(std::string texture, osg::Vec3 pos, float radius);

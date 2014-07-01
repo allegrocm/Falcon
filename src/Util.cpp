@@ -21,6 +21,7 @@
 
 // Project Headers
 #include "Util.h"
+#include <osgUtil/TangentSpaceGenerator>
 
 using namespace osg;
 namespace  Util
@@ -760,6 +761,54 @@ void setPos(osg::Matrix& m, osg::Vec3 v)
 	m.ptr()[14] = v.z();
 }
 
+void addTangentSpaceCoordinates(osg::Geometry* geom);
+
+void makeTangentSpace(Node* n)
+{
+	//dive in or recurse
+	Geode* geode = n->asGeode();
+	Group* group = n->asGroup();
+	if(geode)
+	{
+		for(size_t i = 0; i < geode->getNumDrawables(); i++)
+		{
+			Drawable* daw = geode->getDrawable(i);
+			if(daw->asGeometry())
+				addTangentSpaceCoordinates(daw->asGeometry());
+		}
+	}
+	else if(group)
+	{
+		for(size_t i = 0; i < group->getNumChildren(); i++)
+			makeTangentSpace(group->getChild(i));
+	}
+}
+
+void addTangentSpaceCoordinates(osg::Geometry* geom)
+{
+
+//	printf("going through drawable\n");
+	osgUtil::TangentSpaceGenerator* tg = new osgUtil::TangentSpaceGenerator;
+	tg->generate(geom, 0);
+	osg::Vec2Array* texes0 = (osg::Vec2Array*)(geom->getTexCoordArray(0));
+	if(!texes0) printf("Gen TS vectors:  no tex array\n");
+//	printf("array sizes:  %i, %i, %i\n", (int)(texes0->size()), (int)(tg->getTangentArray()->size()), (int)(tg->getBinormalArray()->size()));
+	//for(int i = 0; i < texes0->size(); i++)
+	//	printf("tex coord:  %.2f, %.2f\n", texes0->at(i)[0], texes0->at(i)[1]);
+//	osg::Array* ta = tg->getTangentArray();
+//	printf("%i tangent coorinates\n", ((Vec4Array*)(ta))->size());
+//	osg::Array* b = tg->getBinormalArray();
+//	printf("%i binormal coorinates\n", ((Vec4Array*)(b))->size());
+	if(!geom->getTexCoordArray(2))
+		geom->setTexCoordArray(2, tg->getTangentArray());
+
+	if(!geom->getTexCoordArray(3))
+		geom->setTexCoordArray(3, tg->getBinormalArray());
+
+//	printf("finished generating vectors for drawable\n");
+
+	
+}
 
 
 		

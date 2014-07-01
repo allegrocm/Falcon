@@ -65,6 +65,7 @@ bool Hyperspace::update(float dt)
 	float HSDuration = 3.0;			//how long does the animation last?
 	float moveStart = 0.5;			//when do the stars shoot towards us?  relative to the whole animation, not in seconds
 	float systemSwitch = 0.75;		//when does the background system change?
+	float resetTime = 1;			//how long after we've finished till we're "done"?
 	if(mHSTime >= 0)
 	{
 		mHSTime += dt;
@@ -76,36 +77,55 @@ bool Hyperspace::update(float dt)
 	}
 	else
 	{
-		mPhase = 1.0;
+		mPhase = 0.0;
 	}
 	if(mHSTime >= switchTimeSeconds && mHSTime - dt < switchTimeSeconds)	//is it time to switch systems??
 	{
 //		printf("HS switch!  phase = %.2f, t = %.2f\n", mPhase, mHSTime);
-		FalconApp::instance().switchSystem();
+
+		//switch systems earlier on Falcon nodes, a bit later on the TIE node
+		if(!FalconApp::instance().tieNode1())
+		{
+			FalconApp::instance().switchSystem();
+		}
+
 	}
 	
 //	mPhase= mAge / 2.0;
 	//just loop our animation for now
 
-	mPhase -= (int)mPhase;
+	//mPhase -= (int)mPhase;
 	
-	mPat->setScale(Vec3(1, 1, 10.0 * mPhase * mPhase));
-	float z = -250;
+	mPat->setScale(Vec3(1, 1, 30.0 * mPhase * mPhase));
+	mZ = 0;		//default displacement
 
 	
 	if(mHSTime > HSDuration + HSDelay)
 	{ 
-		z = 10000;
-		mHSTime = -1;
+		mZ = 10000;
+
 	}
+	
+	if(mHSTime > HSDuration + HSDelay + resetTime)
+	{ 
+		mZ = 0000;
+		mHSTime = -1;
+
+		if(FalconApp::instance().tieNode1())
+		{
+			FalconApp::instance().switchSystem();
+		}
+		
+	}
+
 	//start moving towards the camera after a certain amount of time
 	if(mPhase > moveStart)
 	{
 		float movement = (mPhase-moveStart) / (1.0-moveStart);
 		movement *= movement * movement;
-		z += movement * 500;
+		mZ += movement * 500 * 3;
 	}
-	mPat->setPosition(Vec3(0, 0, z));
+	mPat->setPosition(Vec3(0, 0, mZ-750));
 	return true;
 }
 

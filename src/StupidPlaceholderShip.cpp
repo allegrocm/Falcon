@@ -22,6 +22,7 @@
 #include "Bullet.h"
 #include <osgUtil/IntersectVisitor>
 #include "EnemyController.h"
+
 using namespace osg;
 
 
@@ -50,7 +51,7 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 	mTargetPosition = Vec3();
 	mCurrentTurnTime = 0;
 	mTimeToTurn = 0;
-	mTimeTillShoot = Util::random(0.0, 2.0);
+	mTimeTillShoot = Util::random(5.0, 10.0);
 	mGun = ROM::TIE_FIGHTER_GUN;
 }
 
@@ -141,14 +142,6 @@ void StupidPlaceholderShip::playerControl(float dt)
 		return;
 	}
 
-	//are we hiding under the falcon?  that's not allowed
-	//TODO:  maybe just have the falcon shoot at us.  makes more sense
-	if(false && (pos.y() < 0 && (xzDist < -pos.y() * 3 || xzDist < 50)))
-	{
-		mTargetPosition = getPos() + Vec3(0, 50, 0);		//fly upward unless we're super close
-		AIControl(dt, false);
-		return;
-	}
 	
 	mPlayer->AIControl = false;
 	//printf("player control!  %.2f, %.2f, %.2f, (%i)\n", input.xAxis, input.yAxis, input.thrustAxis, input.trigger);
@@ -333,37 +326,42 @@ void StupidPlaceholderShip::wasHit(Bullet* b, osg::Vec3 hitPos)
 		explode();
 }
 
-void StupidPlaceholderShip::explode()
+void StupidPlaceholderShip::explode(bool withAWhimper)
 {
 	//make scattered little explosions
 	mHP = 0;
-	int count = rand()%2+3;
-	for(int i = 0; i < count; i++)
-	{
-		Vec3 pos = Util::randomVector();
-		pos.x() *= 5.0;
-		pos.y() *= 3.0;
-		pos.z() *= 3.0;
-
-
-		FalconApp::instance().getFX()->makeExplosion(pos * getTransform(), Util::random(.5, 2.0));
-	}
 	
-	KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::PLACEHOLDER_EXPLOSION_SOUND, 1, getPos().x(), getPos().y(), getPos().z(), false, 100);
-//	printf("my mat:\n");
-//	Util::printMatrix(getTransform());
-	osg::MatrixTransform* debrisRoot = Util::loadModel("data/models/tief3DS/TieFighterDebris.3DS", 1.0, -90);
-	std::vector<Debris*> debris = explodeSection(debrisRoot, 1, 3, .5, .5, getTransform(), debrisRoot, 5);
-	for(size_t i = 0; i < debris.size(); i++)
+	if(!withAWhimper)
 	{
-		Debris* h = debris[i];
-//		printf("Debris mat:\n");
-//		Util::printMatrix(h->getTransform());
-//		h->setTransformAndOffset(h->getTransform() * getTransform(), Vec3());
-		h->setVel(h->getVel() + mVel);
-//		h->setFireAmount(0);
-//		h->setLife(100);
-		FalconApp::instance().addThis(h);
+		int count = rand()%2+3;
+		for(int i = 0; i < count; i++)
+		{
+			Vec3 pos = Util::randomVector();
+			pos.x() *= 5.0;
+			pos.y() *= 3.0;
+			pos.z() *= 3.0;
+
+
+			FalconApp::instance().getFX()->makeExplosion(pos * getTransform(), Util::random(.5, 2.0));
+		}
+		
+		GameController::instance().enemyWasKilled(this);
+		KSoundManager::instance()->play3DSound(std::string("data/sounds/") + ROM::PLACEHOLDER_EXPLOSION_SOUND, 1, getPos().x(), getPos().y(), getPos().z(), false, 100);
+	//	printf("my mat:\n");
+	//	Util::printMatrix(getTransform());
+		osg::MatrixTransform* debrisRoot = Util::loadModel("data/models/tief3DS/TieFighterDebris.3DS", 1.0, -90);
+		std::vector<Debris*> debris = explodeSection(debrisRoot, 1, 3, .5, .5, getTransform(), debrisRoot, 5);
+		for(size_t i = 0; i < debris.size(); i++)
+		{
+			Debris* h = debris[i];
+	//		printf("Debris mat:\n");
+	//		Util::printMatrix(h->getTransform());
+	//		h->setTransformAndOffset(h->getTransform() * getTransform(), Vec3());
+			h->setVel(h->getVel() + mVel);
+	//		h->setFireAmount(0);
+	//		h->setLife(100);
+			FalconApp::instance().addThis(h);
+		}
 	}
 	
 	if(mEngineSound)
@@ -378,7 +376,7 @@ void StupidPlaceholderShip::explode()
 		printf("Player's ship died!\n");
 		mPlayer->shipDied();
 	}
-	GameController::instance().enemyWasKilled(this);
+	
 
 }
 

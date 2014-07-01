@@ -31,7 +31,7 @@ public:
 	virtual int getHP()					{return mHP;}
 	virtual int getScore()				{return mScore;}
 	virtual void kill();				//blow it up
-	virtual void explode()				{}
+	virtual void explode(bool whimper = false)				{}
 	virtual void setPlayer(EnemyPlayer* p)		{mPlayer = p;}
 	virtual EnemyPlayer* getPlayer()			{return mPlayer;}
 	virtual void loadTIEModel()	{printf("SPS load thai\n");}

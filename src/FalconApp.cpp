@@ -62,22 +62,26 @@ void FalconApp::init()
 	
 	mTotalTime = 0;
 	mRoot = new osg::Group;
+	
+	//put our non-far-background stuff into a camera that only clears the depth buffa
+	Camera* nearCam = new Camera();
+	nearCam->setClearMask(GL_DEPTH_BUFFER_BIT);
 	mNavigation = new osg::MatrixTransform;
-
-	mRoot->addChild(mNavigation.get());
+	nearCam->addChild(mNavigation);
+	mRoot->addChild(nearCam);
 	mRoot->getOrCreateStateSet()->setMode(GL_NORMALIZE, true);
 	mAvgFrameRate = 30;
 	mModelGroup = new osg::Group;
 	mNavigation->addChild(mModelGroup.get());
 	mScreen = new ComputerScreen();
 	mTIEScreen = new TIEComputer();
-
 	
 	
+	mSPOffset = 0;
 	//quickly add a lil spacebox
 	mSpaceBox = new SpaceBox();
- 	mModelGroup->addChild(mSpaceBox->getRoot());
-	
+// 	mModelGroup->addChild(mSpaceBox->getRoot());
+	mRoot->addChild(mSpaceBox->getRoot());
 	mLightSource = new osg::LightSource;
 	mNavigation->addChild(mLightSource.get());
 
@@ -122,8 +126,8 @@ void FalconApp::init()
 		mRoot->addChild(mBloom->getRoot());
 		mBloom->getScene()->addChild(mNavigation);
 	}
-	else
-		mRoot->addChild(mNavigation);
+//	else
+//		mRoot->addChild(mNavigation);
 	
 	
 	//audio only plays on the master and tie fighter nodes
@@ -138,7 +142,7 @@ void FalconApp::init()
 	mTIEDisplayGroup->addChild(qrc);
 	
 	//HACK:  for temps, put the TIE radar on the main screen
-#if(1)
+#if(0)
 #ifndef USE_VRJ
 	qrc = new CameraThatRendersAQuad();
 	qrc->setTexture(mTIEScreen->getCamera()->getTargetTexture(0));
@@ -158,6 +162,11 @@ void FalconApp::init()
 	t->setFilter(Texture::MIN_FILTER, Texture::NEAREST);
 	mModelGroup->getOrCreateStateSet()->setTextureAttribute(0, t);
 	toggleShaders();
+	
+//	MatrixTransform* ds = Util::loadModel("data/models/isd4(MAX3_3DS)/isd.3ds", 1, 0, 0, 0);
+//	mModelGroup->addChild(ds);
+//	Util::printNodeHierarchy(ds);
+//	ShaderManager::instance().applyShaderToNode("data/shaders/DeathStar", ds);
 }
 
 
@@ -208,6 +217,10 @@ void FalconApp::update(float fulldt)
 		EnemyPlayer* player = mEnemyController->getPlayer();
 		mListenerVelocity = Vec3();			//zero by default
 		
+		
+		//the falcon moves with its hyperspace thingy
+		mFalcon->setPos(Vec3(0, 0, -mFalcon->getHyperspace()->getZ()));
+		
 		//updating navigation for the TIE fighter
 		if(player && player->getShip() && mTieNode1)
 		{
@@ -233,10 +246,15 @@ void FalconApp::update(float fulldt)
 			if(mFalcon->getHyperspace()->done() == false && GameController::instance().vaderWon())
 			{
 				Vec3 viewPos(20, 40, 100);
-				Vec3 z(viewPos);
+				Vec3 z(viewPos -mFalcon->getPos());
 				z.normalize();
 				float HSTime = mFalcon->getHyperspace()->getHSTime();
-				float HSPhase = mFalcon->getHyperspace()->getHSPhase();
+				
+				//wait a few seconds before we start spinning
+				float spinDelay = 5.0;
+				float spin = HSTime-spinDelay;
+				if(spin < 0) spin = 0;
+				
 				Vec3 up(0, 1, 0);
 				Vec3 x = up ^ z;
 				x.normalize();
@@ -244,10 +262,11 @@ void FalconApp::update(float fulldt)
 				Util::setZAxis(nav, z);
 				Util::setXAxis(nav, x);
 				Util::setYAxis(nav, up);
-				nav = nav * Matrix::rotate(HSPhase, z);
+				nav = nav * Matrix::rotate(spin, z);
 				Util::setPos(nav, viewPos);
 			
 			}
+			
 			
 			//Util::printMatrix(nav);
 			nav.invert(nav);
@@ -257,10 +276,15 @@ void FalconApp::update(float fulldt)
 		}
 		else if (!mTieNode1)
 		{
-			mNavigation->setMatrix(osg::Matrix());
+			Matrix nav = mFalcon->getTransform();
+			nav.invert(nav);
+			mNavigation->setMatrix(nav);
 
 		}
 		
+		
+
+
 		//update bullets. when one is "finished", delete it
 		for(size_t i = 0; i < mBullets.size(); i++)
 		{
@@ -291,7 +315,23 @@ void FalconApp::update(float fulldt)
 		//so we can never approach the actual objects in it
 		Matrix nav = mNavigation->getMatrix();
 		nav.invert(nav);
-		mSpaceBox->setViewerPos(Util::pos(nav));
+
+//		mSpaceBox->setViewerPos(Util::pos(nav));
+		
+		//spacebox root navigates with our navigation, minus the position
+		Matrix navRot = mNavigation->getMatrix();
+		
+		//
+		Util::setPos(navRot, Vec3());
+		mSpaceBox->getRoot()->setMatrix(navRot);
+		mSpaceBox->getNearGroup()->setPosition(Vec3(0, 0, -mSPOffset));
+
+		//fly planets toward us after we jump
+		float SPSpeed = 100000;
+		if(mSPOffset < 10000)
+			SPSpeed = (mSPOffset / 10000 * 0.9 + 0.1) * SPSpeed;
+		mSPOffset -= SPSpeed * mTimeStep;
+		if(mSPOffset < 0) mSPOffset = 0;
 
 		
 		//neither the TIE fighter nor the MF need to change their audio in response to head movement
@@ -300,8 +340,6 @@ void FalconApp::update(float fulldt)
 		KSoundManager::instance()->updateListener(mTimeStep, navf.ptr(),
 			mListenerVelocity.x(), mListenerVelocity.y(), mListenerVelocity.z());
 		mEventAudioManager->update(mTimeStep);
-		//in the C6, the listener moves relative to the speakers already
-		//KSoundManager::instance()->update(mTimeStep);
 
 
 		
@@ -393,8 +431,8 @@ void FalconApp::drawStatus()
 	int rowHeight = 20;
 	int row = 2;
 
-	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System",
-		mAvgFrameRate, mGameController->getMode(), mSpaceBox->getSystemName().c_str());
+	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System (SP:%.0f)",
+		mAvgFrameRate, mGameController->getMode(), mSpaceBox->getSystemName().c_str(), mSPOffset);
 	drawStringOnScreen(20, rowHeight * row++, "Buttons:  %i, %i, %i, %i, %i, %i",
 		mButtons[0], mButtons[1], mButtons[2], mButtons[3], mButtons[4], mButtons[5]);
 	drawStringOnScreen(20, rowHeight * row++, "Head at:  %.2f, %.2f, %.2f",
@@ -610,5 +648,6 @@ void FalconApp::toggleShaders()
 
 void FalconApp::switchSystem()
 {
+	mSPOffset = 50000;
 	mSpaceBox->nextSystem();
 }

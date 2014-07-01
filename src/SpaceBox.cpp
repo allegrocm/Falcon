@@ -38,7 +38,7 @@ SpaceBox::SpaceBox()
 	mRoot->getOrCreateStateSet()->setMode(GL_LIGHTING, false);
 //	mRoot->getOrCreateStateSet()->setAttribute(new Depth(Depth::LESS, 0, 1, false));		//don't write to the depth buffer
 
-	osg::Box* cube = new Box(Vec3(), 10000);
+	osg::Box* cube = new Box(Vec3(), 100000);
 	ShapeDrawable* sd = new ShapeDrawable(cube);
 	mBox = new Geode();
 	mBox->addDrawable(sd);
@@ -47,8 +47,8 @@ SpaceBox::SpaceBox()
 	//interfering with close-range depth testing
 	Camera* c = new Camera;
 	Matrix projShift;		//matrix to shift the culling distances farther
-	projShift.ptr()[15] = 100;
-	//c->setProjectionMatrix(projShift);
+	projShift.ptr()[15] = 1000;
+	c->setProjectionMatrix(projShift);
 	c->setName("Spacebox Camera");
 	mRoot->addChild(c);
 
@@ -56,7 +56,7 @@ SpaceBox::SpaceBox()
 	mRoot->setNodeMask(1 << NON_GLOW_LAYER);
 	mRoot->getOrCreateStateSet()->setMode(GL_BLEND, true);
 
-	mNearGroup = new MatrixTransform;
+	mNearGroup = new PositionAttitudeTransform;
 	//mRoot->addChild(mNearGroup);
 	mFarGroup = new MatrixTransform;
 	//mRoot->addChild(mFarGroup);
@@ -218,7 +218,7 @@ bool SpaceObject::fromXML(TiXmlElement* element)
 {
 	__FUNCTION_HEADER__
 	std::string eventName = element->Attribute("type");
-	printf("Got a %s\n", eventName.c_str());
+//	printf("Got a %s\n", eventName.c_str());
 	if(KenXML::CICompare(eventName, "Planet")) type = PLANET;
 	else if(KenXML::CICompare(eventName, "BillBoard")) type = BILLBOARD;
 	else type = BILLBOARD_PLUS;
@@ -285,7 +285,7 @@ bool SpaceBox::loadSystems(std::string file)
 		}
 		
 		std::string eventName = eaNode->Attribute("name");
-		printf("Got name %s\n", eventName.c_str());
+//		printf("Got name %s\n", eventName.c_str());
 		s.name = eventName;
 
 		printf("loaded scene called %s with %i objects\n", s.name.c_str(), (int)s.objects.size());

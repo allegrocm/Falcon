@@ -29,10 +29,11 @@ CameraThatRendersAQuad::CameraThatRendersAQuad()
 	float y0 = 0;
 	float width = 512;
 	float height = 512;
-	verts->push_back(osg::Vec3(x0, y0, 0));
-	verts->push_back(osg::Vec3(x0 + width, y0, 0));
-	verts->push_back(osg::Vec3(x0 + width, y0 + height, 0));
-	verts->push_back(osg::Vec3(x0, y0 + height, 0));
+	float z = 0;
+	verts->push_back(osg::Vec3(x0, y0, z));
+	verts->push_back(osg::Vec3(x0 + width, y0, z));
+	verts->push_back(osg::Vec3(x0 + width, y0 + height, z));
+	verts->push_back(osg::Vec3(x0, y0 + height, z));
 
 	osg::Vec3Array* colors = new osg::Vec3Array;
 	colors->push_back(osg::Vec3(1, 1, 1));

@@ -205,7 +205,7 @@ void GameController::mainGame(float dt)
 void GameController::falconLost()
 {
 	mWeLost = true;
-	mSwitchTime = 10.0;
+	mSwitchTime = 14.0;
 	FalconApp::instance().getScreen()->setStatusText("WARNING:  HULL BREACH.");
 	FalconApp::instance().getScreen()->setIsUp(true);		//put the screen back up
 }

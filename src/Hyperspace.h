@@ -23,9 +23,11 @@ public:
 	bool done();		//have we finished the jump?
 	float getHSTime()	{return mHSTime;}
 	float getHSPhase()	{return mPhase;}
+	float getZ()		{return mZ;}		//how far as the ship "moved"?
 protected:
 	float mHSTime;				//used to time hyperspace things
 	float mPhase;			//what phase of the jump are we in?
+	float mZ;
 
 };
 

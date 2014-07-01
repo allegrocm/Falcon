@@ -172,7 +172,7 @@ void EnemyController::killAll()
 	printf("******** kill em all!\n");
 	for(size_t i = 0; i < mEnemies.size(); i++)
 	{
-		mEnemies[i]->explode();
+		mEnemies[i]->explode(true);
 	}
 	mLeftToSpawn = 0;
 	

@@ -19,7 +19,7 @@ class StupidPlaceholderShip : public Spacecraft
 public:
 	StupidPlaceholderShip();
 	virtual bool update(float dt);			//flies around in a circle....
-	virtual void explode();
+	virtual void explode(bool withAWhimper = false);
 	virtual void wasHit(Bullet* b, osg::Vec3 hitPos);
 	virtual void drawDebug();
 	virtual bool shoot();

@@ -132,7 +132,7 @@ protected:
 	
 	BloomController* mBloom;					//for bloom!
 	bool mLowerTurretAllowed;				//on by default
-	
+	float mSPOffset;						//z-offset for our spacebox when we fly to a new system
 	
 };
 

@@ -239,7 +239,7 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 8500.0);
+	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 1000.0);
 	FalconApp::instance().getBloom()->setAspectRatio(aspect);
 
 	currentCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
