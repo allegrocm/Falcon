@@ -53,7 +53,7 @@ SpaceBox::SpaceBox()
 	mRoot->addChild(c);
 
 	c->setRenderOrder(Camera::NESTED_RENDER, -1);
-	mRoot->setNodeMask(1 << NON_GLOW_LAYER);
+	mRoot->setNodeMask(1 << BACKGROUND_LAYER);
 	mRoot->getOrCreateStateSet()->setMode(GL_BLEND, true);
 
 	mNearGroup = new PositionAttitudeTransform;

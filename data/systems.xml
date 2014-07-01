@@ -57,6 +57,15 @@
 		<z>1200</z>
 		<texture>Space_Texture_1_by_zy0rg.png</texture>
 	</Object>
+	
+	<Object type="Planet">
+		<!--an object has a size, a position, and a texture.  oh and a type-->
+		<radius>2800</radius>
+		<x>100</x>
+		<y>-3000</y>
+		<z>20000</z>
+		<texture>planet_Telos1200.png</texture>
+	</Object>
 
 </System>
 

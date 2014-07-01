@@ -91,6 +91,8 @@ void FalconApp::init()
 	light->setAmbient(osg::Vec4(0.25f, 0.25f, .25, 1.0f));
 	light->setPosition(osg::Vec4(100.0f, 100.0f, 100.0f, 0.0f));
 
+	//have to add these to the spacebox too for the planets to light properly
+	mSpaceBox->getRoot()->addChild(mLightSource);
 
 	mLightSource = new osg::LightSource;
 	mNavigation->addChild(mLightSource.get());
@@ -102,8 +104,9 @@ void FalconApp::init()
 	light->setAmbient(osg::Vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	light->setPosition(osg::Vec4(-10.0f, -100.0f, 0.0f, 0.0f));
 
-
-
+	//have to add these to the spacebox too for the planets to light properly
+	mSpaceBox->getRoot()->addChild(mLightSource);
+	
 	mWandXForm = new osg::MatrixTransform;
 	mModelGroup->addChild(mWandXForm);
 
