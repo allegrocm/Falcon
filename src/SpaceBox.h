@@ -23,11 +23,12 @@ class TiXmlElement;		//for XML parsing
 class SpaceObject
 {
 public:
-	enum ObjectType {PLANET, BILLBOARD, BILLBOARD_PLUS, NUM_OBJECT_TYPES};		//billboard plus is additively blended
+	enum ObjectType {PLANET, BILLBOARD, BILLBOARD_PLUS, MODEL, NUM_OBJECT_TYPES};		//billboard plus is additively blended
 	ObjectType type;
 	float size;	//height/radius
 	osg::Vec3 pos;
-	std::string texName;
+	osg::Vec3 heading;		//euler angles.  only used for ships
+	std::string texName;	//or model name
 	bool fromXML(TiXmlElement* e);
 	SpaceObject(){type = PLANET; size = 500;}
 };
@@ -78,6 +79,7 @@ protected:
 	osg::ref_ptr<osg::Geode> mBox;		//what with the stars
 	void addPlanet(std::string texture, osg::Vec3 pos, float radius);
 	void addBillboard(std::string texture, osg::Vec3 pos, float height, bool additiveBlend);
+	void addModel(SpaceObject o);
 	std::vector<SpaceScene> mSystems;
 	int mCurrentSystem;		//for cycling through the systems
 	

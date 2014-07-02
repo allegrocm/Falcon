@@ -237,13 +237,16 @@ void TIEComputer::updateStatusText(float dt)
 	std::string statusText = "";
 	Spacecraft* playerShip = getShip();
 	EnemyPlayer* player = EnemyController::instance().getPlayer();
-	if(!playerShip)
+	
+	if(GameController::instance().getMode() != GameController::MAIN_GAME)
 	{
-		if(GameController::instance().getMode() != GameController::MAIN_GAME)
-		{
-			statusText = "Waiting for the game to start...";
-		}
-		else
+		statusText = "Waiting for the game to start...";
+	}
+		
+		
+	else if(!playerShip)
+	{
+
 		if(player && EnemyController::instance().getShips().size())
 			statusText = Util::stringWithFormat("Destroyed!  Waiting to respawn in %.2f...", player->deadTimer());
 		else
@@ -259,7 +262,12 @@ void TIEComputer::updateStatusText(float dt)
 	
 	//otherwise show the Falcon health
 	::Stats& stats = GameController::instance().getStats();
-	if(statusText == "") statusText = Util::stringWithFormat("Falcon:  %i/%i\n", stats.health, stats.maxHealth);
+	if(statusText == "")
+	{
+		int active = EnemyController::instance().getShips().size();
+		int left = EnemyController::instance().getShipsLeftToSpawn(); 	
+		statusText = Util::stringWithFormat("Falcon:  %i/%i\nEmpire:  %i active, %i left", stats.health, stats.maxHealth, active, left);
+	}
 	mAIText->setText(statusText);
 	mAITextFlashTime += dt;
 	float textFlashRate = 1.0;

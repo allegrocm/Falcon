@@ -112,7 +112,7 @@ void GameController::enemyWasKilled(Spacecraft* c)
 	if(!mWeLost)
 		EventAudio::instance().eventHappened("EnemyKilled");
 	mStats.score += c->getScore();
-
+	printf("Enemy died at t = %.2f\n", mModeTime);
 }
 
 void GameController::enemyWasHit(Spacecraft* c)

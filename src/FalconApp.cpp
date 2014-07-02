@@ -168,9 +168,9 @@ void FalconApp::init()
 	mModelGroup->getOrCreateStateSet()->setTextureAttribute(0, t);
 	toggleShaders();
 
-	mStarDestroyer = new StarDestroyer();
+	//mStarDestroyer = new StarDestroyer();
 //	mStarDestroyer->setPos(Vec3(0, -500, 0));
-	addThis(mStarDestroyer);
+	//addThis(mStarDestroyer);
 }
 
 
@@ -444,6 +444,9 @@ void FalconApp::drawStatus()
 ::Stats& stats = GameController::instance().getStats();	
 	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System (%i/%i)",
 		mAvgFrameRate, mGameController->getMode(), mSpaceBox->getSystemName().c_str(), stats.health, stats.maxHealth);
+	int active = mEnemyController->getShips().size();
+	int left = mEnemyController->getShipsLeftToSpawn();
+	drawStringOnScreen(20, rowHeight*row++, "Enemies:  %i/%i", active, left);
 	drawStringOnScreen(20, rowHeight * row++, "Buttons:  %i, %i, %i, %i, %i, %i",
 		mButtons[0], mButtons[1], mButtons[2], mButtons[3], mButtons[4], mButtons[5]);
 	drawStringOnScreen(20, rowHeight * row++, "Head at:  %.2f, %.2f, %.2f",
@@ -582,6 +585,7 @@ bool FalconApp::addThis(GameObject* g)
 {
 	//we can find out what kind of object this is through dynamic casts
 	Spacecraft* ship = dynamic_cast<Spacecraft*>(g);
+	StarDestroyer* sd = dynamic_cast<StarDestroyer*>(g);
 	Bullet* bullet = dynamic_cast<Bullet*>(g);
 	if(bullet)
 	{
@@ -590,7 +594,7 @@ bool FalconApp::addThis(GameObject* g)
 		return true;
 	}
 	
-	if(ship)
+	if(ship && !sd)
 		mEnemyController->addShip(ship);
 	
 	if(g)
@@ -635,7 +639,6 @@ Spacecraft* FalconApp::getEnemyPlayerShip()
 	Spacecraft* playerShip = player->getShip();
 	if(!playerShip)
 	{
-		//TODO:  show something indicating if we'll respawn?
 		return NULL;
 	}
 
@@ -661,5 +664,5 @@ void FalconApp::switchSystem()
 {
 	mSPOffset = 100000;
 	mSpaceBox->nextSystem();
-	mStarDestroyer->warp();
+	//mStarDestroyer->warp();
 }

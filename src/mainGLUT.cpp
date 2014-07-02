@@ -14,7 +14,7 @@
 
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
-#include <osgDB/writefile>
+#include <osgDB/WriteFile>
 #include <stdarg.h>
 #include "FalconApp.h"
 #include "quickprof.h"

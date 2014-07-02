@@ -10,7 +10,7 @@
 #include "FalconApp.h"
 #include "Util.h"
 #include "ShaderManager.h"
-
+#include "Layers.h"
 using namespace osg;
 
 StarDestroyer::StarDestroyer()
@@ -19,7 +19,10 @@ StarDestroyer::StarDestroyer()
 	MatrixTransform* ds = Util::loadModel("data/models/SD.ive", 4, 0, -90);
 	ShaderManager::instance().applyShaderToNode("data/shaders/DeathStar", ds);
 	mPat->addChild(ds);
-	warp();
+	//warp();
+	setPos(Vec3(2000, -200, -1000));
+	setForward(Vec3(-1, 0, 0));
+	mRoot->setNodeMask(1 << BACKGROUND_LAYER);
 }
 
 
@@ -35,14 +38,14 @@ bool StarDestroyer::update(float dt)
 void StarDestroyer::warp()
 {
 	float theta = Util::random(0.0, 6.28);
-	float phi = Util::random(0, 1.0);
+	float phi = Util::random(-.25, 1.0);
 	float dist = Util::random(2400, 4800);
 	setPos(Vec3(cosf(theta)*cosf(phi), sinf(phi), sinf(theta)*cosf(phi))*dist);
 	
 	//random heading
 //	theta = Util::random(0, 6.28);
 //	setForward(Vec3(cosf(theta), 0, sinf(theta)));
-	Vec3 up = Util::vectorInCone(getPos()*-1, 80, 20);
+	Vec3 up = Util::vectorInCone(getPos()*-1, 60, 30);
 	setForward(up);
 //	Vec3 pos = getPos() * -1;;
 //	pos.normalize();

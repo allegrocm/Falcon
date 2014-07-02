@@ -107,6 +107,13 @@ void EnemyController::update(float dt)
 		
 	}
 	
+	//if there's no active player and hasn't been for a while, spawn it anyway
+	if(GameController::instance().getMode() == GameController::PRE_GAME)
+	{
+		if(mPlayer->isReadyForShip())
+			spawnEnemy(true);
+	}
+	
 }
 
 void EnemyController::spawnEnemy(bool initing)

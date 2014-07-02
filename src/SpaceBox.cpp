@@ -9,6 +9,7 @@
 #include "Util.h"
 #include "SpaceBox.h"
 #include "KenXML.h"
+#include "ShaderManager.h"
 
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
@@ -61,6 +62,7 @@ SpaceBox::SpaceBox()
 	mFarGroup = new MatrixTransform;
 	//mRoot->addChild(mFarGroup);
 	mFarGroup->addChild(mBox);
+	mNearGroup->setNodeMask(1 << BACKGROUND_LAYER);
 	c->addChild(mFarGroup);
 	c->addChild(mNearGroup);
 	reload();
@@ -106,6 +108,8 @@ void SpaceBox::loadSystem(int which)
 			}
 			else if(o.type == SpaceObject::BILLBOARD_PLUS)
 				addBillboard(std::string("data/textures/planets/")+o.texName, o.pos, o.size, true);
+			else if(o.type == SpaceObject::MODEL)
+				addModel(o);
 			else
 				addBillboard(std::string("data/textures/planets/")+o.texName, o.pos, o.size, false);
 		}
@@ -166,6 +170,26 @@ void SpaceBox::addPlanet(std::string texture, osg::Vec3 pos, float radius)
 }
 
 
+void SpaceBox::addModel(SpaceObject o)
+{
+	//load the model.  pass in the rotation here cuz it's easy
+	printf("add model.  size = %.2f, angles:  %.2f, %.2f, %.2f\n", o.size, o.heading.x(), o.heading.y(), o.heading.z());
+	MatrixTransform* mat = Util::loadModel(o.texName, o.size, o.heading.x(), o.heading.y(), o.heading.z());
+	Matrix m = mat->getMatrix();;
+	
+	//position the model
+	Util::setPos(m, o.pos);
+	mat->setMatrix(m);
+	
+	//apply shader
+	ShaderManager::instance().applyShaderToNode("data/shaders/DeathStar", mat);
+	
+	//and add it!
+	mSystems[mCurrentSystem].mNearThings->addChild(mat);
+	
+}
+
+
 void SpaceBox::addBillboard(std::string texture, Vec3 pos, float height, bool additiveBlend)
 {
 
@@ -218,9 +242,10 @@ bool SpaceObject::fromXML(TiXmlElement* element)
 {
 	__FUNCTION_HEADER__
 	std::string eventName = element->Attribute("type");
-//	printf("Got a %s\n", eventName.c_str());
+	printf("Got a %s\n", eventName.c_str());
 	if(KenXML::CICompare(eventName, "Planet")) type = PLANET;
 	else if(KenXML::CICompare(eventName, "BillBoard")) type = BILLBOARD;
+	else if(KenXML::CICompare(eventName, "Model")) type = MODEL;
 	else type = BILLBOARD_PLUS;
 	
 	
@@ -228,15 +253,22 @@ bool SpaceObject::fromXML(TiXmlElement* element)
 	{
 		std::string what = e->Value();
 		if(KenXML::CICompare(what, "texture"))	KenXML::readValue(e, texName);
+		else if(KenXML::CICompare(what, "file"))	KenXML::readValue(e, texName);
 		else if(KenXML::CICompare(what, "x"))	KenXML::readValue(e, pos.x());
 		else if(KenXML::CICompare(what, "y"))	KenXML::readValue(e, pos.y());
 		else if(KenXML::CICompare(what, "z"))	KenXML::readValue(e, pos.z());
 		else if(KenXML::CICompare(what, "radius"))	KenXML::readValue(e, size);
 		else if(KenXML::CICompare(what, "height"))	KenXML::readValue(e, size);
+		else if(KenXML::CICompare(what, "scale"))	KenXML::readValue(e, size);
+		else if(KenXML::CICompare(what, "yaw")) KenXML::readValue(e, heading.y());
+		else if(KenXML::CICompare(what, "pitch")) KenXML::readValue(e, heading.z());
+		else if(KenXML::CICompare(what, "roll")) KenXML::readValue(e, heading.x());
+		else Util::logError("SpaceObject doesn't know what to do with %s\n", what.c_str());
 	}
 	
 	//preload all the textures
-	Util::loadImage(std::string("data/textures/planets/") + texName);
+	if(type != MODEL)
+		Util::loadImage(std::string("data/textures/planets/") + texName);
 	return true;
 	
 

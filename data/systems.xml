@@ -24,7 +24,18 @@
 		<z>-2400</z>
 		<texture>Ssc2003-06c.jpg</texture>
 	</Object>
-
+	<Object type="Model">
+		<!--an object has a size, a position, and a texture.  oh and a type-->
+		<scale>2</scale>
+		<x>-2000</x>
+		<y>750</y>
+		<z>-1000</z>
+		<yaw>-130</yaw>
+		<roll>-35</roll>
+		<pitch>-20</pitch>
+		<file>data/models/SD.ive</file>
+	</Object>
+	
 </System>
 
 
@@ -73,10 +84,10 @@
   <!--Each system has a name and a collection of objects-->
   <Object type="Planet">
     <!--an object has a size, a position, and a texture.  oh and a type-->
-    <radius>1500</radius>
+    <radius>1100</radius>
     <x>1200</x>
     <y>-1500</y>
-    <z>-4000</z>
+    <z>-7000</z>
     <texture>planet_Bog1200.png</texture>
   </Object>
   <Object type="Planet">

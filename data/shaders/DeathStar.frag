@@ -54,7 +54,12 @@ void calcNormal()
 //	surfaceNormal = TSNormal;
 //	surfaceNormal = normalize(owsNormal);
 	surfaceNormal = normalize(owsTangent) * TSNormal.x + normalize(owsNormal) * TSNormal.z + normalize(owsBinormal) * TSNormal.y;
-	if((gl_NormalMatrix * oNormal).z < 0.01)
+	
+	//the normal is facing away from the view direction, flip it!
+	vec3 viewNorm = normalize(gl_NormalMatrix * normalize(oNormal));
+	vec3 viewDir = (projCoords.xyz + vec3(0.0, 0.0, 10.0));
+	
+	if(viewNorm.z * viewDir.z < 0.0)
 		surfaceNormal *= -1.0;
 }
 
@@ -98,4 +103,13 @@ void main()
 //	gl_FragColor.rgb = surfaceNormal * 0.5 + 0.5;
 //	if(gl_FragCoord.x > 400.0)
 //		gl_FragColor.rgb = mainTexture.rgb;
+	
+	
+	
+	//gl_FragColor.rgb = viewDir.rgb * 0.5 + 0.5;
+	//if(gl_FragCoord.x < 400.0) gl_FragColor.rgb = viewNorm.xyz * 0.5 + 0.5;
+	//float dott = dot(viewDir.zzz, viewNorm.zzz);
+	//gl_FragColor.rgb = vec3(dott);
+	//if(dott < 0.0)
+	
 }
