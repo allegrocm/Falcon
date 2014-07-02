@@ -110,6 +110,7 @@ Falcon::Falcon()
 
 bool Falcon::update(float dt)
 {
+	mAge += dt;
 	Matrix wand = FalconApp::instance().getWandMatrix();
 	mAimedPart->setAttitude(wand.getRotate());
 	mUpperAimedPart->setAttitude(wand.getRotate());
@@ -300,6 +301,7 @@ void Falcon::wasHit(Bullet* b, osg::Vec3 hitPos)
 	EventAudio::instance().eventHappened("falconHit");
 	float oldPercent = 1.0 * (stats.health) / stats.maxHealth;
 	stats.health--;
+	printf("got hit at %.3f, health left:  %i\n", mAge, stats.health);
 
 	float newPercent = 1.0 * stats.health / stats.maxHealth;
 	
