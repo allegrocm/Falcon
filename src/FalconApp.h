@@ -29,6 +29,9 @@ class EnemyController;
 class GameController;
 class EventAudio;
 class SpaceBox;
+class StarDestroyer;
+
+
 class FalconApp
 {
 public:
@@ -78,6 +81,7 @@ public:
 	SpaceBox* getSpaceBox()							{return mSpaceBox;}		//for scene loading
 	void switchSystem();							//called when we warp to a new solar system
 	void toggleShaders();
+	StarDestroyer* getDestroyer()					{return mStarDestroyer;}
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call
@@ -101,6 +105,7 @@ protected:
 	TIEComputer*							mTIEScreen;			//for the TIE figher cockpit
 	GameController*							mGameController;
 	SpaceBox*								mSpaceBox;			//holds distance scenery
+	StarDestroyer*							mStarDestroyer;
 	osg::ref_ptr<osg::Group> mRoot;								//root of our scenegraph
 	osg::ref_ptr<osg::MatrixTransform> mNavigation;				//navigation matrix
 	osg::Vec3 mListenerVelocity;								//for audio

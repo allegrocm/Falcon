@@ -37,7 +37,7 @@ public:
 	//-----------some handy setters, getters, etceters
 	//set/get position
 	virtual osg::Vec3 getPos()	{return mPat->getPosition();}
-	virtual void setPos(osg::Vec3 p)		{mPat->setPosition(p);}
+	virtual void setPos(osg::Vec3 p)		{mPat->setPosition(p); updateTransformUniforms();}
 	
 	//set/get transform by matrix
 	virtual osg::Matrixf getTransform();
@@ -45,7 +45,7 @@ public:
 	
 	//set/get rotation by quat
 	virtual osg::Quat getQuat()	{return mPat->getAttitude();}
-	virtual void setQuat(osg::Quat q)	{mPat->setAttitude(q);}
+	virtual void setQuat(osg::Quat q)	{mPat->setAttitude(q); updateTransformUniforms();}
 	
 	//----------other directioneering things
 	
@@ -66,12 +66,17 @@ public:
 	
 	//perform a raycast against this object
 	virtual bool checkRaycast(osg::Vec3 origin, osg::Vec3 vec, osg::Vec3& hitPos);
-	
+
+	virtual void updateTransformUniforms();
 protected:
 	osg::ref_ptr<osg::Group>						mRoot;
 	osg::ref_ptr<osg::PositionAttitudeTransform>	mPat;		//used for positioning/orienting
 	float											mAge;		//how old is this?  Can be used for timing and control
 	std::string										mName;
+
+	//some models need to know their own transform for normal or bumpmapping
+	osg::ref_ptr<osg::Uniform> mTransformUniform;
+	osg::ref_ptr<osg::Uniform> mInverseTransformUniform;
 };
 
 

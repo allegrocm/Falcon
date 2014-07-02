@@ -41,19 +41,21 @@ void calcNormal()
 	float dTex = 1.0 / 512.0;
 //	vec4 here = texture2D(tex0, gl_TexCoord[0].xy);
 	vec2 BMCoords = gl_TexCoord[0].xy * 4.0;
-	vec4 xMinus = texture2D(tex1, BMCoords - vec2(dTex, 0.0));
-	vec4 xPlus = texture2D(tex1, BMCoords + vec2(dTex, 0.0));
-	vec4 zMinus = texture2D(tex1, BMCoords - vec2(0.0, dTex));
-	vec4 zPlus = texture2D(tex1, BMCoords + vec2(0.0, dTex));
+	vec4 xMinus = texture2D(tex0, BMCoords - vec2(dTex, 0.0));
+	vec4 xPlus = texture2D(tex0, BMCoords + vec2(dTex, 0.0));
+	vec4 zMinus = texture2D(tex0, BMCoords - vec2(0.0, dTex));
+	vec4 zPlus = texture2D(tex0, BMCoords + vec2(0.0, dTex));
 	
 	//come up with a tangent space normal first
-	float bumpScale = 5.0;
+	float bumpScale = 15.0;
 	vec3 TSNormal = vec3(xPlus.r-xMinus.r, zPlus.r-zMinus.r, 1.0 / bumpScale);
 	TSNormal = normalize(TSNormal);
 //	TSNormal = vec3(0.0, 0.0, 1.0);
 //	surfaceNormal = TSNormal;
 //	surfaceNormal = normalize(owsNormal);
 	surfaceNormal = normalize(owsTangent) * TSNormal.x + normalize(owsNormal) * TSNormal.z + normalize(owsBinormal) * TSNormal.y;
+	if((gl_NormalMatrix * oNormal).z < 0.01)
+		surfaceNormal *= -1.0;
 }
 
 void calcLighting()
@@ -71,9 +73,9 @@ void calcLighting()
 		float specAmount = lightReflect.z;
 		specColor.rgb =+ vec3(specAmount);
 	}
-//	ambientColor *= gl_FrontMaterial.ambient;
-//	specColor *= gl_FrontMaterial.specular;
-//	diffuseColor *= gl_FrontMaterial.diffuse;
+	ambientColor *= gl_FrontMaterial.ambient;
+	specColor *= gl_FrontMaterial.specular;
+	diffuseColor *= gl_FrontMaterial.diffuse * 2.0;
 	
 }
 
@@ -91,8 +93,9 @@ void main()
 	finalColor.rgb += gl_FrontMaterial.emission.rgb;
 	finalColor.a = clamp(finalColor.a, 0.0, 1.0);
 	gl_FragColor = finalColor;
-//	gl_FragColor = mainTexture * finalColor;
+	gl_FragColor = mainTexture * finalColor;
+//	gl_FragColor.rgb = gl_NormalMatrix * oNormal * 0.5 + 0.5;
 //	gl_FragColor.rgb = surfaceNormal * 0.5 + 0.5;
-//	if(gl_FragCoord.x > 700.0)
+//	if(gl_FragCoord.x > 400.0)
 //		gl_FragColor.rgb = mainTexture.rgb;
 }

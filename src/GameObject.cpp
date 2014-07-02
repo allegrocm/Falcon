@@ -28,6 +28,10 @@ GameObject::GameObject()
 	mRoot->addChild(mPat);
 	setName("GameObject");
 	setGlows(false);			//things don't glow by default
+	mTransformUniform = new Uniform("transform", Matrixf());
+	mInverseTransformUniform = new Uniform("inverseTransform", Matrixf());
+	mRoot->getOrCreateStateSet()->addUniform(mTransformUniform);
+	mRoot->getOrCreateStateSet()->addUniform(mInverseTransformUniform);
 }
 
 GameObject::~GameObject()
@@ -61,8 +65,10 @@ Matrixf GameObject::getTransform()
 
 void GameObject::setTransform(Matrixf m)
 {
+	__FUNCTION_HEADER__
 	mPat->setAttitude(m.getRotate());
 	mPat->setPosition(m.getTrans());
+	updateTransformUniforms();
 	
 }
 
@@ -253,3 +259,12 @@ bool GameObject::checkRaycast(osg::Vec3 origin, osg::Vec3 vec, osg::Vec3& hitPos
 		
 	return false;
 }
+
+void GameObject::updateTransformUniforms()
+{
+	Matrix mat = getTransform();
+	mTransformUniform->set(mat);
+	mat.invert(mat);
+	mInverseTransformUniform->set(mat);
+}
+

@@ -14,6 +14,7 @@
 
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
+#include <osgDB/writefile>
 #include <stdarg.h>
 #include "FalconApp.h"
 #include "quickprof.h"
@@ -22,7 +23,7 @@
 #include "SpaceBox.h"
 #include "ShaderManager.h"
 #include "GameController.h"
-
+#include "Util.h"
 
 int screenWidth = 1024;
 int screenHeight = 768;
@@ -240,7 +241,7 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 1000.0);
+	currentCam->setProjectionMatrixAsPerspective(60, aspect, 0.2, 5000.0);
 	FalconApp::instance().getBloom()->setAspectRatio(aspect);
 
 	currentCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
@@ -422,7 +423,7 @@ void keyboard(unsigned char key, int x, int y)
 		case ' ':	FalconApp::instance().buttonInput(0, true);	break;		//space bar controls the main wand button
 		case 'T': FalconApp::instance().toggleTIEMode();	break;		//switch views between TIE figher and Falcon
 		case 'L': FalconApp::instance().getSpaceBox()->reload(); break;
-		case 'P': FalconApp::instance().getSpaceBox()->nextSystem(); break;
+		case 'P': FalconApp::instance().switchSystem(); break;
 		case 'r': ShaderManager::instance().reloadShaders();	break;
 		case 'R':
 		{

@@ -41,6 +41,8 @@
 #include "TIEComputer.h"
 #include "ShaderManager.h"
 #include "Hyperspace.h"
+#include "StarDestroyer.h"
+#include <osgDB/WriteFile>
 
 using namespace osg;
 
@@ -165,13 +167,10 @@ void FalconApp::init()
 	t->setFilter(Texture::MIN_FILTER, Texture::NEAREST);
 	mModelGroup->getOrCreateStateSet()->setTextureAttribute(0, t);
 	toggleShaders();
-	
-//	MatrixTransform* ds = Util::loadModel("data/models/Star_Destroyer/star_destroyer.obj", 1, -90, 90, 0);
-//	mModelGroup->addChild(ds);
-//	Util::makeTangentSpace(ds);
-//	ds->setNodeMask(1 << BACKGROUND_LAYER);
-////	Util::printNodeHierarchy(ds);
-//	ShaderManager::instance().applyShaderToNode("data/shaders/DeathStar", ds);
+
+	mStarDestroyer = new StarDestroyer();
+//	mStarDestroyer->setPos(Vec3(0, -500, 0));
+	addThis(mStarDestroyer);
 }
 
 
@@ -655,4 +654,5 @@ void FalconApp::switchSystem()
 {
 	mSPOffset = 100000;
 	mSpaceBox->nextSystem();
+	mStarDestroyer->warp();
 }
