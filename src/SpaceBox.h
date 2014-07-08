@@ -49,6 +49,7 @@ public:
 	bool loaded;
 	osg::ref_ptr<osg::Group> mFarThings;
 	osg::ref_ptr<osg::Group> mNearThings;
+	std::vector<osg::MatrixTransform*> mCapitalShips;
 	
 };
 
@@ -70,11 +71,15 @@ public:
 		mCurrentSystem = (mCurrentSystem+1)%mSystems.size();
 		loadSystem(mCurrentSystem);
 	}
-	osg::PositionAttitudeTransform* getNearGroup()	{return mNearGroup;}
+	osg::MatrixTransform* getNearGroup()	{return mNearGroup;}
+	osg::MatrixTransform* getFarGroup()	{return mFarGroup;}
 	std::string getSystemName()	{return mSystems[mCurrentSystem].name;}
+	osg::MatrixTransform* getCapitalShip();		//get something we can spawn TIE fighers near!
+	void setNavMatrix(osg::Matrix nav, float zOffset);
 protected:
 	osg::ref_ptr<osg::MatrixTransform> mRoot;
-	osg::ref_ptr<osg::PositionAttitudeTransform> mNearGroup;		//planets
+	osg::ref_ptr<osg::Group> mNearSystemStuff;			///where system objects go
+	osg::ref_ptr<osg::MatrixTransform> mNearGroup;		//planets
 	osg::ref_ptr<osg::MatrixTransform> mFarGroup;		//far-away things
 	osg::ref_ptr<osg::Geode> mBox;		//what with the stars
 	void addPlanet(std::string texture, osg::Vec3 pos, float radius);

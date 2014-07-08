@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "EnemyPlayer.h"
-
+#include <osg/Group>
 //manages spawning of enemies
 
 class Spacecraft;
@@ -31,13 +31,14 @@ public:
 	void reset();
 	void killAll();			//kill all the current enemy ships
 	void setEnemyInput(int which, EnemyControlInput i);		//for controlling enemy players
-	int getShipsLeftToSpawn()		{return mLeftToSpawn;}
+	int getShipsLeftToSpawn()		{return mSwarm->getNumChildren();}
 	EnemyPlayer* getPlayer()					{return mPlayer;}
 	virtual void spawnEnemy(bool initing = false);				//make an enemy.  maybe make it human-controlled
+	void populateSwarm(int howMany);							//put ships into our swarm!
 protected:
+	osg::ref_ptr<osg::Group> mSwarm;			//holds potential TIE spawns
 	std::vector<Spacecraft*> mEnemies;
 	int mMaxEnemies;			//max in play
-	int mLeftToSpawn;			//how many more enemies will we be spawning
 	
 	
 	//for...MULTIPLAYER!

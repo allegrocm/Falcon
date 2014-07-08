@@ -43,6 +43,7 @@
 #include "Hyperspace.h"
 #include "StarDestroyer.h"
 #include <osgDB/WriteFile>
+#include <osgUtil/IntersectVisitor>
 
 using namespace osg;
 
@@ -112,9 +113,10 @@ void FalconApp::init()
 	mWandXForm = new osg::MatrixTransform;
 	mModelGroup->addChild(mWandXForm);
 
+	mFalcon = new Falcon();
 	mEnemyController = new EnemyController(mTieNode1);
 
-	mFalcon = new Falcon();
+
 	mModelGroup->addChild(mFalcon->getRoot());
 
 	mModelGroup->addChild(mScreen->getRoot());
@@ -167,7 +169,9 @@ void FalconApp::init()
 	t->setFilter(Texture::MIN_FILTER, Texture::NEAREST);
 	mModelGroup->getOrCreateStateSet()->setTextureAttribute(0, t);
 	toggleShaders();
-
+//	MatrixTransform* sd = Util::loadModel("data/models/sd.ive", 2.0, 0, -90);
+//	mRoot->addChild(sd);
+//	osgDB::writeNodeFile(*sd, "sd.ive");
 	//mStarDestroyer = new StarDestroyer();
 //	mStarDestroyer->setPos(Vec3(0, -500, 0));
 	//addThis(mStarDestroyer);
@@ -325,7 +329,9 @@ void FalconApp::update(float fulldt)
 		//the spacebox's position always follows the navigation
 		//so we can never approach the actual objects in it
 		Matrix nav = mNavigation->getMatrix();
-		nav.invert(nav);
+
+		mSpaceBox->setNavMatrix(nav, mSPOffset);
+//		nav.invert(nav);
 
 //		mSpaceBox->setViewerPos(Util::pos(nav));
 		
@@ -333,9 +339,12 @@ void FalconApp::update(float fulldt)
 		Matrix navRot = mNavigation->getMatrix();
 		
 		//
-		Util::setPos(navRot, Vec3());
-		mSpaceBox->getRoot()->setMatrix(navRot);
-		mSpaceBox->getNearGroup()->setPosition(Vec3(0, 0, -mSPOffset));
+//		Vec3 navPos = Util::pos(navRot);
+//		Util::setPos(navRot, Vec3());
+//		Matrix navUnrot = navRot;
+//		navRot.invert navRot;		//for undoing the navrot before applying nav to the neargroup
+//		mSpaceBox->getRoot()->setMatrix(nav);
+//		mSpaceBox->getNearGroup()->setMatrix((navPos + Vec3(0, 0, -mSPOffset));
 
 		//fly planets toward us after we jump
 		float SPSpeed = 100000;
@@ -615,12 +624,13 @@ void FalconApp::drawDebug()
 	}
 	glColor3f(0, 1, 0);
 	glPushMatrix();
-		glMultMatrixf(mWandMatrix.ptr());
+//		glMultMatrixf(mWandMatrix.ptr());
 		glBegin(GL_LINES);
-			glVertex3f(0, 0, -0.25);
-			glVertex3f(0, 0, 0.25);
+
 		glEnd();
 	glPopMatrix();
+	
+
 	mEnemyController->drawDebug();
 	
 }
@@ -666,3 +676,80 @@ void FalconApp::switchSystem()
 	mSpaceBox->nextSystem();
 	//mStarDestroyer->warp();
 }
+
+Matrix FalconApp::getPotentialSpawnPosition(bool nearShip)
+{
+	MatrixTransform* capitalShip = mSpaceBox->getCapitalShip();
+	if(mFalcon->getHyperspace()->done() == false)
+	{
+		printf("Spawning ship during hyperspace jump!  Won't use the local star system for positioning\n");
+		capitalShip = NULL;
+	}
+	
+	//if there are no capital ships around, make a random spawn position
+	if(!nearShip || !capitalShip)
+	{
+		Matrix mat;
+		
+		//generate a position
+		float theta = Util::random(0, 6.28);
+		float phi = Util::random(0.1, 1.0);
+		float r = 900;
+		Vec3 pos = Vec3(sinf(theta)*cosf(phi) * r, sinf(phi)*r, cosf(theta)*cosf(phi)*r);
+		
+		//and construct a coordinate system around it
+		Vec3 forward = Util::vectorInCone(pos * -1.0, 20, 10);
+		Vec3 up(0, 1, 0);
+		Vec3 x = forward ^ up;
+		up = x ^ forward;
+		up.normalize();
+		x.normalize();
+		forward.normalize();
+		Util::setPos(mat, pos);
+		Util::setXAxis(mat, x);
+		Util::setYAxis(mat, up);
+		Util::setZAxis(mat, forward*-1);
+
+		return mat;
+
+	}
+	
+	//there's a capital ship, so let's spawn near it!
+	Matrix mat = capitalShip->getMatrix();
+	int tries = 5;		//let's try a few times to get a position near it but not in it
+	Vec3 spawnPos = Util::pos(mat);
+	printf("Using capital ship at %.2f, %.2f, %.2f for spawn origin\n", spawnPos.x(), spawnPos.y(), spawnPos.z());
+	while(tries)
+	{
+		
+		osgUtil::IntersectVisitor iv;
+		//make a line segment representing the laser beam
+		Vec3 dir = spawnPos * -1.0;
+		dir.normalize();
+		dir = Util::vectorInCone(dir, 90);		//make sure the TIE fighters are always on the falcon side of the ship
+		printf("dir:  %.2f, %.2f, %.2f\n", dir.x(), dir.y(), dir.z());
+		ref_ptr<LineSegment> seg = new LineSegment(spawnPos, spawnPos+dir * 1000);
+
+		iv.addLineSegment(seg.get());
+	//	printf("Seg:  %.2f, %.2f, %.2f\n", pos.x(), pos.y(), pos.z());
+		capitalShip->accept(iv);
+		osgUtil::IntersectVisitor::HitList& hitList = iv.getHitList(seg.get());
+		if(hitList.size())		//if there's any size in the hitlist, we HIT something!
+		{
+			spawnPos = hitList.back().getWorldIntersectPoint() + dir * Util::random(100, 200);
+			printf("%i hits!  Found a spawn pos at %.2f, %.2f, %.2f\n",(int)hitList.size(), spawnPos.x(), spawnPos.y(), spawnPos.z());
+			tries = 0;
+		}
+//		spawnPos = spawnPos + dir * 50;
+		
+	}
+	
+	//good to go!
+	Util::setPos(mat, spawnPos);
+
+	return mat;
+	
+	
+
+}
+

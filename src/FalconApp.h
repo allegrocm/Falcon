@@ -82,6 +82,9 @@ public:
 	void switchSystem();							//called when we warp to a new solar system
 	void toggleShaders();
 	StarDestroyer* getDestroyer()					{return mStarDestroyer;}
+
+//potential spawn position/rotation for a TIE fighter.  nearship indicates if this position should be near a capital ship
+	osg::Matrix getPotentialSpawnPosition(bool nearShip);
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call

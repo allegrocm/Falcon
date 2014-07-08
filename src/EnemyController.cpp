@@ -14,8 +14,10 @@
 #include "Util.h"
 #include "GameController.h"
 #include "EventAudio.h"
+#include "Layers.h"
 #include "VaderTIE.h"
 #include <stdlib.h>
+#include "SpaceBox.h"
 
 using namespace osg;
 EnemyController& EnemyController::instance()
@@ -30,6 +32,9 @@ EnemyController::EnemyController(bool TIENode)
 		mPlayer = mEnemyPlayers.back();
 	//else
 	//	mPlayer = NULL;
+	mSwarm = new Group();
+	mSwarm->setNodeMask(1 << BACKGROUND_LAYER);		//only show this on the background layer for speedz
+	FalconApp::instance().getSpaceBox()->getNearGroup()->addChild(mSwarm);
 	reset();
 
 }
@@ -40,14 +45,14 @@ void EnemyController::reset()
 //just add a few generic spaceships for now
 	int numToMake = 3;
 
-	mLeftToSpawn = 10;
+	int totalEnemies = 10;
 	mMaxEnemies = 7;
 	
 	Defaults::instance().getValue("InitialShipCount", numToMake);
-	Defaults::instance().getValue("demoBattleTotalShipCount", mLeftToSpawn);
+	Defaults::instance().getValue("demoBattleTotalShipCount", totalEnemies);
 	Defaults::instance().getValue("demoBattleMaxShipCount", mMaxEnemies);
 
-
+	populateSwarm(totalEnemies);
 	
 	for(int i = 0; i < numToMake; i++)
 	{
@@ -89,12 +94,12 @@ void EnemyController::update(float dt)
 		//never let us have no enemies
 		if(!mEnemies.size())
 			chance = 10000;
-		if(!mLeftToSpawn) chance = 0;		///..unlesss there are none left to spawn
+		if(!getShipsLeftToSpawn()) chance = 0;		///..unlesss there are none left to spawn
 
 		//but always spawn if there's a human player needing a ship
 		//is there a human player waiting to respawn?
 		//if it's ready, spawn right away.  otherwise don't spawn at all
-		if(!mPlayer->getShip() && (mLeftToSpawn || mEnemies.size()))
+		if(!mPlayer->getShip() && (getShipsLeftToSpawn() || mEnemies.size()))
 		{
 			chance = mPlayer->isReadyForShip() * 1000;
 		}
@@ -128,11 +133,27 @@ void EnemyController::spawnEnemy(bool initing)
 	//if we're resetting, make sure the enemy player has a ship
 	if(mPlayer && mPlayer->getShip() == NULL && initing)
 		playerForShip = mPlayer;
-		
-	if(mLeftToSpawn != 0)
-		mLeftToSpawn--;
+	
+	Matrix spawnPos;
+	
+	//if there are ships left in our swarm, grab one of them
+	if(getShipsLeftToSpawn())
+	{
+		int whichSpawn = rand()%getShipsLeftToSpawn();
+		printf("spawning from position %i in the swarm of %i\n", whichSpawn, getShipsLeftToSpawn());
+		Node* spawner = mSwarm->getChild(whichSpawn);
+		MatrixTransform* spawnMat = dynamic_cast<MatrixTransform*>(spawner);
+		spawnPos = spawnMat->getMatrix();
+		mSwarm->removeChildren(whichSpawn, 1);		//pull this guy out of the swarm cuz he turned into a real ship
+	}
+	else
+	{
+		printf("no swarm left.  just spawning willy-nilly\n");
+		spawnPos = FalconApp::instance().getPotentialSpawnPosition(true);
+	}
+	
 	StupidPlaceholderShip* sps;
-	printf("Spawn ship!  %i left\n", mLeftToSpawn);
+
 	if(playerForShip)
 	{
 		printf("Vader tie!\n");
@@ -143,7 +164,8 @@ void EnemyController::spawnEnemy(bool initing)
 	else sps = new StupidPlaceholderShip();
 	sps->loadTIEModel();
 	addShip(sps);
-
+	sps->setTransform(spawnPos);
+	sps->setVel(sps->getForward() * sps->getVel().length());		//set the initial velocity to forward
 
 	//events and things only happen if we're not initializing the controller
 	if(!initing)
@@ -164,7 +186,7 @@ void EnemyController::addShip(Spacecraft* s)
 
 bool EnemyController::isDone()
 {
-	return (mEnemies.size() == 0 && mLeftToSpawn <= 0);
+	return (mEnemies.size() == 0 && getShipsLeftToSpawn() <= 0);
 }
 
 
@@ -181,7 +203,7 @@ void EnemyController::killAll()
 	{
 		mEnemies[i]->explode(true);
 	}
-	mLeftToSpawn = 0;
+	mSwarm->removeChildren(0, mSwarm->getNumChildren());
 	
 }
 
@@ -189,4 +211,25 @@ void EnemyController::setEnemyInput(int which, EnemyControlInput i)
 {
 	if(which < mEnemyPlayers.size())
 		mEnemyPlayers[which]->setInput(i);
+}
+
+void EnemyController::populateSwarm(int howMany)
+{
+	printf("populating swarm with %i ships\n", howMany);
+	//load up a TIE fighter for each spawn
+	for(int i = 0; i < howMany; i++)
+	{
+		bool nearShip = (rand()%4 != 0);
+		MatrixTransform* TIENode = Util::loadModel("data/models/tief3DS/TIEF_10.3ds", 1.0, -90);
+		MatrixTransform* TIEXform = new MatrixTransform;
+		
+		Matrix mat = FalconApp::instance().getPotentialSpawnPosition(nearShip);
+		TIEXform->setMatrix(mat);
+		if(nearShip)					//if this wasn't near a ship, it's a "random" spawn, and doesn't need a placeholder graphic
+			TIEXform->addChild(TIENode);
+		
+		mSwarm->addChild(TIEXform);
+		TIEXform->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
+	}
+
 }
