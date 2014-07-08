@@ -138,8 +138,8 @@ void StupidPlaceholderShip::playerControl(float dt)
 	//if the player flies too far away help them get pointed in the right direction
 	if(pos.length() > 1500 || (mPlayer->AIControl && towardness < 0.9 && pos.length() > 1200))
 	{
-		AIControl(dt, false);
-		return;
+//		AIControl(dt, false);
+//		return;
 	}
 
 	

@@ -72,13 +72,14 @@ bool Bullet::checkHit()
 
 	//dunno if this is the best way to do it or not, but we're gonna just check each ship individually
 	std::vector<Spacecraft*> ships = EnemyController::instance().getShips();
-	
-	if(mIsEnemy)		//enemy shots only hit the falcon
+	bool canHitEnemy = (!mIsEnemy || mAge > 0.1);		//friendly fire activates after a moment so we dont' hit our own gun
+	if(mIsEnemy)		//enemy shots only hit the falcon in their first moments
 	{
-		ships.clear();
+		if(canHitEnemy == false)
+			ships.clear();
 		Falcon* f = FalconApp::instance().getFalcon();
 
-		ships.push_back((Spacecraft*)f);
+		//ships.push_back((Spacecraft*)f);
 
 		if(ROM::FALCON_HIT_DETECTION)
 			ships.push_back((Spacecraft*)f);
@@ -88,6 +89,7 @@ bool Bullet::checkHit()
 	Vec3 hitPos;
 	for(size_t i = 0; i < ships.size() && !hitSometing; i++)
 	{
+		if(mIsEnemy && ships[i] == mShooter) continue;		//don't let the TIE's shots it itself
 //		iv.reset();
 		Vec3 hitPos;
 		if(ships[i]->checkRaycast(pos-dir*length*0.5, dir*length, hitPos))

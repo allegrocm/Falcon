@@ -35,20 +35,22 @@ SpaceBox::SpaceBox()
 	Texture2D* tex = new Texture2D(img);
 	mCurrentSystem = 0;
 
-	mRoot->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex);
-	mRoot->getOrCreateStateSet()->setMode(GL_LIGHTING, false);
 
 
 	osg::Box* cube = new Box(Vec3(), 20000);
+
+	mRoot->getOrCreateStateSet()->setMode(GL_LIGHTING, false);
+
 	ShapeDrawable* sd = new ShapeDrawable(cube);
 	mBox = new Geode();
+	mBox->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex);
 	mBox->addDrawable(sd);
 	mBox->getOrCreateStateSet()->setAttribute(new Depth(Depth::LESS, 0, 1, false));		//don't write to the depth buffer
 	//we render the spacebox to a separate camera so we can have it very, very far away without it
 	//interfering with close-range depth testing
 	Camera* c = new Camera;
 	Matrix projShift;		//matrix to shift the culling distances farther
-	projShift.ptr()[15] = 1000;
+	projShift.ptr()[15] = 100;
 	c->setProjectionMatrix(projShift);
 	c->setName("Spacebox Camera");
 	mRoot->addChild(c);
@@ -57,11 +59,14 @@ SpaceBox::SpaceBox()
 	mRoot->setNodeMask(1 << BACKGROUND_LAYER);
 	mRoot->getOrCreateStateSet()->setMode(GL_BLEND, true);
 
-	mNearGroup = new PositionAttitudeTransform;
+	mNearGroup = new MatrixTransform;
 	//mRoot->addChild(mNearGroup);
 	mFarGroup = new MatrixTransform;
 	//mRoot->addChild(mFarGroup);
 	mFarGroup->addChild(mBox);
+	mNearSystemStuff = new Group();
+	mNearGroup->addChild(mNearSystemStuff);
+	mNearGroup->getOrCreateStateSet()->setMode(GL_LIGHTING, true);
 	mNearGroup->setNodeMask(1 << BACKGROUND_LAYER);
 	c->addChild(mFarGroup);
 	c->addChild(mNearGroup);
@@ -83,14 +88,15 @@ void SpaceBox::loadSystem(int which)
 	}
 
 	SpaceScene& scene = mSystems[which];
+
 	mCurrentSystem = which;
 	
 	//clear out our stuffs
-	mNearGroup->removeChild(0, mNearGroup->getNumChildren());
+	mNearSystemStuff->removeChild(0, mNearSystemStuff->getNumChildren());
 	mFarGroup->removeChild(0, mFarGroup->getNumChildren());
 	
 	//add in this scene's object groups
-	mNearGroup->addChild(scene.mNearThings);
+	mNearSystemStuff->addChild(scene.mNearThings);
 	mFarGroup->addChild(mBox);
 	mFarGroup->addChild(scene.mFarThings);
 
@@ -165,6 +171,7 @@ void SpaceBox::addPlanet(std::string texture, osg::Vec3 pos, float radius)
 	gee->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex);
 	gee->getOrCreateStateSet()->setMode(GL_LIGHTING, true);
 	gee->getOrCreateStateSet()->setMode(GL_LIGHT1, false);
+	
 //	gee->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 //	sd->getOrCreateStateSet()->setAttribute(new BlendFunc(GL_SRC_ALPHA, GL_ONE));
 }
@@ -174,18 +181,25 @@ void SpaceBox::addModel(SpaceObject o)
 {
 	//load the model.  pass in the rotation here cuz it's easy
 	printf("add model.  size = %.2f, angles:  %.2f, %.2f, %.2f\n", o.size, o.heading.x(), o.heading.y(), o.heading.z());
-	MatrixTransform* mat = Util::loadModel(o.texName, o.size, o.heading.x(), o.heading.y(), o.heading.z());
-	Matrix m = mat->getMatrix();;
-	
+	MatrixTransform* matx = Util::loadModel(o.texName, 1.0);
+	Matrix mat = Matrix::scale(o.size, o.size, o.size);
+	mat = mat * Matrix::rotate(o.heading.x() / 57.296, Vec3(1, 0, 0));
+	mat = mat * Matrix::rotate(o.heading.z() / 57.296, Vec3(0, 0, 1));
+	mat = mat * Matrix::rotate(o.heading.y() / 57.296, Vec3(0, 1, 0));
+
+
+	mat = mat * Matrix::translate(o.pos);
+
 	//position the model
-	Util::setPos(m, o.pos);
-	mat->setMatrix(m);
+
+	matx->setMatrix(mat);
 	
 	//apply shader
-	ShaderManager::instance().applyShaderToNode("data/shaders/DeathStar", mat);
+	ShaderManager::instance().applyShaderToNode("data/shaders/DeathStar", matx);
 	
 	//and add it!
-	mSystems[mCurrentSystem].mNearThings->addChild(mat);
+	mSystems[mCurrentSystem].mNearThings->addChild(matx);
+	mSystems[mCurrentSystem].mCapitalShips.push_back(matx);
 	
 }
 
@@ -261,8 +275,8 @@ bool SpaceObject::fromXML(TiXmlElement* element)
 		else if(KenXML::CICompare(what, "height"))	KenXML::readValue(e, size);
 		else if(KenXML::CICompare(what, "scale"))	KenXML::readValue(e, size);
 		else if(KenXML::CICompare(what, "yaw")) KenXML::readValue(e, heading.y());
-		else if(KenXML::CICompare(what, "pitch")) KenXML::readValue(e, heading.z());
-		else if(KenXML::CICompare(what, "roll")) KenXML::readValue(e, heading.x());
+		else if(KenXML::CICompare(what, "roll")) KenXML::readValue(e, heading.z());
+		else if(KenXML::CICompare(what, "pitch")) KenXML::readValue(e, heading.x());
 		else Util::logError("SpaceObject doesn't know what to do with %s\n", what.c_str());
 	}
 	
@@ -363,4 +377,26 @@ void SpaceBox::reload()
 		
 	}
 	loadSystem(mCurrentSystem);
+}
+
+MatrixTransform* SpaceBox::getCapitalShip()
+{
+	if(!mSystems[mCurrentSystem].mCapitalShips.size()) return NULL;
+	int which = rand()%mSystems[mCurrentSystem].mCapitalShips.size();
+	return mSystems[mCurrentSystem].mCapitalShips[which];
+}
+
+void SpaceBox::setNavMatrix(Matrix nav, float z)
+{
+	Matrix poslessNav = nav;
+	Util::setPos(poslessNav, Vec3());		//remove the position
+	Matrix navInverse = poslessNav;
+	navInverse.invert(navInverse);
+	//everything but the near group just uses the regular nav matrix
+	mRoot->setMatrix(poslessNav);
+	
+	//but we DO move the near group around us
+	//so undo the previous operation first
+	nav.ptr()[14] -= z;
+	mNearGroup->setMatrix(nav * navInverse);
 }
