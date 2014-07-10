@@ -26,13 +26,13 @@
 	</Object>
 	<Object type="Model">
 		<!--an object has a size, a position, and a texture.  oh and a type-->
-		<scale>2</scale>
-		<x>-2000</x>
-		<y>750</y>
-		<z>-1000</z>
-		<yaw>-130</yaw>
-		<roll>-35</roll>
-		<pitch>-20</pitch>
+		<scale>.5</scale>
+		<x>-450</x>
+		<y>300</y>
+		<z>-800</z>
+		<yaw>-70</yaw>
+		<roll>-25</roll>
+		<pitch>-15</pitch>
 		<file>data/models/SD.ive</file>
 	</Object>
 	
