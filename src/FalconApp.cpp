@@ -169,9 +169,15 @@ void FalconApp::init()
 	t->setFilter(Texture::MIN_FILTER, Texture::NEAREST);
 	mModelGroup->getOrCreateStateSet()->setTextureAttribute(0, t);
 	toggleShaders();
+<<<<<<< HEAD
 	//MatrixTransform* sd = Util::loadModel("data/models/SD.ive", 2.0, 0, -90);
 	//mRoot->addChild(sd);
 	//osgDB::writeNodeFile(*sd, "SD.ive");
+=======
+//	MatrixTransform* sd = Util::loadModel("data/models/sd.ive", 2.0, 0, -90);
+//	mRoot->addChild(sd);
+//	osgDB::writeNodeFile(*sd, "sd.ive");
+>>>>>>> c21ba12bf057eaff21f9099d253027b94ed5252c
 	//mStarDestroyer = new StarDestroyer();
 //	mStarDestroyer->setPos(Vec3(0, -500, 0));
 	//addThis(mStarDestroyer);
