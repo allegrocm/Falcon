@@ -144,11 +144,8 @@ void EnemyController::spawnEnemy(bool initing)
 		Node* spawner = mSwarm->getChild(whichSpawn);
 		MatrixTransform* spawnMat = dynamic_cast<MatrixTransform*>(spawner);
 		spawnPos = spawnMat->getMatrix();
-<<<<<<< HEAD
 		spawnPos = FalconApp::instance().getPotentialSpawnPosition((playerForShip != NULL));
-		
-=======
->>>>>>> c21ba12bf057eaff21f9099d253027b94ed5252c
+
 		mSwarm->removeChildren(whichSpawn, 1);		//pull this guy out of the swarm cuz he turned into a real ship
 	}
 	else
@@ -171,13 +168,10 @@ void EnemyController::spawnEnemy(bool initing)
 	addShip(sps);
 	sps->setTransform(spawnPos);
 	sps->setVel(sps->getForward() * sps->getVel().length());		//set the initial velocity to forward
-<<<<<<< HEAD
 	static int spawnCount = 0;
 	spawnCount++;
 	printf("Enemy %i spawned at %.2f, %.2f, %.2f\n", spawnCount, spawnPos.ptr()[12], spawnPos.ptr()[13], spawnPos.ptr()[14]);
-=======
 
->>>>>>> c21ba12bf057eaff21f9099d253027b94ed5252c
 	//events and things only happen if we're not initializing the controller
 	if(!initing)
 	{
@@ -215,11 +209,9 @@ void EnemyController::killAll()
 		mEnemies[i]->explode(true);
 	}
 	mSwarm->removeChildren(0, mSwarm->getNumChildren());
-<<<<<<< HEAD
+
 	FalconApp::instance().getPotentialSpawnPosition(true);
-=======
-	
->>>>>>> c21ba12bf057eaff21f9099d253027b94ed5252c
+
 }
 
 void EnemyController::setEnemyInput(int which, EnemyControlInput i)
@@ -235,10 +227,9 @@ void EnemyController::populateSwarm(int howMany)
 	for(int i = 0; i < howMany; i++)
 	{
 		bool nearShip = (rand()%4 != 0);
-<<<<<<< HEAD
+
 		nearShip = false;		//HACK till we figure out how to spawn near capital ship and still be fun
-=======
->>>>>>> c21ba12bf057eaff21f9099d253027b94ed5252c
+
 		MatrixTransform* TIENode = Util::loadModel("data/models/tief3DS/TIEF_10.3ds", 1.0, -90);
 		MatrixTransform* TIEXform = new MatrixTransform;
 		
