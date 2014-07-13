@@ -114,7 +114,17 @@
     <z>-900</z>
     <texture>7c257eb6ae6ef1eba78f9847118b1662-d2lh209.png</texture>
   </Object>
-
+	<Object type="Model">
+		<!--an object has a size, a position, and a texture.  oh and a type-->
+		<scale>.5</scale>
+		<x>750</x>
+		<y>-200</y>
+		<z>300</z>
+		<yaw>20</yaw>
+		<roll>10</roll>
+		<pitch>0</pitch>
+		<file>data/models/SD.ive</file>
+	</Object>
 </System>
 
 <System name="Columbia">
@@ -172,7 +182,17 @@
 		<z>-2400</z>
 		<texture>0124-0906-2509-2407_hubble_space_telescope_image_of_messier_101_galaxy_o.jpg</texture>
 	</Object>
-
+	<Object type="Model">
+		<!--an object has a size, a position, and a texture.  oh and a type-->
+		<scale>.5</scale>
+		<x>90</x>
+		<y>450</y>
+		<z>-1000</z>
+		<yaw>220</yaw>
+		<roll>0</roll>
+		<pitch>-15</pitch>
+		<file>data/models/SD.ive</file>
+	</Object>
 </System>
 
 
