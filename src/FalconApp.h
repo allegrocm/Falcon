@@ -78,6 +78,7 @@ public:
 	static Spacecraft*	getEnemyPlayerShip();		//shortcut cuz we need this a lot
 	
 	bool lowerTurretAllowed()						{return mLowerTurretAllowed;}
+	bool zeroPlayerMode()							{return mZeroPlayerMode;}
 	SpaceBox* getSpaceBox()							{return mSpaceBox;}		//for scene loading
 	void switchSystem();							//called when we warp to a new solar system
 	void toggleShaders();
@@ -85,13 +86,16 @@ public:
 
 //potential spawn position/rotation for a TIE fighter.  nearship indicates if this position should be near a capital ship
 	osg::Matrix getPotentialSpawnPosition(bool nearShip);
+
+
+	void autoPlay(float dt);		//for zero-player mode
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call
 	FalconApp()
 	{
 		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = 0.01; mTieNode1 = false;
-		mEventAudioManager = NULL; mLowerTurretAllowed = true;
+		mEventAudioManager = NULL; mLowerTurretAllowed = true; mZeroPlayerMode = false;
 	}
 	
 	//update our calculated frame rate
@@ -141,7 +145,7 @@ protected:
 	BloomController* mBloom;					//for bloom!
 	bool mLowerTurretAllowed;				//on by default
 	float mSPOffset;						//z-offset for our spacebox when we fly to a new system
-	
+	bool mZeroPlayerMode;					//is the computer playing itself?  for testing
 };
 
 

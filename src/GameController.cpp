@@ -137,9 +137,24 @@ void GameController::preGame(float dt)
 	}
 	
 	//button 1 will start the fight!
-	if(FalconApp::instance().getButton(1) == FalconApp::TOGGLE_ON && !isSwitching())
+	bool switchButton = FalconApp::instance().getButton(1) == FalconApp::TOGGLE_ON;
+	
+	//auto start in zero player mode
+	if(FalconApp::instance().zeroPlayerMode())
+	{
+		switchButton = false;
+		if(mModeTime > 5.0 && mModeTime - dt <= 5.0)
+			switchButton = true;
+	}
+	
+	if(switchButton && !isSwitching())
 	{
 		int seed = mTime * 100;
+		static int times = 0;
+		times++;
+		//in zero player mode, use pre-existing seeds for no randomosity
+		if(FalconApp::instance().zeroPlayerMode())
+			seed = times;
 		srand(seed);		//use the time we start to seed the RNG
 		printf("Seed RNG to %i\n", seed);
 		mSwitchTime = 3.0;

@@ -117,6 +117,11 @@ bool Falcon::update(float dt)
 
 	mHyperspace->update(dt);
 	mGun.update(dt);
+	if(FalconApp::instance().zeroPlayerMode())
+	{
+		if(GameController::instance().getMode() == GameController::MAIN_GAME)
+			shoot();		//automatically shoot in zero player mode
+	}
 	if(mGun.canAutofire()) shoot();		//if we've started a burst shot, finish it
 	
 	if(FalconApp::instance().lowerTurretAllowed())

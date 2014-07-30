@@ -57,7 +57,7 @@ StupidPlaceholderShip::StupidPlaceholderShip()
 
 void StupidPlaceholderShip::loadTIEModel()
 {
-	printf("Load thai model:  regular\n");
+//	printf("Load thai model:  regular\n");
 	//load a ship model.  we can also pre-transform the model into our coordinate system
 //	MatrixTransform* red = Util::loadModel("data/models/tief3DS/TIEFReduced.3DS", 1.0, -90);
 	MatrixTransform* nbest = Util::loadModel("data/models/tief3DS/TIEF.3DS", 1.0, -90);
@@ -283,7 +283,7 @@ bool StupidPlaceholderShip::update(float dt)
 {
 
 
-	if(mPlayer)
+	if(mPlayer && !FalconApp::instance().zeroPlayerMode())
 		playerControl(dt);
 	else
 		AIControl(dt);

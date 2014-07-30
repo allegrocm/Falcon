@@ -208,13 +208,14 @@ void FalconApp::update(float fulldt)
 	{
 	
 		mTotalTime += mTimeStep;
-		
+		if(mZeroPlayerMode) autoPlay(mTimeStep);
 		
 		//buttons 0, 5, 6, and 7 all shoot
 		if(mButtons[0] == TOGGLE_ON || mButtons[5] == TOGGLE_ON || mButtons[6] == TOGGLE_ON || mButtons[7] == TOGGLE_ON)
 		{
 			//fire!
-			mFalcon->shoot();
+			if(!mZeroPlayerMode)
+				mFalcon->shoot();
 		//	printf("BAM!\n");
 		}
 
@@ -390,6 +391,7 @@ void FalconApp::setHeadMatrix(osg::Matrixf mat)
 
 void FalconApp::setWandMatrix(osg::Matrixf mat)
 {
+	if(mZeroPlayerMode)	return;
 //	mWandMatrix = mat*mNavigation->getInverseMatrix();
 	mWandMatrix = mat;
 	mWandXForm->setMatrix(osg::Matrixf::scale(0.25, 0.125, 1.0)*mWandMatrix);
@@ -523,6 +525,13 @@ void FalconApp::handleArguments(int* argc, char **argv)
 			handled = true;
 			printf("Lower turret turned off\n");
 		}
+		else if(KenXML::CICompare(arg, "--zeroPlayers"))		//no lower turret allowed
+		{
+			mZeroPlayerMode = true;
+			handled = true;
+			printf("Zero player mode!\n");
+		}
+
 		else if(KenXML::CICompare(arg, "--tienode"))
 		{
 			if(i < *argc-1)
@@ -751,7 +760,42 @@ Matrix FalconApp::getPotentialSpawnPosition(bool nearShip)
 
 	return mat;
 	
+}
+
+void FalconApp::autoPlay(float dt)
+{
+	//point the wand matrix at whatever ship is nearest
+	Spacecraft* closest = NULL;
+	float bestDist = 10000;
+	for(size_t i = 0; i < mEnemyController->getShips().size(); i++)
+	{
+		Spacecraft* ship = mEnemyController->getShips()[i];
+		float thisDist = ship->getPos().length();
+		if(thisDist < bestDist)
+		{
+			bestDist = thisDist;
+			closest = ship;
+		}
+	}
 	
+	if(closest)		//did we find a ship?
+	{
+		//set up the wand matrix in this direction now
+		Vec3 fwd = closest->getPos();
+		fwd.normalize();;
+		Vec3 pos(0, 4, 0);
+		Vec3 up(0, 1, 0);
+		Vec3 right = fwd ^ up;
+		right.normalize();
+		up = right ^ fwd;
+		up.normalize();
+		Matrix mat;
+		Util::setPos(mat, pos + fwd * 2.0);
+		Util::setZAxis(mat, fwd*-1);
+		Util::setXAxis(mat, right);
+		Util::setYAxis(mat, up);
+		mWandMatrix = mat;
+	}
 
 }
 
