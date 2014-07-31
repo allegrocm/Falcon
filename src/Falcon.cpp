@@ -263,6 +263,7 @@ bool Falcon::shoot()
 	Vec3 barrelPos = Vec3(1.0 * (-1 + 2*(whichBarrel%2)), 1.0 * (whichBarrel/2), 0) * wandRotate;
 	Vec3 shootFrom = getTransform() * Vec3(0, 6, -2) * wandRotate;
 	Vec3 fireDir = mAimTarget - shootFrom;			//actual direction our shot will travel
+	
 	fireDir.normalize();
 	b->setTransform(wand);
 	b->setPos(shootFrom + barrelPos);

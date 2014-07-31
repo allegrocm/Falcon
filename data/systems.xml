@@ -25,7 +25,6 @@
 		<texture>Ssc2003-06c.jpg</texture>
 	</Object>
 	<Object type="Model">
-		<!--an object has a size, a position, and a texture.  oh and a type-->
 		<scale>.5</scale>
 		<x>-450</x>
 		<y>300</y>
@@ -115,7 +114,6 @@
     <texture>7c257eb6ae6ef1eba78f9847118b1662-d2lh209.png</texture>
   </Object>
 	<Object type="Model">
-		<!--an object has a size, a position, and a texture.  oh and a type-->
 		<scale>.5</scale>
 		<x>750</x>
 		<y>-200</y>
@@ -183,7 +181,6 @@
 		<texture>0124-0906-2509-2407_hubble_space_telescope_image_of_messier_101_galaxy_o.jpg</texture>
 	</Object>
 	<Object type="Model">
-		<!--an object has a size, a position, and a texture.  oh and a type-->
 		<scale>.5</scale>
 		<x>90</x>
 		<y>450</y>

@@ -201,6 +201,7 @@ void FalconApp::buttonInput(unsigned int button, bool pressed)
 void FalconApp::update(float fulldt)
 {
 	__FUNCTION_HEADER__
+	int r1 = rand();
 	updateFrameRate(fulldt);
 
 	mTargetTime += fulldt;
@@ -227,7 +228,6 @@ void FalconApp::update(float fulldt)
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
 		mListenerVelocity = Vec3();			//zero by default
-		
 		
 		//the falcon moves with its hyperspace thingy
 		mFalcon->setPos(Vec3(0, 0, -mFalcon->getHyperspace()->getZ()));
@@ -257,9 +257,7 @@ void FalconApp::update(float fulldt)
 			Util::setYAxis(nav, up);
 			nav = nav * Matrix::rotate(spin, z);
 			Util::setPos(nav, viewPos);
-		
 			nav.invert(nav);
-			
 			mNavigation->setMatrix(nav);
 		}
 
@@ -282,10 +280,7 @@ void FalconApp::update(float fulldt)
 			{
 				nav.ptr()[12+i] += nav.ptr()[8+i] * ahead + nav.ptr()[4+i] * lower + nav.ptr()[i]*right;
 			}
-			
-			
-			
-			
+
 			//Util::printMatrix(nav);
 			nav.invert(nav);
 			
@@ -299,9 +294,6 @@ void FalconApp::update(float fulldt)
 			mNavigation->setMatrix(nav);
 
 		}
-		
-		
-
 
 		//update bullets. when one is "finished", delete it
 		for(size_t i = 0; i < mBullets.size(); i++)
@@ -314,8 +306,7 @@ void FalconApp::update(float fulldt)
 				mBullets.pop_back();
 			}
 		}
-		
-		
+	
 		//update all the other stuff
 		for(size_t i = 0; i < mJunk.size(); i++)
 		{
@@ -327,8 +318,7 @@ void FalconApp::update(float fulldt)
 				mJunk.pop_back();
 			}
 		}
-		
-
+	
 		//the spacebox's position always follows the navigation
 		//so we can never approach the actual objects in it
 		Matrix nav = mNavigation->getMatrix();
@@ -341,14 +331,7 @@ void FalconApp::update(float fulldt)
 		//spacebox root navigates with our navigation, minus the position
 		Matrix navRot = mNavigation->getMatrix();
 		
-		//
-//		Vec3 navPos = Util::pos(navRot);
-//		Util::setPos(navRot, Vec3());
-//		Matrix navUnrot = navRot;
-//		navRot.invert navRot;		//for undoing the navrot before applying nav to the neargroup
-//		mSpaceBox->getRoot()->setMatrix(nav);
-//		mSpaceBox->getNearGroup()->setMatrix((navPos + Vec3(0, 0, -mSPOffset));
-
+	
 		//fly planets toward us after we jump
 		float SPSpeed = 100000;
 		if(mSPOffset < 10000)
@@ -370,6 +353,17 @@ void FalconApp::update(float fulldt)
 	}
 	
 	PROFILER.endCycle();		//needed for time profiling
+	int r2 = rand();
+	static float reportTime = 1.0;
+	reportTime -= fulldt;
+	if(reportTime < 0)
+	{
+		reportTime += 0.5;
+		Vec3 playerShip;
+		if(mEnemyController->getPlayer() && mEnemyController->getPlayer()->getShip())
+			playerShip =  mEnemyController->getPlayer()->getShip()->getPos();
+		printf("Report at %.4f:  Player at %.2f, %.2f, %.2f, nums are %i, %i\n", mTotalTime, playerShip.x(), playerShip.y(), playerShip.z(), r1%1000, r2%1000);
+	}
 }
 
 void FalconApp::deToggleButtons()
@@ -433,6 +427,39 @@ void drawStringOnScreen(int x, int y, const char* format, ...)
 
 }
 
+void drawBigStringOnScreen(int x, int y, const char* format, ...)
+{
+	char stringData[2024];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(stringData, 2024, format, args);
+	
+	//find the viewport size so we can properly size everything
+	int vport[4];
+	glGetIntegerv(GL_VIEWPORT, vport);
+	int screenWidth = vport[2];
+	int screenHeight = vport[3];
+	glPushMatrix();
+		glLoadIdentity();
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+			glLoadIdentity();
+			glOrtho(0, screenWidth, 0, screenHeight, -1, 1);
+
+			glDisable(GL_LIGHTING);
+			glDisable(GL_TEXTURE_2D);
+			glRasterPos3i(x, screenHeight - y, 0);
+			
+			for(int i=0; i<2024 && stringData[i] != 0; i++ )
+			{
+				glutBitmapCharacter( GLUT_BITMAP_HELVETICA_18, stringData[i] );
+			}
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+
+}
 
 void FalconApp::drawStatus()
 {	
@@ -455,8 +482,9 @@ void FalconApp::drawStatus()
 	int rowHeight = 20;
 	int row = 2;
 ::Stats& stats = GameController::instance().getStats();	
-	drawStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System (%i/%i)",
+	drawBigStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System (%i/%i)",
 		mAvgFrameRate, mGameController->getMode(), mSpaceBox->getSystemName().c_str(), stats.health, stats.maxHealth);
+	row++;
 	int active = mEnemyController->getShips().size();
 	int left = mEnemyController->getShipsLeftToSpawn();
 	drawStringOnScreen(20, rowHeight*row++, "Enemies:  %i/%i", active, left);

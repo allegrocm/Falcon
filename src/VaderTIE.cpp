@@ -122,6 +122,7 @@ void VaderTIE::loadTIEModel()
 
 void VaderTIE::wasHit(Bullet* b, osg::Vec3 hitPos)
 {
+	printf("Vader got hit at %.4f,%i hp left random = %i\n", FalconApp::instance().getTime(), mHP, rand()%1000);
 	StupidPlaceholderShip::wasHit(b, hitPos);
 	FalconApp::instance().getFX()->makeExplosion(hitPos, 1.0);
 	//which zone did this hit?

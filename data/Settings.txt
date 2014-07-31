@@ -23,10 +23,10 @@ tieHitboxSize = 12
 initialShipCount = 1
 
 #how many ships do we have to kill to win the demo battle?
-demoBattleTotalShipCount = 10
+demoBattleTotalShipCount = 30
 
 #how many simultaneous ships can there be during the demo battle?
-demoBattleMaxShipCount = 4
+demoBattleMaxShipCount = 12
 
 #perform collision checking with Millennium Falcon?  need to improve our 3d model...
 falconHitDetection = true
