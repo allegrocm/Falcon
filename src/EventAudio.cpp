@@ -124,8 +124,8 @@ void EventAudio::reset()
 void EventAudio::eventHappened(std::string name)
 {
 	//grab the random numbers now before we exit out due to sounds already playing
-	int r1 = rand();
-	int r2 = rand();
+	int r1 = Util::loggedRandom("EventAudioR1");
+	int r2 = Util::loggedRandom("EventAudioR2");
 	//do we have sounds for this event?
 	Event* e = NULL;
 	for(size_t i = 0; i < mEvents.size(); i++)

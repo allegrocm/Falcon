@@ -152,7 +152,7 @@ std::vector<Debris*> GameObject::explodeSection(osg::Group* n, int depth, int ma
 
 
 		//top tier stuff can't vanish
-		bool vanish = (1.0 * rand() / RAND_MAX < vanishChance) && (depth > 2);
+		bool vanish = (1.0 * Util::loggedRandom("Explode Vanish") / RAND_MAX < vanishChance) && (depth > 2);
 //		printf("Depth:  %i\n", depth);
 		if(vanish)
 		{
@@ -161,7 +161,7 @@ std::vector<Debris*> GameObject::explodeSection(osg::Group* n, int depth, int ma
 		}
 		
 		//only groups can split, and only if there's still depth to go
-		float splitVal = 1.0 * rand() / RAND_MAX;
+		float splitVal = 1.0 * Util::loggedRandom("Explode split") / RAND_MAX;
 //		printf("Split val:  %.2f vs %.2f\n", splitVal, splitChance);
 		float thisSplitChance = splitChance;
 		if(depth == 1) thisSplitChance = 1.0;		//top level always splits
@@ -189,7 +189,7 @@ std::vector<Debris*> GameObject::explodeSection(osg::Group* n, int depth, int ma
 			Vec4 cg = Util::getNodeCG(node, root);
 			Vec3 cgDir = Vec3(cg.x()/cg.w(), cg.y()/cg.w(), cg.z()/cg.w());
 			
-			Debris* h = new Debris(node, cgDir, 20, 20.0 + 40.0 * rand() / RAND_MAX, 120 * depth);
+			Debris* h = new Debris(node, cgDir, 20, 20.0 + 40.0 * Util::loggedRandom("Debris Speed") / RAND_MAX, 120 * depth);
 			
 			
 //			printf("Cum matrix:  \n");

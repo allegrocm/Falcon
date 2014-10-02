@@ -382,7 +382,7 @@ void SpaceBox::reload()
 MatrixTransform* SpaceBox::getCapitalShip()
 {
 	if(!mSystems[mCurrentSystem].mCapitalShips.size()) return NULL;
-	int which = rand()%mSystems[mCurrentSystem].mCapitalShips.size();
+	int which = Util::loggedRandom("GetCapitalShip")%mSystems[mCurrentSystem].mCapitalShips.size();
 	return mSystems[mCurrentSystem].mCapitalShips[which];
 }
 

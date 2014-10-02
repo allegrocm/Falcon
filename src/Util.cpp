@@ -23,6 +23,9 @@
 #include "Util.h"
 #include <osgUtil/TangentSpaceGenerator>
 
+//hacky hacky hackypants
+#include <FalconApp.h>
+
 using namespace osg;
 namespace  Util
 {
@@ -337,8 +340,16 @@ osg::Image* loadImage(std::string name)
 }
 
 
+int loggedRandom(std::string reason)
+{
+	static int count = 1;
+	int r = rand();
+	float t = FalconApp::instance().getTime();
+	printf("LogRDM %i:  %f:  %i:  %s\n", count++, t, r, reason.c_str());
+	return r;
+}
 
-float random(float minVal, float maxVal) 	{return minVal + (maxVal-minVal) * rand() / RAND_MAX;}
+float random(float minVal, float maxVal) 	{return minVal + (maxVal-minVal) * loggedRandom("randomFloat") / RAND_MAX;}
 osg::Vec3 randomVector()
 {
 	Vec3 v(random(-1, 1), random(-1, 1), random(-1,1));
@@ -367,7 +378,7 @@ osg::Vec3 vectorInCone(osg::Vec3 generalDirection, float maxAngle, float minAngl
 	float s = sinf(phi);
 	float c = cosf(phi);
 	
-	float theta = 6.28 * rand() / RAND_MAX;
+	float theta = 6.28 * Util::loggedRandom("vectorInCone") / RAND_MAX;
 	float st = sinf(theta);
 	float ct = cosf(theta);
 	

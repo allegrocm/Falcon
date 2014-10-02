@@ -85,7 +85,12 @@ namespace Util
 	std::string findDataFile(std::string name);						//error reporting version of OSG"s finddatafile function
 	
 	void makeTangentSpace(osg::Node* n);
+	
 	//number generation
+	
+	//logging all random number generation to figure out cluster
+	//sync issues
+	int loggedRandom(std::string reason);
 	float random(float minVal, float maxVal);
 	osg::Vec3 randomVector();			//a random unit vector
 	osg::Vec3 vectorInCone(osg::Vec3 axis, float maxAngleDegrees, float minAngleDegrees = 0);

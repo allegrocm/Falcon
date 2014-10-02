@@ -29,7 +29,7 @@ Debris::Debris(osg::Node* model, osg::Vec3 generalDirection, float directionDelt
 	
 	
 	mOmega = angularSpeed / 57.3;
-	mSpinAxis = Vec3(-1.0+2.0*rand()/RAND_MAX, -1.0+2.0*rand()/RAND_MAX, -1.0+2.0*rand()/RAND_MAX);
+	mSpinAxis = Vec3(-1.0+2.0*Util::loggedRandom("Debris")/RAND_MAX, -1.0+2.0*Util::loggedRandom("Debris")/RAND_MAX, -1.0+2.0*Util::loggedRandom("Debris")/RAND_MAX);
 	mSpinAxis.normalize();
 	mLife = 2.0;
 }

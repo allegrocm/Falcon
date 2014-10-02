@@ -333,7 +333,7 @@ void StupidPlaceholderShip::explode(bool withAWhimper)
 	
 	if(!withAWhimper)
 	{
-		int count = rand()%2+3;
+		int count = Util::loggedRandom("Enemy explosion count")%2+3;
 		for(int i = 0; i < count; i++)
 		{
 			Vec3 pos = Util::randomVector();

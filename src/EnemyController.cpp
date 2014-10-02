@@ -104,7 +104,8 @@ void EnemyController::update(float dt)
 			chance = mPlayer->isReadyForShip() * 1000;
 		}
 		
-		if(1.0 * rand() /  RAND_MAX < chance * dt)
+
+		if(chance && 1.0 * Util::loggedRandom("Spawn chance") /  RAND_MAX < chance * dt)
 		{
 			//spawn a ship!
 			spawnEnemy();
@@ -139,7 +140,7 @@ void EnemyController::spawnEnemy(bool initing)
 	//if there are ships left in our swarm, grab one of them
 	if(getShipsLeftToSpawn())
 	{
-		int whichSpawn = rand()%getShipsLeftToSpawn();
+		int whichSpawn = Util::loggedRandom("Choose spawn location")%getShipsLeftToSpawn();
 		printf("spawning from position %i in the swarm of %i\n", whichSpawn, getShipsLeftToSpawn());
 		Node* spawner = mSwarm->getChild(whichSpawn);
 		MatrixTransform* spawnMat = dynamic_cast<MatrixTransform*>(spawner);
@@ -227,7 +228,7 @@ void EnemyController::populateSwarm(int howMany)
 	//load up a TIE fighter for each spawn
 	for(int i = 0; i < howMany; i++)
 	{
-		bool nearShip = (rand()%4 != 0);
+		bool nearShip = (Util::loggedRandom("PopulateSwarm")%4 != 0);
 
 		nearShip = false;		//HACK till we figure out how to spawn near capital ship and still be fun
 

@@ -18,6 +18,7 @@
 #ifdef KENS_MIDI_CONTROLLER
 #include "magicjoystick.h"
 #endif
+#include "Util.h"
 
 using namespace osg;
 
@@ -95,14 +96,13 @@ void ParticleFX::makeExplosion(Vec3 pos, float size, float countMult, float life
 
 
 		//local position of this particle within the explosion
-		Vec3 offset( -1.0 + 2.0 * rand() / RAND_MAX, -1.0 + 2.0 * rand() / RAND_MAX, -1.0 + 2.0 * rand() / RAND_MAX);
-		offset.normalize();
-		offset *= 1.0 * rand() / RAND_MAX * size;
+		Vec3 offset = Util::randomVector();
+		offset *= 1.0 * Util::loggedRandom("Particle Offset") / RAND_MAX * size;
 		osgParticle::Particle* party = mSystems[EXPLOSION]->createParticle(&basicParticle);
-		party->setLifeTime((0.25 + 0.5 * rand() / RAND_MAX) * size * lifeMult);
+		party->setLifeTime((0.25 + 0.5 * Util::loggedRandom("Particle Life") / RAND_MAX) * size * lifeMult);
 		party->setPosition(pos + offset);
-		party->setVelocity(offset * speedMult * (50.0 + 55.0 * rand() / RAND_MAX));
-		party->setAngularVelocity(Vec3(0, 0, 2.0 * (-1.0 + 2.0 * rand() / RAND_MAX)));
+		party->setVelocity(offset * speedMult * (50.0 + 55.0 * Util::loggedRandom("particle speed") / RAND_MAX));
+		party->setAngularVelocity(Vec3(0, 0, 2.0 * (-1.0 + 2.0 * Util::loggedRandom("Particle omega") / RAND_MAX)));
 //		printf("Made particle at %.2f, %.2f, %.2f\n", pos.x()+offset.x(), pos.y()+offset.y(), pos.z()+offset.z());
 	}
 }
