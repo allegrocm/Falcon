@@ -262,7 +262,7 @@ void TIEComputer::updateStatusText(float dt)
 	
 	//otherwise show the Falcon health
 	::Stats& stats = GameController::instance().getStats();
-	if(statusText == "")
+	if(statusText == "" || FalconApp::instance().zeroPlayerMode())
 	{
 		int active = EnemyController::instance().getShips().size();
 		int left = EnemyController::instance().getShipsLeftToSpawn(); 	

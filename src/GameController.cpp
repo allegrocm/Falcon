@@ -134,11 +134,14 @@ void GameController::preGame(float dt)
 		FalconApp::instance().getScreen()->setButtonText(2, "");
 		FalconApp::instance().getScreen()->setButtonText(3, "");
 		FalconApp::instance().getScreen()->setIsUp(true);		//put the screen so we know to interact with it
+		
+	
 	}
+	
 	
 	//button 1 will start the fight!
 	bool switchButton = FalconApp::instance().getButton(1) == FalconApp::TOGGLE_ON;
-	
+
 	//auto start in zero player mode
 	if(FalconApp::instance().zeroPlayerMode())
 	{
