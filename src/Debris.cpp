@@ -71,7 +71,7 @@ bool Debris::update(float dt)
 	setPos(getPos() + mVel * dt);
 	
 	//lots of little explosions as we die
-	FalconApp::instance().getFX()->makeExplosion(getPos() + Util::randomVector()*Util::random(0.2, 2.5) * mFireAmount, .75 *  mFireAmount, 0.2 / mFireAmount, 1.0 / mFireAmount);
+//	FalconApp::instance().getFX()->makeExplosion(getPos() + Util::randomVector()*Util::random(0.2, 2.5) * mFireAmount, .75 *  mFireAmount, 0.2 / mFireAmount, 1.0 / mFireAmount);
 	return(mAge < mLife);
 
 }

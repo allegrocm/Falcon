@@ -36,7 +36,7 @@ Hyperspace::Hyperspace()
 	for(int i  = 0; i < stars; i++)
 	{
 		float radius = Util::random(10, 150);
-		float theta = 6.28 * rand() / RAND_MAX;
+		float theta = 6.28 * Util::loggedRandom("Hyperspace theta") / RAND_MAX;
 		float s = cosf(theta);
 		float c = sinf(theta);
 		Vec3 localUp(-s, c, 0);

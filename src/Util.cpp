@@ -345,14 +345,20 @@ int loggedRandom(std::string reason)
 	static int count = 1;
 	int r = rand();
 	float t = FalconApp::instance().getTime();
-	printf("LogRDM %i:  %f:  %i:  %s\n", count++, t, r, reason.c_str());
+	if(reason != "SILENT")
+		printf("LogRDM %i:  %f:  %i:  %s\n", count++, t, r, reason.c_str());
+	else
+		count++;
 	return r;
 }
 
 float random(float minVal, float maxVal) 	{return minVal + (maxVal-minVal) * loggedRandom("randomFloat") / RAND_MAX;}
 osg::Vec3 randomVector()
 {
-	Vec3 v(random(-1, 1), random(-1, 1), random(-1,1));
+	float x = loggedRandom("randomVector") / RAND_MAX * 2.0 - 1.0;
+	float y = loggedRandom("SILENT") / RAND_MAX * 2.0 - 1.0;
+	float z = loggedRandom("SILENT") / RAND_MAX * 2.0 - 1.0;
+	Vec3 v(x, y, z);
 	v.normalize();
 	return v;
 }

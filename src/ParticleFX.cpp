@@ -89,20 +89,26 @@ void ParticleFX::makeExplosion(Vec3 pos, float size, float countMult, float life
 #endif
 //	printf("Speed mult:  %.2f\n", speedMult);
 	basicParticle.setSizeRange(osgParticle::rangef(4.0 * baseSize, 10.0 * baseSize));
-
+	printf("LogRDM %i particles\n", numParticles);
 	for(int i = 0; i < numParticles; i++)
 	{
 		basicParticle.setColorRange(osgParticle::range<Vec4>(Vec4(1.0, .9, 0.5, 1.0), Vec4(0.5, 0.2, 0.1, 0.0)));
 
-
+		//these random numbers all come together, so only report one
 		//local position of this particle within the explosion
-		Vec3 offset = Util::randomVector();
-		offset *= 1.0 * Util::loggedRandom("Particle Offset") / RAND_MAX * size;
+		float x = Util::loggedRandom("SILENT") / RAND_MAX * 2.0 - 1.0;
+		float y = Util::loggedRandom("SILENT") / RAND_MAX * 2.0 - 1.0;
+		float z = Util::loggedRandom("SILENT") / RAND_MAX * 2.0 - 1.0;
+		Vec3 v(x, y, z);
+		v.normalize();
+		Vec3 offset = v;
+//		Vec3 offset = Util::randomVector();
+		offset *= 1.0 * Util::loggedRandom("SILENT") / RAND_MAX * size;
 		osgParticle::Particle* party = mSystems[EXPLOSION]->createParticle(&basicParticle);
-		party->setLifeTime((0.25 + 0.5 * Util::loggedRandom("Particle Life") / RAND_MAX) * size * lifeMult);
+		party->setLifeTime((0.25 + 0.5 * Util::loggedRandom("SILENT") / RAND_MAX) * size * lifeMult);
 		party->setPosition(pos + offset);
-		party->setVelocity(offset * speedMult * (50.0 + 55.0 * Util::loggedRandom("particle speed") / RAND_MAX));
-		party->setAngularVelocity(Vec3(0, 0, 2.0 * (-1.0 + 2.0 * Util::loggedRandom("Particle omega") / RAND_MAX)));
+		party->setVelocity(offset * speedMult * (50.0 + 55.0 * Util::loggedRandom("SILENT") / RAND_MAX));
+		party->setAngularVelocity(Vec3(0, 0, 2.0 * (-1.0 + 2.0 * Util::loggedRandom("SILENT") / RAND_MAX)));
 //		printf("Made particle at %.2f, %.2f, %.2f\n", pos.x()+offset.x(), pos.y()+offset.y(), pos.z()+offset.z());
 	}
 }

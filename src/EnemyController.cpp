@@ -171,7 +171,7 @@ void EnemyController::spawnEnemy(bool initing)
 	sps->setVel(sps->getForward() * sps->getVel().length());		//set the initial velocity to forward
 	static int spawnCount = 0;
 	spawnCount++;
-	int random = rand()%512;
+	int random = Util::loggedRandom("spawnPos");
 	printf("Enemy %i spawned at %.2f, %.2f, %.2f (t = %.2f) random num = %i\n", 
 		spawnCount, spawnPos.ptr()[12], spawnPos.ptr()[13], spawnPos.ptr()[14], FalconApp::instance().getTime(), random);
 

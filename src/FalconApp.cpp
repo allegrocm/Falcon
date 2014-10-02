@@ -201,7 +201,6 @@ void FalconApp::buttonInput(unsigned int button, bool pressed)
 void FalconApp::update(float fulldt)
 {
 	__FUNCTION_HEADER__
-	int r1 = rand();
 	updateFrameRate(fulldt);
 
 	mTargetTime += fulldt;
@@ -353,16 +352,18 @@ void FalconApp::update(float fulldt)
 	}
 	
 	PROFILER.endCycle();		//needed for time profiling
-	int r2 = rand();
+
 	static float reportTime = 1.0;
 	reportTime -= fulldt;
 	if(reportTime < 0)
 	{
+//		int r2 = rand();
+		int r2 = 100;
 		reportTime += 0.5;
 		Vec3 playerShip;
 		if(mEnemyController->getPlayer() && mEnemyController->getPlayer()->getShip())
 			playerShip =  mEnemyController->getPlayer()->getShip()->getPos();
-		printf("Report at %.4f:  Player at %.2f, %.2f, %.2f, nums are %i, %i\n", mTotalTime, playerShip.x(), playerShip.y(), playerShip.z(), r1%1000, r2%1000);
+		printf("Report at %.4f:  Player at %.2f, %.2f, %.2f, nums is %i\n", mTotalTime, playerShip.x(), playerShip.y(), playerShip.z(), r2%1000);
 	}
 }
 
