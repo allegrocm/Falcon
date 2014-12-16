@@ -89,7 +89,9 @@ void ParticleFX::makeExplosion(Vec3 pos, float size, float countMult, float life
 #endif
 //	printf("Speed mult:  %.2f\n", speedMult);
 	basicParticle.setSizeRange(osgParticle::rangef(4.0 * baseSize, 10.0 * baseSize));
+#ifdef RNG_LOGGING
 	printf("LogRDM %i particles\n", numParticles);
+#endif
 	for(int i = 0; i < numParticles; i++)
 	{
 		basicParticle.setColorRange(osgParticle::range<Vec4>(Vec4(1.0, .9, 0.5, 1.0), Vec4(0.5, 0.2, 0.1, 0.0)));
