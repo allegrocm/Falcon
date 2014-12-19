@@ -81,6 +81,7 @@ SpaceBox::SpaceBox()
 void SpaceBox::loadSystem(int which)
 {
 	__FUNCTION_HEADER__
+	printf("LogRDM -------------Switch to system %i\n", which);
 	if(which < 0 || which >= mSystems.size())
 	{
 		Util::logError("Couldn't load system %i\n", which);
@@ -381,8 +382,9 @@ void SpaceBox::reload()
 
 MatrixTransform* SpaceBox::getCapitalShip()
 {
+	int which = Util::loggedRandom("GetCapitalShip");
 	if(!mSystems[mCurrentSystem].mCapitalShips.size()) return NULL;
-	int which = Util::loggedRandom("GetCapitalShip")%mSystems[mCurrentSystem].mCapitalShips.size();
+	which = which%mSystems[mCurrentSystem].mCapitalShips.size();
 	return mSystems[mCurrentSystem].mCapitalShips[which];
 }
 

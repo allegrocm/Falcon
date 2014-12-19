@@ -33,6 +33,7 @@ GameController::GameController()
 
 void GameController::reset()
 {
+	printf("Resetting to pregame!\n");
 	mTime = 0;
 	mMode = PRE_GAME;
 	mSwitchTime = 0;
@@ -58,6 +59,27 @@ void GameController::update(float dt)
 	mSoundTimer -= dt;
 	mSwitchTime -= dt;
 	
+	
+	
+	if(mSwitchTime + dt > 0 && mSwitchTime <= 0)		//is it time to switch modes?
+	{
+		printf("Switch mode!\n");
+		if(mMode == PRE_GAME)
+		{
+			printf("To pre game!\n");
+			startGame();
+		}
+		else if(mMode == MAIN_GAME)
+		{
+			printf("To Main game!\n");
+			EnemyController::instance().reset();		
+			reset();
+			
+		}
+		return;
+		
+	}
+	
 	if(mMode == PRE_GAME)
 	{
 		preGame(dt);
@@ -70,25 +92,11 @@ void GameController::update(float dt)
 	
 	mModeTime += dt;
 	
-	if(mSwitchTime + dt > 0 && mSwitchTime <= 0)		//is it time to switch modes?
-	{
-		if(mMode == PRE_GAME)
-		{
-			startGame();
-		}
-		else if(mMode == MAIN_GAME)
-		{
-			EnemyController::instance().reset();		
-			reset();
-			
-		}
-		
-	}
-	
 }
 
 void GameController::startGame()
 {
+	printf("Reset the game!\n");
 	mMode = MAIN_GAME;
 	mStats.reset();
 	mModeTime = 0;
@@ -186,7 +194,7 @@ void GameController::mainGame(float dt)
 		FalconApp::instance().getScreen()->setIsUp(false);		//put the screen down
 	}
 	
-	if(EnemyController::instance().isDone())
+	if(EnemyController::instance().isDone() && !mWeLost)
 	{
 		mJumpTime -= dt;
 		if(mJumpTime < 3.0 && mJumpTime + dt >= 3.0)
@@ -195,6 +203,7 @@ void GameController::mainGame(float dt)
 
 			EventAudio::instance().eventHappened("timeToGo");
 			FalconApp::instance().getScreen()->setStatusText("Initiating hyperspace jump...");
+			printf("Getting ready for hyperspace....\n");
 
 		}
 
@@ -202,6 +211,7 @@ void GameController::mainGame(float dt)
 		{
 			FalconApp::instance().getFalcon()->jump();
 			mSwitchTime = 10.0;
+			printf("We won!  Going to hyperspace....\n");
 		}
 
 
@@ -209,7 +219,8 @@ void GameController::mainGame(float dt)
 	}
 	else if(mWeLost)		//did we lose?  run away
 	{
-		mSwitchTime -= dt;
+		//mSwitchTime -= dt;
+		//printf("We lost.  Switch time at %.2f....\n", mSwitchTime);
 	}
 	else
 	{
@@ -223,7 +234,7 @@ void GameController::mainGame(float dt)
 void GameController::falconLost()
 {
 	mWeLost = true;
-	mSwitchTime = 14.0;
+	mSwitchTime = 7.0;
 	FalconApp::instance().getScreen()->setStatusText("WARNING:  HULL BREACH.");
 	FalconApp::instance().getScreen()->setIsUp(true);		//put the screen back up
 }

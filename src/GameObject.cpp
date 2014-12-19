@@ -15,11 +15,13 @@
 #include "Layers.h"
 #include <stdlib.h>
 #include <osgUtil/IntersectVisitor>
-
+static int GOOID = 0;
 using namespace osg;
 
 GameObject::GameObject()
 {
+	mObjectID = GOOID++;
+	
 	mAge = 0;
 	mRoot = new Group();
 	mRoot->setName("GameObject Root");
@@ -32,6 +34,9 @@ GameObject::GameObject()
 	mInverseTransformUniform = new Uniform("inverseTransform", Matrixf());
 	mRoot->getOrCreateStateSet()->addUniform(mTransformUniform);
 	mRoot->getOrCreateStateSet()->addUniform(mInverseTransformUniform);
+#ifdef RNG_LOGGING
+	printf("LogRDM  Create object %i\n", mObjectID);
+#endif
 }
 
 GameObject::~GameObject()

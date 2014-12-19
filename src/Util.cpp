@@ -347,7 +347,7 @@ int loggedRandom(std::string reason)
 #ifdef RNG_LOGGING
 	float t = FalconApp::instance().getTime();
 	if(reason != "SILENT")
-		printf("LogRDM %i:  %f:  %i:  %s\n", count++, t, r, reason.c_str());
+		printf("LogRDM Gen %i:  %f:  %i:  %s\n", count++, t, r, reason.c_str());
 	else
 		count++;
 #endif

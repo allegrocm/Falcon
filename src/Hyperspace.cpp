@@ -74,6 +74,7 @@ bool Hyperspace::update(float dt)
 	if(mHSTime > HSDelay)
 	{
 		mPhase = (mHSTime-HSDelay) / HSDuration;
+		//printf("Hyperspace phase:  %.2f\n", mPhase);
 	}
 	else
 	{
@@ -81,10 +82,10 @@ bool Hyperspace::update(float dt)
 	}
 	if(mHSTime >= switchTimeSeconds && mHSTime - dt < switchTimeSeconds)	//is it time to switch systems??
 	{
-//		printf("HS switch!  phase = %.2f, t = %.2f\n", mPhase, mHSTime);
+		printf("Hyperspace switch!  phase = %.2f, t = %.2f\n", mPhase, mHSTime);
 
 		//switch systems earlier on Falcon nodes, a bit later on the TIE node
-		if(!FalconApp::instance().tieNode1())
+	//	if(!FalconApp::instance().tieNode1())
 		{
 			FalconApp::instance().switchSystem();
 		}
@@ -103,17 +104,17 @@ bool Hyperspace::update(float dt)
 	if(mHSTime > HSDuration + HSDelay)
 	{ 
 		mZ = 10000;
-
+		
 	}
 	
 	if(mHSTime > HSDuration + HSDelay + resetTime)
 	{ 
 		mZ = 0000;
 		mHSTime = -1;
-
+		printf("Hyperspace reset!\n");
 		if(FalconApp::instance().tieNode1())
 		{
-			FalconApp::instance().switchSystem();
+		//	FalconApp::instance().switchSystem();
 		}
 		
 	}
@@ -131,6 +132,7 @@ bool Hyperspace::update(float dt)
 
 void Hyperspace::go()
 {
+	printf("Hyperspace got the GO at t= %.2f!\n", FalconApp::instance().getTime());
 	std::string hyperspaceSound;
 	getDefault("hyperspaceSound", hyperspaceSound);
 	KSoundManager::instance()->playSound(std::string("data/sounds/") + hyperspaceSound, 1.0);

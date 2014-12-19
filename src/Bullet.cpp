@@ -19,6 +19,8 @@
 #include <osg/Geode>
 #include <osgUtil/IntersectVisitor>
 #include "Layers.h"
+#include "VaderTIE.h"
+
 using namespace osg;
 
 Bullet::Bullet()
@@ -31,6 +33,7 @@ Bullet::Bullet()
 	mLength = ROM::FALCON_LASER_LENGTH;
 	addGeometry();
 	setGlows(true);
+
 }
 
 bool Bullet::update(float dt)
@@ -38,8 +41,15 @@ bool Bullet::update(float dt)
 	GameObject::update(dt);
 	 
 	setPos(getPos() + mVel * dt);
-//	printf("pos:  %.2f, %.2f, %.2f\n", getPos().x(), getPos().y(), getPos().z());
+#ifdef RNG_LOGGING
+	//printf("LogRDM Bullet %i Pos:  %.2f, %.2f, %.2f\n", mObjectID, getPos().x(), getPos().y(), getPos().z());
+#endif
+
 	if(checkHit()) return false;
+#ifdef RNG_LOGGING
+	if(mAge >= mLife)
+		printf("LogRDM Bullet %i disappearing\n", mObjectID);
+#endif
 	return (mAge < mLife);
 }
 
@@ -94,8 +104,36 @@ bool Bullet::checkHit()
 		Vec3 hitPos;
 		if(ships[i]->checkRaycast(pos-dir*length*0.5, dir*length, hitPos))
 		{
-//			printf("Bullet just hit %s, cast length %.2f\n", ships[i]->getName().c_str(), length);
-//			printf("dist:  %.2f\n", (pos-hitPos).length());
+			//friendly fire doesn't affect Vader's TIE.
+			//this is partly because the camera view for Vader's tie apparently allows it to be hit by bullets near the origin!
+			if(dynamic_cast<VaderTIE*>(ships[i]) && mIsEnemy)
+			{
+				printf("************Avoiding invalid hit on TIE fighter!\n");
+				continue;
+			}
+			
+			//sometimes a laser will "hit" a ship that's very far away from it.
+			//Seems to only happen when laser direction and ship-to-target are almost completely parallel
+			Vec3 meToHit = hitPos-pos;
+			Vec3 shipToHit = hitPos-ships[i]->getPos();
+			meToHit.normalize();
+			shipToHit.normalize();
+			if(fabs(meToHit * shipToHit) > 0.999)
+			{
+				printf("***********Detected parallel laser and ship-to-hit, might be a bad collision\n");
+				continue;
+			}
+#ifdef RNG_LOGGING
+			printf("LogRDM Bullet %i just hit %s, cast length %.2f, isE = %i, age = %.2f\n", 
+				mObjectID, ships[i]->getName().c_str(), length, mIsEnemy, mAge);
+			printf("direction:  %.2f, %.2f, %.2f\n", dir.x(), dir.y(), dir.z());
+			float distToShip = (pos-ships[i]->getPos()).length();
+			printf("LogRDM dist:  %.2f.  Target dist:  %.2f\n", (pos-hitPos).length(), distToShip);
+			if(distToShip > length)
+			{
+			//	printf("LogDRM ******************************* bullet hit invalid target!\n");
+			}
+#endif
 			explode(hitPos);
 			ships[i]->wasHit(this, hitPos);
 			hitSometing = true;

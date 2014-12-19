@@ -225,6 +225,10 @@ void Falcon::updateAutoTurret(float dt)
 
 
 	Bullet* b = new Bullet();
+#ifdef RNG_LOGGING
+	printf("Falcon autoturret created bullet %i\n", b->mObjectID);
+#endif
+
 	b->mShooter = this;
 
 	//each of the four barrels has a different position
@@ -252,6 +256,9 @@ bool Falcon::shoot()
 	static int whichBarrel = 0;
 	whichBarrel = (whichBarrel+1)%4;
 	Bullet* b = new Bullet();
+	#ifdef RNG_LOGGING
+	printf("Falcon main turret created bullet %i\n", b->mObjectID);
+#endif
 	b->mShooter = this;
 	//align the new bullet more or less with the wand, since that's our turret
 	Matrix wand = FalconApp::instance().getWandMatrix();
@@ -327,7 +334,7 @@ void Falcon::wasHit(Bullet* b, osg::Vec3 hitPos)
 
 	if(oldPercent > 0 && newPercent <= 0)
 	{
-		printf("No health left!\n");
+		printf("No health left!--starting hyperspace jump!\n");
 		EventAudio::instance().eventHappened("noHealth");
 		mHyperspace->go();		//gotta go now!
 		GameController::instance().falconLost();

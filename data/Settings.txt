@@ -3,7 +3,7 @@
 #the parameter names are NOT case sensitive, but if you provide a filename for a sound or texture or model, that IS.
 
 #how many shots to kill the Falcon?
-FalconHitPoints = 125
+FalconHitPoints = 80
 
 hyperspaceSound = hyperspace.mp3
 mainMusic =	imperialProbe.mp3
@@ -23,10 +23,10 @@ tieHitboxSize = 12
 initialShipCount = 1
 
 #how many ships do we have to kill to win the demo battle?
-demoBattleTotalShipCount = 30
+demoBattleTotalShipCount = 20
 
 #how many simultaneous ships can there be during the demo battle?
-demoBattleMaxShipCount = 12
+demoBattleMaxShipCount = 13
 
 #perform collision checking with Millennium Falcon?  need to improve our 3d model...
 falconHitDetection = true

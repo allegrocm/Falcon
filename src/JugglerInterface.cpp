@@ -10,7 +10,7 @@
 #include <vrj/Draw/OpenGL/DrawManager.h>
 #include <vrj/Display/Display.h>
 #include <vrj/Draw/OpenGL/Window.h>
-
+#include "VRJSyncMonitor.h"
 
 JugglerInterface::JugglerInterface(vrj::Kernel* kern, int& argc, char** argv) : vrj::OsgApp(kern)
 {
@@ -55,6 +55,8 @@ void JugglerInterface::init()
 	
 	 vrj::OsgApp::init();
 	osg::setNotifyLevel(osg::FATAL);
+	
+	RNGSyncMonitor::init();
 }
 
 void JugglerInterface::initScene()
@@ -66,6 +68,8 @@ void JugglerInterface::initScene()
 
 void JugglerInterface::preFrame()
 {	
+	
+	RNGSyncMonitor::preFrame();
 	//trigger handling
 	
 	//if(mButton1->getData() == gadget::Digital::TOGGLE_ON)
@@ -77,12 +81,26 @@ void JugglerInterface::preFrame()
 
 void JugglerInterface::latePreFrame()
 {
-	//std::cout << "begin preframe" << std::endl;
+#ifdef RNG_LOGGING
+	static int RNGFrame = 0;
+	printf("LogRDM ===============================Preframe %06i=====================================================\n", RNGFrame++);
+	RNGSyncMonitor::latePreFrame();
+	if(RNGSyncMonitor::isSynced() == false)
+	{
+		FalconApp::instance().syncFaultHappened();
+		fflush(stdout);
+		::exit(0);		//quit so we kill the log now
+	}
+#endif
+//	std::cout << "begin preframe" << std::endl;
 	static double tLast = mHead->getTimeStamp().secd();
 	double tNow = mHead->getTimeStamp().secd();
 	double dt = tNow - tLast;
 	tLast = tNow;
-	
+#ifdef RNG_LOGGING
+	//dt = 0.05;
+#endif
+	//std::cout << "Timestamp:  " << tNow << std::endl;
 	//pass changes in button state on to the app
 	for(int i = 0; i < 8; i++)
 	{

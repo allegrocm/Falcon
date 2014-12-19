@@ -206,7 +206,10 @@ void FalconApp::update(float fulldt)
 	mTargetTime += fulldt;
 	while(mTotalTime < mTargetTime)
 	{
-	
+		mListenerVelocity = Vec3();			//zero by default
+#ifdef RNG_LOGGING
+		printf("LogRDM _______________________TIMESTEP___________________________________________\n");
+#endif
 		mTotalTime += mTimeStep;
 		if(mZeroPlayerMode) autoPlay(mTimeStep);
 		
@@ -226,8 +229,7 @@ void FalconApp::update(float fulldt)
 		mEnemyController->update(mTimeStep);
 		mGameController->update(mTimeStep);
 		EnemyPlayer* player = mEnemyController->getPlayer();
-		mListenerVelocity = Vec3();			//zero by default
-		
+
 		//the falcon moves with its hyperspace thingy
 		mFalcon->setPos(Vec3(0, 0, -mFalcon->getHyperspace()->getZ()));
 		
@@ -300,6 +302,9 @@ void FalconApp::update(float fulldt)
 			if(!mBullets[i]->update(mTimeStep))
 			{
 				mModelGroup->removeChild(mBullets[i]->getRoot());
+#ifdef RNG_LOGGING
+				printf("LogRDM Remove bullet %i\n", mBullets[i]->mObjectID);
+#endif
 				delete mBullets[i];
 				mBullets[i] = mBullets.back();
 				mBullets.pop_back();
@@ -482,9 +487,12 @@ void FalconApp::drawStatus()
 	glColor3f(.6, .6, .9);
 	int rowHeight = 20;
 	int row = 2;
+	int min = mTotalTime/60;
+	int sec = ((int)mTotalTime)%60;
+	int cs = mTotalTime*100; cs%= 100;
 ::Stats& stats = GameController::instance().getStats();	
-	drawBigStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System (%i/%i)",
-		mAvgFrameRate, mGameController->getMode(), mSpaceBox->getSystemName().c_str(), stats.health, stats.maxHealth);
+	drawBigStringOnScreen(20, rowHeight*row++, "Frame Rate:  %.2f        Game Mode %i In the %s System (%i/%i)    %02i:%02i:%02i",
+		mAvgFrameRate, mGameController->getMode(), mSpaceBox->getSystemName().c_str(), stats.health, stats.maxHealth, min, sec, cs);
 	row++;
 	int active = mEnemyController->getShips().size();
 	int left = mEnemyController->getShipsLeftToSpawn();
@@ -719,16 +727,24 @@ void FalconApp::switchSystem()
 
 Matrix FalconApp::getPotentialSpawnPosition(bool nearShip)
 {
-	MatrixTransform* capitalShip = mSpaceBox->getCapitalShip();
+	MatrixTransform* capitalShip = NULL;  
 	if(mFalcon->getHyperspace()->done() == false)
 	{
-		printf("Spawning ship during hyperspace jump!  Won't use the local star system for positioning\n");
+		printf("LogRDM Spawning ship during hyperspace jump!  Won't use the local star system for positioning\n");
 		capitalShip = NULL;
 	}
-	
+	else capitalShip = mSpaceBox->getCapitalShip();
+	#ifdef RNG_LOGGING
+		printf("Get spawn pos in system %i! Hyperspace time is %.2f\n", 
+			mSpaceBox->getSystemNumber(), mFalcon->getHyperspace()->getHSTime());
+#endif
 	//if there are no capital ships around, make a random spawn position
 	if(!nearShip || !capitalShip)
 	{
+#ifdef RNG_LOGGING
+		printf("No capital ship found in system %i, using local star system.  Hyperspace time is %.2f\n", 
+			mSpaceBox->getSystemNumber(), mFalcon->getHyperspace()->getHSTime());
+#endif
 		Matrix mat;
 		
 		//generate a position
@@ -758,7 +774,7 @@ Matrix FalconApp::getPotentialSpawnPosition(bool nearShip)
 	Matrix mat = capitalShip->getMatrix();
 	int tries = 5;		//let's try a few times to get a position near it but not in it
 	Vec3 spawnPos = Util::pos(mat);
-	printf("Using capital ship at %.2f, %.2f, %.2f for spawn origin\n", spawnPos.x(), spawnPos.y(), spawnPos.z());
+	printf("LogRDM Using capital ship at %.2f, %.2f, %.2f for spawn origin\n", spawnPos.x(), spawnPos.y(), spawnPos.z());
 	while(tries)
 	{
 		
@@ -777,7 +793,7 @@ Matrix FalconApp::getPotentialSpawnPosition(bool nearShip)
 		if(hitList.size())		//if there's any size in the hitlist, we HIT something!
 		{
 			spawnPos = hitList.back().getWorldIntersectPoint() + dir * Util::random(100, 200);
-			printf("%i hits!  Found a spawn pos at %.2f, %.2f, %.2f\n",(int)hitList.size(), spawnPos.x(), spawnPos.y(), spawnPos.z());
+			printf("LogRDM  %i hits!  Found a spawn pos at %.2f, %.2f, %.2f\n",(int)hitList.size(), spawnPos.x(), spawnPos.y(), spawnPos.z());
 			tries = 0;
 		}
 //		spawnPos = spawnPos + dir * 50;

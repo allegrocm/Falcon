@@ -32,6 +32,7 @@ VaderTIE::VaderTIE()
 	for(int i = 0; i < 3; i++)
 		mZoneHP[i] = ROM::VADER_TIE_HP/3;
 	mTopSpeed = ROM::VADER_TIE_MAX_SPEED;
+	setName("Vader's TIE");
 }
 
 void VaderTIE::loadTIEModel()
@@ -105,6 +106,7 @@ void VaderTIE::loadTIEModel()
 		for(int i = 0; i < numRings; i++)
 		{
 			ScreenImage* reticle1 = new ScreenImage(true);
+			setLayer(reticle1->transform, COLLISION_LAYER, false);
 			
 			//don't know why this works
 			//putting anything in the transparent bin seems to make it vanish
@@ -122,7 +124,8 @@ void VaderTIE::loadTIEModel()
 
 void VaderTIE::wasHit(Bullet* b, osg::Vec3 hitPos)
 {
-	printf("Vader got hit at %.4f,%i hp left random = %i\n", FalconApp::instance().getTime(), mHP, rand()%1000);
+	printf("LogRDM Vader got hit at %.4f,%i hp left random = %i, pos = %.2f, %.2f, %.2f\n", FalconApp::instance().getTime(), mHP, rand()%1000,
+		getPos().x(), getPos().y(), getPos().z());
 	StupidPlaceholderShip::wasHit(b, hitPos);
 	FalconApp::instance().getFX()->makeExplosion(hitPos, 1.0);
 	//which zone did this hit?

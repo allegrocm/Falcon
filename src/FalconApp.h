@@ -89,13 +89,16 @@ public:
 
 
 	void autoPlay(float dt);		//for zero-player mode
+	
+	void syncFaultHappened()	{mHasSyncFault = true;}
+	bool hasSyncFault()			{return mHasSyncFault;}
 protected:
 
 	//put very little in the constructor so we don't risk a recurisive call
 	FalconApp()
 	{
 		mIsMaster = true; mTargetTime = 0; mTotalTime = 0; mTimeStep = 0.01; mTieNode1 = false;
-		mEventAudioManager = NULL; mLowerTurretAllowed = true; mZeroPlayerMode = false;
+		mEventAudioManager = NULL; mLowerTurretAllowed = true; mZeroPlayerMode = false; mHasSyncFault = false;
 	}
 	
 	//update our calculated frame rate
@@ -146,6 +149,7 @@ protected:
 	bool mLowerTurretAllowed;				//on by default
 	float mSPOffset;						//z-offset for our spacebox when we fly to a new system
 	bool mZeroPlayerMode;					//is the computer playing itself?  for testing
+	bool mHasSyncFault;
 };
 
 

@@ -238,7 +238,7 @@
 
 </System>
 
-<System name="Afrikans">
+<System name="Alrikan">
   <!--Each system has a name and a collection of objects-->
   <Object type="Planet">
     <!--an object has a size, a position, and a texture.  oh and a type-->

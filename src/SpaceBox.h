@@ -66,6 +66,7 @@ public:
 	void reload();
 	bool loadSystems(std::string fileName);
 	void loadSystem(int which);
+	int getSystemNumber()	{return mCurrentSystem;}
 	void nextSystem()
 	{
 		mCurrentSystem = (mCurrentSystem+1)%mSystems.size();

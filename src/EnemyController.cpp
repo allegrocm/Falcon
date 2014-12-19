@@ -141,7 +141,7 @@ void EnemyController::spawnEnemy(bool initing)
 	if(getShipsLeftToSpawn())
 	{
 		int whichSpawn = Util::loggedRandom("Choose spawn location")%getShipsLeftToSpawn();
-		printf("spawning from position %i in the swarm of %i\n", whichSpawn, getShipsLeftToSpawn());
+		printf("LogRDM spawning from position %i in the swarm of %i\n", whichSpawn, getShipsLeftToSpawn());
 		Node* spawner = mSwarm->getChild(whichSpawn);
 		MatrixTransform* spawnMat = dynamic_cast<MatrixTransform*>(spawner);
 		spawnPos = spawnMat->getMatrix();
@@ -206,7 +206,7 @@ void EnemyController::drawDebug()
 
 void EnemyController::killAll()
 {
-	printf("******** kill em all!\n");
+	printf("LogRDM ******** kill em all! (all %i)\n", (int)mEnemies.size());
 	for(size_t i = 0; i < mEnemies.size(); i++)
 	{
 		mEnemies[i]->explode(true);

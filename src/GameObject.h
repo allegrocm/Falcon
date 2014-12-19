@@ -68,6 +68,7 @@ public:
 	virtual bool checkRaycast(osg::Vec3 origin, osg::Vec3 vec, osg::Vec3& hitPos);
 
 	virtual void updateTransformUniforms();
+	int mObjectID;
 protected:
 	osg::ref_ptr<osg::Group>						mRoot;
 	osg::ref_ptr<osg::PositionAttitudeTransform>	mPat;		//used for positioning/orienting

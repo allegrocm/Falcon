@@ -268,6 +268,10 @@ void TIEComputer::updateStatusText(float dt)
 		int left = EnemyController::instance().getShipsLeftToSpawn(); 	
 		statusText = Util::stringWithFormat("Falcon:  %i/%i\nEmpire:  %i active, %i left", stats.health, stats.maxHealth, active, left);
 	}
+	
+	//check for sync fault
+	if(FalconApp::instance().hasSyncFault())
+		statusText = "Sync fault detected!";
 	mAIText->setText(statusText);
 	mAITextFlashTime += dt;
 	float textFlashRate = 1.0;

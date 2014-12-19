@@ -314,12 +314,26 @@ bool StupidPlaceholderShip::update(float dt)
 		explode();
 	}
 		
-		
+#ifdef RNG_LOGGING
+	//printf("LogRDM End of timestep:  Enemy %i at %.2f, %.2f, %.2f, v = %.2f, %.2f, %.2f\n", mObjectID,
+		//pos.x(), pos.y(), pos.z(), vel.x(), vel.y(), vel.z());
+#endif
 	return up;
 }
 
 void StupidPlaceholderShip::wasHit(Bullet* b, osg::Vec3 hitPos)
 {
+#ifdef RNG_LOGGING
+	printf("LogRDM Enemy %i at %.2f, %.2f, %.2f was hit by bullet %i %.2f, %.2f, %.2f\n", mObjectID, getPos().x(), getPos().y(), getPos().z(),
+		b->mObjectID, b->getPos().x(), b->getPos().y(), b->getPos().z());
+	Vec3 shipToHit = hitPos - getPos();
+	Vec3 billToHit = hitPos-b->getPos();
+	shipToHit.normalize();
+	billToHit.normalize();
+	printf("LogRDM S2H:  %f, %f, %f\n", shipToHit.x(), shipToHit.y(), shipToHit.z());
+	printf("LogRDM B2H:  %f, %f, %f\n", billToHit.x(), billToHit.y(), billToHit.z());
+	printf("LogRDM Hit dot:  %f\n", shipToHit*billToHit); 
+#endif
 	GameController::instance().enemyWasHit(this);
 	mHP--;
 	if(mHP <= 0)
@@ -396,6 +410,9 @@ bool StupidPlaceholderShip::shoot()
 	
 
 	Bullet* b = new Bullet();
+#ifdef RNG_LOGGING
+	printf("Enemy ship created bullet %i\n", b->mObjectID);
+#endif
 	b->mShooter = this;
 	//align the new bullet more or less with the wand, since that's our turret
 	//each of the four barrels has a different position
